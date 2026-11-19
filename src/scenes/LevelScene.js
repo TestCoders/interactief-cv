@@ -1,12 +1,14 @@
 import Phaser from 'phaser';
 import { buildStations } from '../cv.js';
 import { showPanel, hidePanel, stationHtml, toast } from '../ui.js';
+import { heroKey } from '../heroes.js';
 
 const GROUND_H = 64;
 const STATION_GAP = 560;
 const START_X = 360;
 const SPEED = 280;
 const JUMP = 620;
+const HERO_SCALE = 3; // 16×18 px-frame → 48×54 px in beeld
 
 // Het level wordt volledig uit het CV opgebouwd: elk bord is een CV-sectie, elke munt een skill.
 export default class LevelScene extends Phaser.Scene {
@@ -71,9 +73,12 @@ export default class LevelScene extends Phaser.Scene {
     this.add.image(finishX, groundY, 'flag').setOrigin(0, 1);
 
     // --- Speler ---
-    const tint = Phaser.Display.Color.HexStringToColor(this.cv.kleur ?? '#3c8772').color;
-    this.player = this.physics.add.sprite(120, groundY - 60, 'player').setTint(tint).setCollideWorldBounds(true);
-    this.player.body.setSize(26, 42).setOffset(3, 2);
+    this.heroKey = heroKey(this.cv);
+    this.player = this.physics.add.sprite(120, groundY - 60, this.heroKey, 'idle0')
+      .setScale(HERO_SCALE).setCollideWorldBounds(true);
+    // Hitbox in frame-pixels (wordt met de schaal meegeschaald): lijf zonder de lege randen.
+    this.player.body.setSize(10, 16).setOffset(3, 2);
+    this.player.play(`${this.heroKey}-idle`);
     this.physics.add.collider(this.player, ground);
     this.physics.add.collider(this.player, platforms);
     this.physics.add.overlap(this.player, this.coins, (_p, coin) => this.collect(coin));
@@ -119,9 +124,10 @@ export default class LevelScene extends Phaser.Scene {
     if (right) player.setFlipX(false);
     if (jump && player.body.blocked.down) player.setVelocityY(-JUMP);
 
-    // Een beetje squash & stretch, zodat het blokje leeft.
+    // Animatie: in de lucht springen, anders rennen of stilstaan.
     const airborne = !player.body.blocked.down;
-    player.setScale(airborne ? 0.92 : 1, airborne ? 1.08 : 1);
+    const anim = airborne ? 'jump' : left || right ? 'run' : 'idle';
+    player.play(`${this.heroKey}-${anim}`, true);
 
     // Parallax.
     const sx = this.cameras.main.scrollX;

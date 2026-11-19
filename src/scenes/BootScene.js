@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { createHeroTextures } from '../heroes.js';
 
 // Genereert alle textures met code, zodat er geen assets nodig zijn om te starten.
 // Vervang later gerust door echte sprites: this.load.image('player', 'assets/player.png') in preload().
@@ -8,13 +9,12 @@ export default class BootScene extends Phaser.Scene {
   }
 
   create() {
-    const g = this.make.graphics({ add: false });
+    const cvs = this.registry.get('cvs');
 
-    // Speler: wit lijf (wordt getint met de kleur uit het CV), zwarte ogen.
-    g.fillStyle(0xffffff).fillRoundedRect(0, 0, 32, 44, 8);
-    g.fillStyle(0x1d2433).fillRect(18, 12, 5, 7).fillRect(26, 12, 4, 7);
-    g.fillStyle(0x1d2433, 0.25).fillRect(4, 36, 24, 4);
-    g.generateTexture('player', 32, 44).clear();
+    // Spelers: één pixel-art held per CV, met animaties (zie src/heroes.js).
+    createHeroTextures(this, cvs);
+
+    const g = this.make.graphics({ add: false });
 
     // Grond-tegel: gras + aarde.
     g.fillStyle(0x7a5230).fillRect(0, 0, 64, 64);
@@ -59,7 +59,6 @@ export default class BootScene extends Phaser.Scene {
     g.destroy();
 
     // ?cv=<id> in de URL slaat het selectiescherm over (deelbare link per persoon).
-    const cvs = this.registry.get('cvs');
     const wanted = new URLSearchParams(location.search).get('cv');
     const direct = cvs.find((c) => c.id === wanted) ?? (cvs.length === 1 ? cvs[0] : null);
     if (direct) this.scene.start('level', { cv: direct });

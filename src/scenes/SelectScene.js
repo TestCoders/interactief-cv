@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { heroKey } from '../heroes.js';
 
 // Karakterselectie: één karakter per CV-bestand.
 export default class SelectScene extends Phaser.Scene {
@@ -20,7 +21,7 @@ export default class SelectScene extends Phaser.Scene {
 
     this.cards = cvs.map((cv, i) => {
       const x = startX + i * gap;
-      const sprite = this.add.image(x, 260, 'player').setScale(2.4).setTint(Phaser.Display.Color.HexStringToColor(cv.kleur ?? '#3c8772').color);
+      const sprite = this.add.sprite(x, 260, heroKey(cv), 'idle0').setScale(5).play(`${heroKey(cv)}-idle`);
       const name = this.add.text(x, 330, cv.naam, { fontFamily: 'system-ui', fontSize: '16px', fontStyle: 'bold', color: '#1d2433', align: 'center', wordWrap: { width: gap - 10 } }).setOrigin(0.5, 0);
       const rol = this.add.text(x, 372, cv.rol, { fontFamily: 'system-ui', fontSize: '13px', color: '#1d2433', align: 'center', wordWrap: { width: gap - 10 } }).setOrigin(0.5, 0);
       sprite.setInteractive({ useHandCursor: true }).on('pointerdown', () => this.choose(i));
