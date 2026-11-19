@@ -7,20 +7,38 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;family=Pixelify+Sans:wght@400;700&amp;display=swap" rel="stylesheet">
 <style>
-  :root { --ink: #1b1f2e; --muted: #3b4561; --paper: #f4f4ec; --bg: #e6ece9; --accent-dark: #2f6f5d; }
+  :root { --ink: #1b1f2e; --muted: #3b4561; --paper: #f4f4ec; --bg: #e6ece9; --accent: #3c8772; --accent-dark: #2f6f5d; --accent-deep: #1f4f42; }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Pixelify Sans', system-ui, sans-serif; }
-  main { max-width: 1040px; margin: 0 auto; padding: 48px 16px 80px; display: flex; flex-direction: column; gap: 40px; }
+  main { max-width: 1488px; margin: 0 auto; padding: 48px 16px 80px; display: flex; flex-direction: column; gap: 32px; }
   .kicker { margin: 0; font-family: 'Press Start 2P', monospace; font-size: 11px; color: var(--accent-dark); }
   h1 { margin: 12px 0 8px; font-family: 'Press Start 2P', monospace; font-weight: 400; font-size: clamp(22px, 5vw, 36px); line-height: 1.3; }
   h2 { margin: 0; font-family: 'Press Start 2P', monospace; font-weight: 400; font-size: 14px; line-height: 1.6; }
   p { font-size: 20px; line-height: 1.4; color: var(--muted); margin: 0; }
   a { color: var(--accent-dark); }
   a:hover { color: var(--ink); }
+
+  /* Tabs */
+  [role="tablist"] { display: flex; gap: 16px; flex-wrap: wrap; padding: 4px; }
+  [role="tab"] {
+    font-family: 'Press Start 2P', monospace; font-size: 11px; line-height: 1.4; min-height: 44px; padding: 12px 16px;
+    border: 0; cursor: pointer; color: var(--ink); background: var(--paper);
+    box-shadow: 0 -4px 0 0 var(--ink), 0 4px 0 0 var(--ink), -4px 0 0 0 var(--ink), 4px 0 0 0 var(--ink), inset -4px -4px 0 0 #c9ccd6;
+  }
+  [role="tab"]:hover { background: #ffffff; }
+  [role="tab"][aria-selected="true"] {
+    color: #ffffff; background: var(--accent-dark);
+    box-shadow: 0 -4px 0 0 var(--ink), 0 4px 0 0 var(--ink), -4px 0 0 0 var(--ink), 4px 0 0 0 var(--ink), inset -4px -4px 0 0 var(--accent-deep), inset 4px 4px 0 0 var(--accent);
+  }
+  [role="tab"]:focus-visible { outline: 3px solid #f2b22e; outline-offset: 6px; }
+  [role="tabpanel"] { display: flex; flex-direction: column; gap: 40px; }
+  [role="tabpanel"][hidden] { display: none; }
+
   section { display: flex; flex-direction: column; gap: 14px; }
   .head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-  .frame { overflow: auto; background: var(--paper); box-shadow: 0 -4px 0 0 var(--ink), 0 4px 0 0 var(--ink), -4px 0 0 0 var(--ink), 4px 0 0 0 var(--ink); margin: 4px; }
+  .frame { overflow-x: auto; background: var(--paper); box-shadow: 0 -4px 0 0 var(--ink), 0 4px 0 0 var(--ink), -4px 0 0 0 var(--ink), 4px 0 0 0 var(--ink); margin: 4px; max-width: max-content; }
   iframe { display: block; border: 0; width: 960px; height: 540px; }
+  iframe.stijlgids { width: 1440px; height: 2680px; }
 </style>
 </head>
 <body>
@@ -31,20 +49,58 @@
     <p>Statische export van het ontwerp. De helden zijn dezelfde pixels als in <code>src/heroes.js</code>; animaties zie je in de game zelf.</p>
   </header>
 
-  <section>
-    <div class="head"><h2>Selectiescherm</h2><a href="selectiescherm.html">Openen op ware grootte</a></div>
-    <div class="frame"><iframe src="selectiescherm.html" title="Selectiescherm" loading="lazy"></iframe></div>
-  </section>
+  <div role="tablist" aria-label="Onderdelen van het ontwerp">
+    <button type="button" role="tab" id="tab-screens" aria-controls="screens" aria-selected="true">GAME-SCREENS</button>
+    <button type="button" role="tab" id="tab-stijlgids" aria-controls="stijlgids" aria-selected="false" tabindex="-1">STIJLGIDS</button>
+  </div>
 
-  <section>
-    <div class="head"><h2>Level met cv-paneel</h2><a href="level.html">Openen op ware grootte</a></div>
-    <div class="frame"><iframe src="level.html" title="Level met cv-paneel" loading="lazy"></iframe></div>
-  </section>
+  <div role="tabpanel" id="screens" aria-labelledby="tab-screens" tabindex="0">
+    <section>
+      <div class="head"><h2>Selectiescherm</h2><a href="selectiescherm.html">Openen op ware grootte</a></div>
+      <div class="frame"><iframe src="selectiescherm.html" title="Selectiescherm"></iframe></div>
+    </section>
+    <section>
+      <div class="head"><h2>Level met cv-paneel</h2><a href="level.html">Openen op ware grootte</a></div>
+      <div class="frame"><iframe src="level.html" title="Level met cv-paneel"></iframe></div>
+    </section>
+  </div>
 
-  <section>
-    <div class="head"><h2>Stijlgids</h2><a href="stijlgids.html">Openen (1440 px breed)</a></div>
-    <p>Palet, typografie, sprites en UI-elementen.</p>
-  </section>
+  <div role="tabpanel" id="stijlgids" aria-labelledby="tab-stijlgids" tabindex="0" hidden>
+    <section>
+      <div class="head"><h2>Stijlgids</h2><a href="stijlgids.html">Openen als losse pagina</a></div>
+      <p>Palet, typografie, sprites en UI-elementen.</p>
+      <div class="frame"><iframe class="stijlgids" src="stijlgids.html" title="Stijlgids retro pixel-art"></iframe></div>
+    </section>
+  </div>
 </main>
+
+<script>
+  // Tabs: klik of pijltjestoetsen; de gekozen tab staat in de URL (#screens of #stijlgids).
+  const tabs = [...document.querySelectorAll('[role="tab"]')];
+
+  function select(tab, { focus = false, updateHash = true } = {}) {
+    for (const t of tabs) {
+      const on = t === tab;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+    }
+    if (focus) tab.focus();
+    if (updateHash) history.replaceState(null, '', `#${tab.getAttribute('aria-controls')}`);
+  }
+
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('click', () => select(tab));
+    tab.addEventListener('keydown', (e) => {
+      const next = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+      if (next === undefined) return;
+      e.preventDefault();
+      select(tabs[(next + tabs.length) % tabs.length], { focus: true });
+    });
+  });
+
+  const fromHash = tabs.find((t) => `#${t.getAttribute('aria-controls')}` === location.hash);
+  if (fromHash) select(fromHash, { updateHash: false });
+</script>
 </body>
 </html>
