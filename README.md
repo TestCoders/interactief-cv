@@ -21,6 +21,16 @@ npm run dev        # http://localhost:5173
 
 Besturing: ← → / A D lopen, spatie / ↑ / W springen. Knop **Klassiek CV** toont hetzelfde CV als gewone (printbare) pagina.
 
+## Hoe het level werkt
+
+- **Scrollen = lopen** (muiswiel, trackpad, ↓, swipe); ← → en spatie om zelf te spelen.
+- Elk CV-onderdeel is een **set piece** met een eigen animatie (`src/pieces/`):
+  - **Expertise** — schatkist die openklapt; expertises vliegen eruit als badges.
+  - **Vaardigheden** — skillbord waarop per skill bloemetjes opgroeien tot het niveau (1–5 → 2–10 bloemen).
+  - **Werkplezier** — collega's die gaan springen als je aankomt.
+  - Overige onderdelen — bord + tekstbox (nog om te bouwen).
+- Aan de finish: **contactformulier naar TestCoders** (opent een ingevulde mail aan info@testcoders.nl).
+
 ## Je eigen CV toevoegen
 
 1. Kopieer `src/data/cv/sam-voorbeeld.json` naar `src/data/cv/<voornaam-achternaam>.json`.
@@ -33,10 +43,12 @@ Besturing: ← → / A D lopen, spatie / ↑ / W springen. Knop **Klassiek CV** 
 | `kleur` | nee | Kleur van je karakter (`"#rrggbb"`) |
 | `opleiding[]` (`periode`, `titel`, `instituut`) | nee | Eén bord per opleiding |
 | `werkervaring[]` (`periode`, `rol`, `opdrachtgever`, `omschrijving`, `tools[]`) | ja | Eén bord per opdracht — **nieuwste eerst** in de JSON, de game loopt van oud naar nieuw |
-| `skills[]` (`naam`, `niveau` 1–5) | ja | Munten om te verzamelen |
+| `expertise[]` | nee | Badges uit de schatkist |
+| `skills[]` (`naam`, `niveau` 1–5) | ja | Bloemetjes op het skillbord |
+| `interesses[]` | nee | Bord "Interesses" |
+| `werkplezier[]` | nee | Werkplezier-scène |
 | `certificeringen[]` | nee | Bord |
-| `hobbys[]` | nee | Bord "Naast het werk" |
-| `contact` (`email`, `telefoon`, `linkedin`) | `email` ja | Finish |
+| `contact` (`email`, …) | `email` ja | Alleen intern; in de game loopt contact via TestCoders |
 
 > Tip: laat een AI-agent je bestaande TC-CV (Word/PDF) omzetten naar dit JSON-formaat — geef `sam-voorbeeld.json` mee als voorbeeld.
 > Let op: de repo en GitHub Pages-site zijn publiek. Zet er geen telefoonnummers of andere gegevens in die je niet openbaar wilt hebben.

@@ -6,47 +6,60 @@
   --paper: #ffffff;
   --muted: #5b6475;
   --bg: #eef3f1;
+  /* Tekstbox/knoppen — hoort bij het retro-thema (src/themes/retro.js) */
+  --pixel-font: "Courier New", ui-monospace, monospace;
+  --box: #2b2147;
+  --box-hover: #3a2d5e;
+  --box-text: #f4e4c1;
+  --box-title: #ffd23f;
+  --box-dim: #8f86b3;
+  --box-shadow: #1a1430;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--ink); }
+body { margin: 0; color: var(--ink); }
 
-.topbar {
-  display: flex; justify-content: space-between; align-items: center; gap: 12px;
-  padding: 10px 16px; background: var(--ink); color: #fff;
-}
-.brand b { color: #7fd1b9; }
+html, body { height: 100%; overflow: hidden; background: #9fd6ff; }
+
+#stage { position: fixed; inset: 0; }
+#game, #game canvas { width: 100%; height: 100%; display: block; }
+
+/* Zwevende knoppen rechtsboven, in de stijl van de tekstbox */
+.topbar { position: fixed; top: 14px; right: 14px; display: flex; gap: 8px; z-index: 5; }
 .topbar button, .close {
-  font: inherit; cursor: pointer; border: 0; border-radius: 6px;
-  padding: 6px 12px; background: var(--accent); color: #fff; margin-left: 6px;
+  font: 700 13px var(--pixel-font); cursor: pointer; padding: 7px 12px;
+  background: var(--box); color: var(--box-text); border: 3px solid var(--box-text);
+  box-shadow: 3px 3px 0 var(--box-shadow); text-transform: uppercase;
 }
-.topbar button:hover, .close:hover { background: var(--accent-dark); }
+.topbar button:hover, .close:hover { background: var(--box-hover); }
+.topbar button:active, .close:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--box-shadow); }
+.brand { position: fixed; left: 16px; bottom: 12px; z-index: 5; font: 700 13px var(--pixel-font); color: #fff; opacity: .85; text-shadow: 2px 2px 0 rgba(0,0,0,.35); }
+.brand b { color: #ffd23f; }
 
-#stage { position: relative; max-width: 960px; margin: 16px auto 0; aspect-ratio: 16 / 9; }
-#game, #game canvas { width: 100%; height: 100%; display: block; border-radius: 8px; }
-
+/* Tekstbox onderin, zoals in een RPG */
 #panel {
-  position: absolute; top: 12px; right: 12px; width: min(380px, 60%); max-height: calc(100% - 24px);
-  overflow: auto; background: var(--paper); border-radius: 8px; padding: 14px 16px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, .25); border-top: 5px solid var(--accent);
-  font-size: 14px; line-height: 1.45;
+  position: fixed; left: 50%; bottom: 24px; width: min(680px, calc(100vw - 32px)); max-height: 42vh; overflow: auto;
+  background: var(--box); color: var(--box-text); border: 4px solid var(--box-text);
+  box-shadow: 6px 6px 0 var(--box-shadow), inset 0 0 0 3px var(--box);
+  outline: 3px solid var(--box-shadow); padding: 16px 20px 18px;
+  font: 15px/1.5 var(--pixel-font); z-index: 4;
 }
-#panel h2 { margin: 0 0 4px; font-size: 18px; }
-#panel h3 { margin: 10px 0 2px; font-size: 15px; }
-#panel .meta { color: var(--muted); font-size: 13px; margin: 0 0 6px; }
-#panel ul { margin: 4px 0; padding-left: 18px; }
+#panel h2 { margin: 0 0 6px; font-size: 19px; color: var(--box-title); text-transform: uppercase; letter-spacing: .5px; }
+#panel h3 { margin: 12px 0 4px; font-size: 15px; color: var(--box-title); }
+#panel .meta { color: var(--box-dim); font-size: 13px; margin: 0 0 8px; }
+#panel ul { margin: 4px 0; padding-left: 20px; }
+#panel a { color: var(--box-title); }
+#panel::after { content: '▼'; position: absolute; right: 14px; bottom: 6px; font-size: 11px; color: var(--box-title); animation: blink 1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
 
-.chips { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0 0; padding: 0; list-style: none; }
-.chips li { background: var(--bg); border-radius: 999px; padding: 2px 8px; font-size: 12px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; padding: 0; list-style: none; }
+.chips li { background: transparent; border: 2px solid var(--box-dim); padding: 1px 8px; font-size: 12px; }
 
 #toast {
-  position: absolute; left: 50%; top: 16px; transform: translateX(-50%);
-  background: #ffd23f; color: var(--ink); font-weight: 700; padding: 6px 14px; border-radius: 999px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, .2);
+  position: fixed; left: 50%; top: 16px; transform: translateX(-50%); z-index: 5;
+  background: #ffd23f; color: #1d2433; font: 700 14px var(--pixel-font); padding: 6px 14px; border: 3px solid #1d2433;
 }
-
-.help { text-align: center; color: var(--muted); font-size: 13px; padding: 0 16px; }
 
 #classic {
   position: fixed; inset: 0; overflow: auto; background: var(--bg); padding: 24px 16px; z-index: 10;
@@ -60,7 +73,38 @@ body { margin: 0; background: var(--bg); color: var(--ink); }
 #classic .close { display: block; margin: 0 auto; }
 
 @media print {
-  .topbar, #stage, .help, #classic .close { display: none !important; }
+  html, body { height: auto; overflow: visible; }
+  .topbar, .brand, #stage, #panel, #classic .close { display: none !important; }
   #classic { position: static; padding: 0; }
   #classic article { border: 0; padding: 0; }
 }
+
+/* Skillmeters (5 niveaus) in het paneel */
+.meters { list-style: none; padding: 0; margin: 6px 0 0; }
+.meters li { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 3px 0; }
+.meters b { display: flex; gap: 3px; }
+.meters i { width: 16px; height: 10px; background: var(--box-shadow); }
+.meters i.on { background: var(--box-title); }
+#classic .meters { max-width: 360px; }
+
+/* Paneel-animatie (game feel) */
+#panel { opacity: 0; transform: translate(-50%, 24px); transition: opacity .2s ease, transform .25s cubic-bezier(.2, 1.4, .4, 1); }
+#panel.in { opacity: 1; transform: translate(-50%, 0); }
+
+/* Contactformulier in de tekstbox */
+.contact-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; margin: 10px 0 6px; }
+.contact-form label { display: grid; gap: 3px; font-size: 12px; color: var(--box-dim); text-transform: uppercase; }
+.contact-form label:nth-child(4) { grid-column: 1 / -1; }
+.contact-form input, .contact-form textarea {
+  font: 14px var(--pixel-font); color: var(--box-text); background: var(--box-shadow);
+  border: 2px solid var(--box-dim); padding: 6px 8px; resize: vertical;
+}
+.contact-form input:focus, .contact-form textarea:focus { outline: none; border-color: var(--box-title); }
+.contact-form button {
+  grid-column: 1 / -1; justify-self: start; font: 700 14px var(--pixel-font); cursor: pointer; padding: 8px 14px;
+  background: var(--box-title); color: var(--box-shadow); border: 3px solid var(--box-text); box-shadow: 3px 3px 0 var(--box-shadow);
+}
+.contact-form button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--box-shadow); }
+@media (max-width: 520px) { .contact-form { grid-template-columns: 1fr; } }
+#panel:has(.contact-form) { max-height: 82vh; bottom: 16px; }
+#panel:has(.contact-form)::after { display: none; }

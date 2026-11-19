@@ -3,46 +3,105 @@
   "rol": "Test Automation Engineer",
   "kleur": "#3c8772",
   "profiel": "Testautomatiseerder die het liefst bugs vindt voordat ze productie halen. Bouwt frameworks die het team écht gebruikt en houdt van een snelle, groene pipeline.",
+  "expertise": [
+    "Opzetten van testautomatiseringsframeworks",
+    "Testen in CI/CD-pipelines",
+    "API- en contracttesten"
+  ],
   "werkervaring": [
     {
       "periode": "2023 – heden",
       "rol": "Test Automation Engineer",
       "opdrachtgever": "Fictieve Bank NV",
       "omschrijving": "Opzet van een Playwright-framework voor de klantportal; regressietijd van 3 dagen naar 25 minuten.",
-      "tools": ["Playwright", "TypeScript", "Azure DevOps"]
+      "tools": [
+        "Playwright",
+        "TypeScript",
+        "Azure DevOps"
+      ]
     },
     {
       "periode": "2021 – 2023",
       "rol": "Tester",
       "opdrachtgever": "Voorbeeld Verzekeringen",
       "omschrijving": "API-tests en contracttesten voor een microservicelandschap; introductie van testdatamanagement.",
-      "tools": ["Postman", "REST Assured", "Java"]
+      "tools": [
+        "Postman",
+        "REST Assured",
+        "Java"
+      ]
     },
     {
       "periode": "2019 – 2021",
       "rol": "Junior Tester",
       "opdrachtgever": "Demo Webshop BV",
       "omschrijving": "Handmatig en geautomatiseerd testen van de checkout; eerste stappen met Cypress.",
-      "tools": ["Cypress", "Jira"]
+      "tools": [
+        "Cypress",
+        "Jira"
+      ]
     }
   ],
   "skills": [
-    { "naam": "Playwright", "niveau": 5 },
-    { "naam": "TypeScript", "niveau": 4 },
-    { "naam": "Java", "niveau": 3 },
-    { "naam": "API-testen", "niveau": 4 },
-    { "naam": "CI/CD", "niveau": 4 },
-    { "naam": "Cypress", "niveau": 3 },
-    { "naam": "SQL", "niveau": 3 },
-    { "naam": "Scrum", "niveau": 4 }
+    {
+      "naam": "Playwright",
+      "niveau": 5
+    },
+    {
+      "naam": "TypeScript",
+      "niveau": 4
+    },
+    {
+      "naam": "Java",
+      "niveau": 3
+    },
+    {
+      "naam": "API-testen",
+      "niveau": 4
+    },
+    {
+      "naam": "CI/CD",
+      "niveau": 4
+    },
+    {
+      "naam": "Cypress",
+      "niveau": 3
+    },
+    {
+      "naam": "SQL",
+      "niveau": 3
+    },
+    {
+      "naam": "Scrum",
+      "niveau": 4
+    }
   ],
-  "certificeringen": ["ISTQB Foundation", "ISTQB Test Automation Engineer", "PSM I"],
+  "certificeringen": [
+    "ISTQB Foundation",
+    "ISTQB Test Automation Engineer",
+    "PSM I"
+  ],
   "opleiding": [
-    { "periode": "2015 – 2019", "titel": "HBO-ICT", "instituut": "Hogeschool Voorbeeld" }
+    {
+      "periode": "2015 – 2019",
+      "titel": "HBO-ICT",
+      "instituut": "Hogeschool Voorbeeld"
+    }
   ],
-  "hobbys": ["Bouldering", "Bordspellen", "Retro gaming"],
+  "interesses": [
+    "Testautomatisering en AI-agents",
+    "Bouldering",
+    "Bordspellen",
+    "Retro gaming"
+  ],
   "contact": {
     "email": "sam.voorbeeld@example.com",
     "linkedin": "https://www.linkedin.com/"
-  }
+  },
+  "werkplezier": [
+    "Samen naar testconferenties",
+    "Hackathons zoals deze, met het hele team",
+    "Kennissessies op vrijdagmiddag met pizza",
+    "Een hechte club van testautomatiseringsgeeks"
+  ]
 }
