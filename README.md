@@ -7,6 +7,8 @@ Het TestCoders-CV als speelbare side scroller. Je loopt door iemands loopbaan: e
 
 ## Snel starten
 
+Op macOS kun je met [Start Interactief CV.command](./Start%20Interactief%20CV.command) de app starten. Je hebt Node.js met npm nodig.
+
 ```bash
 npm install
 npm run dev        # http://localhost:5173
