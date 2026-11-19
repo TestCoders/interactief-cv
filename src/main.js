@@ -17,9 +17,10 @@ const game = new Phaser.Game({
   height: HEIGHT,
   backgroundColor: '#9fd6ff',
   pixelArt: true,
+  roundPixels: true, // camera en sprites op hele pixels: geen trillende tekst tijdens het lopen
   physics: { default: 'arcade', arcade: { gravity: { y: 1400 }, debug: false } },
-  // EXPAND: vult het hele venster; het basisvlak van 960×540 is altijd zichtbaar, bredere schermen zien meer wereld.
-  scale: { mode: Phaser.Scale.EXPAND, autoCenter: Phaser.Scale.CENTER_BOTH },
+  // RESIZE: het canvas rendert op de echte venstergrootte (scherp); de LevelScene zoomt de wereld van 540 px hoog op naar schermhoogte.
+  scale: { mode: Phaser.Scale.RESIZE, width: window.innerWidth, height: window.innerHeight },
   scene: [BootScene, SelectScene, LevelScene]
 });
 

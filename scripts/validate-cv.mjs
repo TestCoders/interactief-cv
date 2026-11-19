@@ -26,7 +26,7 @@ for (const file of files) {
   if (!Array.isArray(cv.skills) || cv.skills.length === 0) err('"skills" moet minstens één item hebben');
   else cv.skills.forEach((s, i) => {
     if (!isStr(s.naam)) err(`skills[${i}].naam ontbreekt`);
-    if (s.niveau !== undefined && !(Number.isInteger(s.niveau) && s.niveau >= 1 && s.niveau <= 5)) err(`skills[${i}].niveau moet 1 t/m 5 zijn`);
+    if (s.niveau !== undefined && !(Number.isInteger(s.niveau) && s.niveau >= 1 && s.niveau <= 5) && !/^(beginner|junior|medior|gevorderd|senior|expert)$/i.test(s.niveau)) err(`skills[${i}].niveau moet 1 t/m 5 of Junior/Medior/Senior zijn`);
   });
   (cv.opleiding ?? []).forEach((o, i) => ['periode', 'titel', 'instituut'].forEach((k) => isStr(o[k]) || err(`opleiding[${i}].${k} ontbreekt`)));
   if (!cv.contact || !isStr(cv.contact.email)) err('"contact.email" ontbreekt');

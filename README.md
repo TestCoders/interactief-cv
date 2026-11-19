@@ -23,25 +23,26 @@ Besturing: ← → / A D lopen, spatie / ↑ / W springen. Knop **Klassiek CV** 
 
 ## Hoe het level werkt
 
-- **Scrollen = lopen** (muiswiel, trackpad, ↓, swipe); ← → en spatie om zelf te spelen.
-- Elk CV-onderdeel is een **set piece** met een eigen animatie (`src/pieces/`):
-  - **Expertise** — schatkist die openklapt; expertises vliegen eruit als badges.
-  - **Vaardigheden** — skillbord waarop per skill bloemetjes opgroeien tot het niveau (1–5 → 2–10 bloemen).
-  - **Werkplezier** — collega's die gaan springen als je aankomt.
-  - Overige onderdelen — bord + tekstbox (nog om te bouwen).
-- Aan de finish: **contactformulier naar TestCoders** (opent een ingevulde mail aan info@testcoders.nl).
+**Ontwerpregels:** extreem makkelijk (alleen scrollen is genoeg, je kunt niets missen of vastlopen) en elke mechanic heeft een reden.
 
-## Versie voor AI
+- **Scrollen = verder in het CV.** Muiswiel, trackpad, swipen en de pijltjes doen precies hetzelfde. Stop je, dan sta je binnen een seconde stil en glijd je naar het dichtstbijzijnde onderdeel (*halteplaats*); de tekstbox blijft staan tot het volgende onderdeel.
+- **Springen is optioneel** (spatie / ↑, of tik op het cadeautje): 🎁 cadeautjes bevatten extra's zoals kernwoorden en bezochte conferenties.
+- **Snel naar een hoofdstuk** (voor recruiters): hoofdstukbalk onderin of toetsen **1–7**. De held reist via een **CI/CD-pipeline**.
+- **De dag verloopt met de loopbaan mee**: ochtend bij het profiel, middag tijdens de opdrachten, avond bij het kampvuur.
+- **Scherp op elk scherm**: het canvas rendert op de echte venstergrootte; de wereld (540 px hoog) wordt opgezoomd en tekst rendert op die resolutie.
+- Elk CV-onderdeel is een **set piece** (`src/pieces/`):
 
-De game is om indruk te maken; voor AI-agents (en wie snel wil scannen) wordt uit dezelfde JSON automatisch Markdown gegenereerd:
+| Onderdeel | Set piece | Waarom zo |
+|-----------|-----------|-----------|
+| Profiel | Spelerskaart, **LVL = jaren in het testvak**, XP-balk, talen, specialiteiten | Kop van het TC-cv als RPG-karakter |
+| Expertise | Schatkist; expertises vliegen eruit als badges (★ = niveau) | Expertise is de schat |
+| Vaardigheden | Bord per categorie; bloemetjes groeien tot het niveau | Vaardigheden groeien |
+| Opleidingen | Oorkondes + afstudeerhoed; certificaten als medailles | Behaalde prijzen |
+| Ervaring | **Release per opdracht**: loop over ▶ RUN, werkzaamheden draaien als testcases op groen, PASSED, releasevlag met opdrachtgever de mast in (**mastlengte = duur**) | Elke opdracht is een geslaagde release — het vak van een tester |
+| Interesses + werkplezier | **Na het werk**: avond, het team rond het kampvuur vertelt om de beurt wat werken bij TestCoders leuk maakt; interesses stijgen op als wensballonnen van licht | De mens achter het cv, als rustig warm einde |
+| Finish | Contactformulier naar TestCoders | Doel van de klant |
 
-| URL | Inhoud |
-|-----|--------|
-| `/llms.txt` | Index van alle CV's volgens [llmstxt.org](https://llmstxt.org) |
-| `/llms-full.txt` | Alle CV's in één bestand |
-| `/cv/<id>.md` | Eén CV als Markdown, met YAML-frontmatter (naam, rol, skills, certificeringen) |
-
-Werkt in `npm run dev` én in de build. Knop **AI / Markdown** in de topbar opent de Markdown van het CV dat je speelt.
+`npm run test:e2e` speelt het level met echte scroll-, toets- en tikevents en controleert deze regels (standaard op `robin-sterrenstof`; `CV=<id> npm run test:e2e` voor een ander CV).
 
 ## Je eigen CV toevoegen
 
@@ -55,10 +56,11 @@ Werkt in `npm run dev` én in de build. Knop **AI / Markdown** in de topbar open
 | `kleur` | nee | Kleur van je karakter (`"#rrggbb"`) |
 | `opleiding[]` (`periode`, `titel`, `instituut`) | nee | Eén bord per opleiding |
 | `werkervaring[]` (`periode`, `rol`, `opdrachtgever`, `omschrijving`, `tools[]`) | ja | Eén bord per opdracht — **nieuwste eerst** in de JSON, de game loopt van oud naar nieuw |
-| `expertise[]` | nee | Badges uit de schatkist |
-| `skills[]` (`naam`, `niveau` 1–5) | ja | Bloemetjes op het skillbord |
+| `expertise[]` (tekst of `naam`, `niveau`, `sinds`) | nee | Badges uit de schatkist |
+| `skills[]` (`naam`, `niveau` 1–5 of Junior/Medior/Senior, `sinds`, `categorie`) | ja | Bloemetjes op een bord per categorie |
+| `kernwoorden[]`, `conferenties[]` | nee | Bonus-cadeautjes |
+| `talen[]` (`taal`, `niveau`) | nee | Spelerskaart |
 | `interesses[]` | nee | Bord "Interesses" |
-| `werkplezier[]` | nee | Werkplezier-scène |
 | `certificeringen[]` | nee | Bord |
 | `contact` (`email`, …) | `email` ja | Alleen intern; in de game loopt contact via TestCoders |
 

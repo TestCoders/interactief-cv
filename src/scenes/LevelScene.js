@@ -1,14 +1,16 @@
 import Phaser from 'phaser';
 import { buildStations } from '../cv.js';
 import { showPanel, hidePanel, stationHtml } from '../ui.js';
-import { createPiece } from '../pieces/index.js';
+import { createPiece, widthOf, bonusFor } from '../pieces/index.js';
+import Bonus from '../pieces/Bonus.js';
 import retro from '../themes/retro.js';
 import { heroKey } from '../heroes.js';
 
-const BASE_H = 540; // wereldhoogte; het venster mag groter zijn (Scale.EXPAND), de wereld schaalt niet mee
+const BASE_H = 540; // wereldhoogte; de camera zoomt dit op naar de schermhoogte (scherp, geen opgerekt canvas)
 const GROUND_H = 64;
-const STATION_GAP = 620;
-const START_X = 420;
+const START_X = 360;
+const PIECE_GAP = 200; // lucht tussen twee set pieces
+const BONUS_GAP = 150; // extra ruimte vóór een set piece met een cadeautje
 const HERO_SCALE = 3;
 
 // --- Game feel: alle knoppen om aan te draaien op één plek ---
@@ -23,11 +25,30 @@ const JUMP_CUT = 0.45; // springknop vroeg loslaten = lagere sprong
 const COYOTE_MS = 110; // nog springen vlak nadat je van een rand loopt
 const BUFFER_MS = 130; // springen vlak vóór de landing wordt onthouden
 const LOOKAHEAD = 140; // camera kijkt vooruit in looprichting
-const SCROLL_FACTOR = 1.4; // px lopen per px scroll
-const SCROLL_MAX = 900; // max opgespaarde loopafstand, zodat hard scrollen niet eindeloos doorloopt
+
+// --- Voortgang: scrollen, swipen en pijltjes zijn één en hetzelfde ("verder in het CV") ---
+const SCROLL_FACTOR = 1.2; // px lopen per px scroll
+const KEY_RATE = 420; // px "scroll" per seconde zolang je een pijltje vasthoudt
+const INTENT_MAX = 240; // max opgespaarde loopafstand: stop je met scrollen, dan sta je binnen ~1 s stil
+const STOP_SNAP = 260; // binnen deze afstand van een halteplaats glijdt de held er vanzelf naartoe
+const IDLE_BEFORE_SNAP = 140; // ms zonder input voordat de held naar de halteplaats glijdt
+const TRAVEL_MS = 750; // snelreis door de pipeline
+
+// --- Dag → avond: de dag verloopt met de loopbaan mee ---
+const SKY = { dag: 0x9fd6ff, middag: 0xbfe0f0, zonsondergang: 0xff9e7a, avond: 0x2b2147 };
+const TINT = { dag: 0xffffff, zonsondergang: 0xffc6a8, avond: 0x5a4f8a };
+
+const CHAPTERS = [
+  { type: 'profiel', label: 'Profiel' },
+  { type: 'expertise', label: 'Expertise' },
+  { type: 'skills', label: 'Vaardigheden' },
+  { type: 'opleiding', label: 'Opleiding' },
+  { type: 'werk', label: 'Ervaring' },
+  { type: 'finale', label: 'Na het werk' },
+  { type: 'finish', label: 'Contact' }
+];
 
 // Het level wordt volledig uit het CV opgebouwd: elk CV-onderdeel is een set piece (src/pieces).
-// Besturing: scrollen / ↓ / swipen = lopen (zoals een gewone pagina), of zelf spelen met ← → en springen.
 export default class LevelScene extends Phaser.Scene {
   constructor() {
     super('level');
@@ -38,46 +59,79 @@ export default class LevelScene extends Phaser.Scene {
     this.theme = retro;
     this.registry.set('currentCv', cv);
     this.finished = false;
-    this.scrollBudget = 0; // resterende afstand (px) die de speler nog "op scroll" loopt; teken = richting
+    this.intent = 0; // resterende afstand (px) die de held nog loopt; teken = richting
+    this.lastInputAt = -1e9;
+    this.lastDir = 1;
+    this.glideTo = null;
     this.hasMoved = false;
+    this.traveling = false;
+    this.sink = 0;
     this.lastGroundedAt = 0;
     this.jumpPressedAt = -1e9;
     this.wasGrounded = false;
     this.lastVy = 0;
+    this.bonusesOpened = 0;
   }
 
   create() {
-    const height = BASE_H;
-    const groundY = height - GROUND_H;
+    const groundY = BASE_H - GROUND_H;
     this.groundY = groundY;
     const stations = buildStations(this.cv);
-    const finishX = START_X + stations.length * STATION_GAP;
-    const worldW = finishX + 400;
 
-    this.physics.world.setBounds(0, 0, worldW, height + 200);
-    this.cameras.main.setBounds(0, 0, worldW, height);
-    this.cameras.main.setBackgroundColor('#9fd6ff');
+    // --- Layout: set pieces naast elkaar op basis van hun breedte ---
+    const layout = [];
+    let cursor = START_X;
+    for (const st of stations) {
+      const bonus = bonusFor(st, this.cv);
+      if (bonus) cursor += BONUS_GAP;
+      const w = widthOf(st);
+      layout.push({ st, x: cursor + w / 2, bonus, bonusX: cursor - BONUS_GAP / 2 - 20 });
+      cursor += w + PIECE_GAP;
+    }
+    const finishX = cursor + 40;
+    const worldW = finishX + 600;
+    this.worldW = worldW;
 
-    // --- Achtergrond (parallax) ---
-    this.clouds = this.add.tileSprite(0, 20, this.scale.width, 160, 'clouds').setOrigin(0, 0).setScrollFactor(0, 1);
-    this.hills = this.add.tileSprite(0, groundY - 260, this.scale.width, 300, 'hills').setOrigin(0, 0).setScrollFactor(0, 1);
+    this.physics.world.setBounds(0, 0, worldW, BASE_H + 200);
+
+    // --- Lucht: sterren (alleen 's avonds zichtbaar) + parallax ---
+    const W = this.scale.width;
+    this.stars = this.add.graphics().setScrollFactor(0.02, 1).setAlpha(0);
+    for (let i = 0; i < 160; i++) {
+      this.stars.fillStyle(0xffffff, Phaser.Math.FloatBetween(0.4, 1)).fillRect(Phaser.Math.Between(-W, 3 * W), Phaser.Math.Between(-600, groundY - 200), 2, 2);
+    }
+    this.clouds = this.add.tileSprite(0, 20, 10, 160, 'clouds').setOrigin(0, 0).setScrollFactor(0, 1);
+    this.hills = this.add.tileSprite(0, groundY - 260, 10, 300, 'hills').setOrigin(0, 0).setScrollFactor(0, 1);
 
     // --- Grond ---
     this.ground = this.add.tileSprite(0, groundY, worldW, GROUND_H, 'ground').setOrigin(0, 0);
     this.physics.add.existing(this.ground, true);
 
-    // --- Set pieces (één per CV-onderdeel) ---
+    // --- Set pieces + bonussen ---
     this.theme.createTextures(this);
-    this.pieces = stations.map((st, i) => {
-      const piece = createPiece(this, START_X + i * STATION_GAP, groundY, st, this.theme);
+    this.pieces = layout.map(({ st, x }) => {
+      const piece = createPiece(this, x, groundY, st, this.theme);
       piece.station = st;
       piece.active = false;
       return piece;
     });
+    this.bonuses = layout.filter((l) => l.bonus).map((l) => new Bonus(this, l.bonusX, groundY, l.bonus, this.theme));
 
     // --- Finish ---
     this.finishX = finishX;
     this.add.image(finishX, groundY, 'flag').setOrigin(0, 1);
+    // Halteplaatsen: bij elk set piece, onder elk cadeautje en bij de finish.
+    this.stops = [...this.pieces.map((p) => p.stopX), ...this.bonuses.map((b) => b.x), finishX + 40].sort((a, b) => a - b);
+
+    // Dag → avond: keerpunten in de wereld.
+    const firstWerk = this.pieces.find((p) => p.station.type === 'werk');
+    const finale = this.pieces.find((p) => p.station.type === 'finale');
+    this.skyKeys = [
+      [0, SKY.dag, TINT.dag],
+      [firstWerk?.x ?? finishX * 0.5, SKY.middag, TINT.dag],
+      [(finale?.x ?? finishX) - 900, SKY.zonsondergang, TINT.zonsondergang],
+      [(finale?.x ?? finishX) - 250, SKY.avond, TINT.avond]
+    ];
 
     // --- Speler ---
     // Hitbox en uiterlijk zijn gescheiden: squash & wiebel mogen de physics niet beïnvloeden.
@@ -87,9 +141,11 @@ export default class LevelScene extends Phaser.Scene {
     this.player.body.setSize(10, 16).setOffset(3, 2);
     this.vis = this.add.sprite(120, groundY, this.heroKey, 'idle0')
       .setOrigin(0.5, 1).setScale(HERO_SCALE).setDepth(5).play(`${this.heroKey}-idle`);
-    this.events.on('postupdate', () => this.vis.setPosition(this.player.x, this.player.y + 27));
+    this.events.on('postupdate', () => this.vis.setPosition(this.player.x, this.player.y + 27 + this.sink));
     this.physics.add.collider(this.player, this.ground);
+    for (const b of this.bonuses) this.physics.add.overlap(this.player, b.gift, () => b.open());
     this.cameras.main.startFollow(this.player, true, 0.09, 0.09, -LOOKAHEAD, 0);
+    this.cameras.main.roundPixels = true;
 
     // Stofwolkjes bij landen en afzetten.
     if (!this.textures.exists('dust')) {
@@ -101,75 +157,113 @@ export default class LevelScene extends Phaser.Scene {
       lifespan: 380, scale: { start: 0.9, end: 0 }, alpha: { start: 0.8, end: 0 }, tint: 0xe9e2d0, emitting: false
     }).setDepth(4);
 
-    // --- Titelkaart: de eerste indruk. Verdwijnt zodra je gaat lopen; de camera zoomt dan uit. ---
-    const { font } = this.theme;
-    const W = this.scale.width;
-    this.titleCard = this.add.container(0, 0).setScrollFactor(0).setDepth(20);
-    const shade = this.add.rectangle(0, 0, W * 3, BASE_H * 3, 0x1a1430, 0.35).setOrigin(0.5);
-    const name = this.add.text(0, -70, this.cv.naam.toUpperCase(), {
-      fontFamily: font, fontSize: '54px', fontStyle: 'bold', color: '#ffd23f', stroke: '#1a1430', strokeThickness: 10
-    }).setOrigin(0.5);
-    const rol = this.add.text(0, -10, this.cv.rol, {
-      fontFamily: font, fontSize: '22px', fontStyle: 'bold', color: '#f4e4c1', stroke: '#1a1430', strokeThickness: 6
-    }).setOrigin(0.5);
-    const start = this.add.text(0, 70, '▼  SCROLL OM TE BEGINNEN  ▼', {
-      fontFamily: font, fontSize: '18px', fontStyle: 'bold', color: '#ffffff', stroke: '#1a1430', strokeThickness: 6
-    }).setOrigin(0.5);
-    const keysHint = this.add.text(0, 104, 'of ← → lopen · spatie springen', {
-      fontFamily: font, fontSize: '14px', color: '#f4e4c1', stroke: '#1a1430', strokeThickness: 4
-    }).setOrigin(0.5);
-    this.titleCard.add([shade, name, rol, start, keysHint]);
-    this.tweens.add({ targets: start, alpha: 0.2, duration: 500, yoyo: true, repeat: -1, ease: 'Stepped', easeParams: [2] });
-    this.tweens.add({ targets: name, y: -76, duration: 1200, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
-    name.setScale(0);
-    this.tweens.add({ targets: name, scale: 1, duration: 600, ease: 'Back.out', delay: 150 });
-
-    // Begin ingezoomd op de speler; bij de eerste stap zoomt de camera uit naar het speelveld.
-    this.cameras.main.setZoom(1.35);
-
-    // HUD (pas zichtbaar na de intro).
-    this.hud = this.add.text(16, 14, `${this.cv.naam} · ${this.cv.rol}`, {
-      fontFamily: font, fontSize: '16px', fontStyle: 'bold', color: '#f4e4c1',
-      backgroundColor: '#2b2147', padding: { x: 10, y: 6 }
-    }).setScrollFactor(0).setDepth(10).setAlpha(0);
-
-    this.layoutScreen();
-    this.scale.on('resize', this.layoutScreen, this);
-    this.events.once('shutdown', () => this.scale.off('resize', this.layoutScreen, this));
-
-    // --- Besturing ---
-    this.keys = this.input.keyboard.addKeys('LEFT,RIGHT,UP,DOWN,SPACE,A,D,W,S');
-    this.setupScrollWalking();
-
     this.confetti = this.add.particles(0, 0, 'flower', {
       speed: { min: 200, max: 500 }, angle: { min: 220, max: 320 }, gravityY: 700, rotate: { min: 0, max: 360 },
       lifespan: 1800, scale: { start: 1, end: 0.3 }, emitting: false
     });
 
-    this.events.once('shutdown', hidePanel);
+    // --- DOM: titelkaart, HUD, hoofdstukken (altijd scherp) ---
+    this.setupDom();
+
+    this.layoutScreen();
+    this.cameras.main.setZoom(this.zoom * 1.35); // begin ingezoomd; bij de eerste stap zoomt de camera uit
+    this.scale.on('resize', this.layoutScreen, this);
+    this.events.once('shutdown', () => {
+      this.scale.off('resize', this.layoutScreen, this);
+      hidePanel();
+      this.dom.titlecard.hidden = true;
+      this.dom.hud.hidden = true;
+      this.dom.chapters.hidden = true;
+    });
+
+    // --- Besturing ---
+    this.keys = this.input.keyboard.addKeys('LEFT,RIGHT,UP,DOWN,SPACE,A,D,W,S');
+    this.setupInput();
   }
 
-  /** Alles wat aan de schermgrootte hangt (venster kan elk formaat hebben). */
+  // ---------- DOM-overlay ----------
+
+  setupDom() {
+    const $ = (id) => document.getElementById(id);
+    this.dom = { titlecard: $('titlecard'), hud: $('hud'), chapters: $('chapters') };
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+    this.dom.titlecard.innerHTML = `<h1>${esc(this.cv.naam.toUpperCase())}</h1><p>${esc(this.cv.rol)}</p><p class="start">▼ SCROLL OM TE BEGINNEN ▼</p>`;
+    this.dom.titlecard.classList.remove('weg');
+    this.dom.titlecard.hidden = false;
+    this.dom.hud.hidden = true;
+    this.updateHud();
+
+    // Hoofdstukken: snel naar een onderdeel via de CI/CD-pipeline (klik of toets 1–7).
+    this.chapters = CHAPTERS.map((c) => {
+      const x = c.type === 'finish' ? this.finishX + 40 : this.pieces.find((p) => p.station.type === c.type)?.stopX;
+      return x === undefined ? null : { ...c, x };
+    }).filter(Boolean);
+    this.dom.chapters.innerHTML = this.chapters.map((c, i) => `<button type="button" data-i="${i}"><b>${i + 1}</b>${c.label}</button>`).join('');
+    this.dom.chapters.onclick = (e) => {
+      const b = e.target.closest('button');
+      if (b) this.travelTo(this.chapters[Number(b.dataset.i)].x);
+    };
+    this.dom.chapters.hidden = false;
+    this.input.keyboard.on('keydown', (e) => {
+      const n = Number(e.key);
+      if (n >= 1 && n <= this.chapters.length) this.travelTo(this.chapters[n - 1].x);
+    });
+  }
+
+  updateHud() {
+    const extra = this.bonuses?.length ? `  🎁 ${this.bonusesOpened}/${this.bonuses.length}` : '';
+    this.dom.hud.textContent = `${this.cv.naam} · ${this.cv.rol}${extra}`;
+  }
+
+  onBonusOpened() {
+    this.bonusesOpened++;
+    this.updateHud();
+    this.sharpenText();
+  }
+
+  dismissTitle() {
+    if (this.hasMoved) return;
+    this.hasMoved = true;
+    this.dom.titlecard.classList.add('weg');
+    setTimeout(() => (this.dom.titlecard.hidden = true), 500);
+    this.dom.hud.hidden = false;
+    this.cameras.main.zoomTo(this.zoom, 900, 'Sine.easeInOut');
+  }
+
+  /** Alles wat aan de schermgrootte hangt. De wereld (540 px hoog) wordt opgezoomd naar het scherm. */
   layoutScreen() {
     const { width, height } = this.scale;
-    this.clouds.setSize(width, 160);
-    this.hills.setSize(width, 300);
-    // Wereld verticaal onderaan het scherm; extra hoogte wordt lucht.
-    this.cameras.main.setBounds(0, Math.min(0, BASE_H - height), this.physics.world.bounds.width, Math.max(BASE_H, height));
-    if (this.titleCard?.active) this.titleCard.setPosition(width / 2, height / 2 - 30);
+    this.zoom = Math.max(0.6, Math.min(height / BASE_H, width / 640));
+    const cam = this.cameras.main;
+    if (this.hasMoved) cam.setZoom(this.zoom);
+    const viewH = Math.max(BASE_H, height / this.zoom);
+    cam.setBounds(0, BASE_H - viewH, this.worldW, viewH);
+    // Parallax-lagen (scrollFactor 0) ruim breder dan het scherm, zodat ze bij elke zoom het beeld vullen.
+    for (const layer of [this.clouds, this.hills]) layer.setPosition(-width, layer.y).setSize(width * 3, layer.height);
+    this.sharpenText();
   }
 
-  // ---------- Besturing ----------
+  /** Tekst in de wereld renderen op de echte schermresolutie (anders is hij wazig bij opzoomen). */
+  sharpenText() {
+    const res = Math.min(4, Math.ceil(this.zoom * (window.devicePixelRatio || 1)));
+    const walk = (list) => list.forEach((o) => {
+      if (o.type === 'Text' && o.style?.resolution !== res) o.setResolution(res);
+      if (o.list) walk(o.list);
+    });
+    walk(this.children.list);
+  }
 
-  setupScrollWalking() {
-    // Muiswiel / trackpad: scroll omlaag (of naar rechts) = vooruit lopen.
+  // ---------- Besturing: één voortgangsmodel ----------
+
+  setupInput() {
+    // Muiswiel / trackpad: scroll omlaag (of naar rechts) = verder in het CV.
     this.input.on('wheel', (_pointer, _objects, dx, dy) => {
       const delta = Math.abs(dy) >= Math.abs(dx) ? dy : dx;
-      this.addScroll(delta * SCROLL_FACTOR);
+      this.addIntent(delta * SCROLL_FACTOR);
     });
-    // Touch: swipe van rechts naar links = vooruit.
+    // Touch: swipe van rechts naar links = verder.
     this.input.on('pointermove', (p) => {
-      if (p.isDown && p.wasTouch) this.addScroll((p.prevPosition.x - p.x) * 2.5);
+      if (p.isDown && p.wasTouch) this.addIntent((p.prevPosition.x - p.x) * 2.5 / this.zoom);
     });
     // Voorkom dat de pagina zelf meescrollt terwijl je met de muis boven de game zit.
     if (!this.game.wheelGuard) {
@@ -179,57 +273,121 @@ export default class LevelScene extends Phaser.Scene {
     }
   }
 
-  addScroll(px) {
-    this.scrollBudget = Phaser.Math.Clamp(this.scrollBudget + px, -SCROLL_MAX, SCROLL_MAX);
+  addIntent(px) {
+    if (this.traveling || Math.abs(px) < 0.01) return;
+    this.intent = Phaser.Math.Clamp(this.intent + px, -INTENT_MAX, INTENT_MAX);
+    this.lastInputAt = this.game.loop.time;
+    this.glideTo = null;
+  }
+
+  /** Springen via tikken/klikken (bijv. op een cadeautje): altijd een volle sprong, er is geen knop om los te laten. */
+  requestJump() {
+    this.jumpPressedAt = this.game.loop.time;
+    this.jumpIsTap = true;
+  }
+
+  /**
+   * Snelreis via de CI/CD-pipeline: er komt een buis uit de grond, de held zakt erin,
+   * de camera schiet naar het gekozen hoofdstuk en de held komt daar uit een buis omhoog.
+   */
+  travelTo(destX) {
+    if (this.traveling || Math.abs(destX - this.player.x) < 20) return;
+    this.dismissTitle();
+    this.traveling = true;
+    this.intent = 0;
+    this.glideTo = null;
+    const cam = this.cameras.main;
+    const from = this.player.x;
+    const pipeIn = this.add.image(from, this.groundY + 4, 'pipeline').setOrigin(0.5, 1).setDepth(6).setScale(1, 0);
+    this.player.setVelocity(0);
+    this.tweens.add({ targets: pipeIn, scaleY: 1, duration: 180, ease: 'Back.out' });
+    this.tweens.add({ targets: this.vis, alpha: 0, duration: 200, delay: 220 });
+    this.tweens.add({
+      targets: this, sink: 90, duration: 260, delay: 160, ease: 'Quad.in',
+      onComplete: () => {
+        this.tweens.add({ targets: pipeIn, scaleY: 0, duration: 180, onComplete: () => pipeIn.destroy() });
+        cam.stopFollow();
+        cam.pan(destX + LOOKAHEAD, cam.midPoint.y, TRAVEL_MS, 'Cubic.easeInOut', true, (_c, progress) => {
+          if (progress < 1) return;
+          this.player.setPosition(destX, this.groundY - 30).setVelocity(0);
+          this.lastDir = 1;
+          cam.followOffset.x = -LOOKAHEAD;
+          const pipeOut = this.add.image(destX, this.groundY + 4, 'pipeline').setOrigin(0.5, 1).setDepth(6).setScale(1, 0);
+          this.tweens.add({ targets: pipeOut, scaleY: 1, duration: 180, ease: 'Back.out' });
+          this.tweens.add({ targets: this.vis, alpha: 1, duration: 150, delay: 160 });
+          this.tweens.add({
+            targets: this, sink: 0, duration: 300, delay: 160, ease: 'Back.out',
+            onComplete: () => {
+              this.dust.explode(10, destX, this.groundY);
+              this.tweens.add({ targets: pipeOut, scaleY: 0, duration: 200, delay: 150, onComplete: () => pipeOut.destroy() });
+              cam.startFollow(this.player, true, 0.09, 0.09, -LOOKAHEAD, 0);
+              this.traveling = false;
+            }
+          });
+        });
+      }
+    });
   }
 
   update(time, delta) {
+    this.updateSky();
+    if (this.traveling) {
+      this.updateParallax();
+      return;
+    }
     const { player, keys, vis } = this;
     const dt = delta / 1000;
     const body = player.body;
     const grounded = body.blocked.down;
     if (grounded) this.lastGroundedAt = time;
 
-    // --- Input ---
-    const kbLeft = keys.LEFT.isDown || keys.A.isDown;
-    const kbRight = keys.RIGHT.isDown || keys.D.isDown || keys.DOWN.isDown || keys.S.isDown;
+    // --- Input: pijltjes doen precies wat scrollen doet ---
+    const fwd = keys.RIGHT.isDown || keys.D.isDown || keys.DOWN.isDown || keys.S.isDown;
+    const back = keys.LEFT.isDown || keys.A.isDown;
+    if (fwd !== back) this.addIntent((fwd ? 1 : -1) * KEY_RATE * dt * 2);
     const JD = Phaser.Input.Keyboard.JustDown;
     if (JD(keys.UP) || JD(keys.SPACE) || JD(keys.W)) this.jumpPressedAt = time;
     const jumpHeld = keys.UP.isDown || keys.SPACE.isDown || keys.W.isDown;
 
-    // --- Gewenste snelheid: toetsenbord wint, anders de opgespaarde scroll-afstand ---
-    let target = 0;
-    const kbDir = kbLeft ? -1 : kbRight ? 1 : 0;
-    const scrolling = kbDir === 0 && Math.abs(this.scrollBudget) > 0.5;
-    if (kbDir !== 0) {
-      this.scrollBudget = 0;
-      target = kbDir * MAX_SPEED;
-    } else if (scrolling) {
-      // Snelheid schaalt mee met wat er nog "in de tank" zit: vloeiend uitlopen i.p.v. abrupt stoppen.
-      target = Math.sign(this.scrollBudget) * Math.min(MAX_SPEED, 90 + Math.abs(this.scrollBudget) * 2.2);
+    // --- Halteplaats: geen input meer en weinig in de tank → glijd naar het dichtstbijzijnde onderdeel ---
+    if (!this.glideTo && time - this.lastInputAt > IDLE_BEFORE_SNAP && Math.abs(this.intent) < 60 && this.hasMoved) {
+      const ahead = this.stops.find((s) => (s - player.x) * this.lastDir > -40 && Math.abs(s - player.x) < STOP_SNAP);
+      if (ahead !== undefined && Math.abs(ahead - player.x) > 4) this.glideTo = ahead;
+      this.intent = 0;
     }
 
-    // --- Optrekken / afremmen (in plaats van direct op topsnelheid) ---
+    // --- Gewenste snelheid ---
+    let target = 0;
+    if (this.glideTo !== null) {
+      const d = this.glideTo - player.x;
+      if (Math.abs(d) < 3) this.glideTo = null;
+      else target = Math.sign(d) * Math.min(MAX_SPEED * 0.8, 40 + Math.abs(d) * 3);
+    } else if (Math.abs(this.intent) > 0.5) {
+      // Snelheid schaalt mee met wat er nog "in de tank" zit: vloeiend uitlopen i.p.v. abrupt stoppen.
+      target = Math.sign(this.intent) * Math.min(MAX_SPEED, 80 + Math.abs(this.intent) * 2.2);
+    }
+
+    // --- Optrekken / afremmen ---
     const vx = body.velocity.x;
     const speedingUp = target !== 0 && (Math.sign(target) === Math.sign(vx) || vx === 0) && Math.abs(target) > Math.abs(vx);
     const rate = grounded ? (speedingUp ? ACCEL_GROUND : DECEL_GROUND) : (speedingUp ? ACCEL_AIR : DECEL_AIR);
     const newVx = moveTowards(vx, target, rate * dt);
     player.setVelocityX(newVx);
 
-    // Scroll-tank leegrijden met de werkelijk afgelegde afstand.
-    if (scrolling && Math.sign(newVx) === Math.sign(this.scrollBudget)) {
-      const travelled = Math.min(Math.abs(newVx) * dt, Math.abs(this.scrollBudget));
-      this.scrollBudget -= Math.sign(this.scrollBudget) * travelled;
+    // Tank leegrijden met de werkelijk afgelegde afstand.
+    if (Math.abs(this.intent) > 0.5 && Math.sign(newVx) === Math.sign(this.intent)) {
+      const travelled = Math.min(Math.abs(newVx) * dt, Math.abs(this.intent));
+      this.intent -= Math.sign(this.intent) * travelled;
     }
 
-    if (newVx < -5) vis.setFlipX(true);
-    if (newVx > 5) vis.setFlipX(false);
+    if (newVx < -5) { vis.setFlipX(true); this.lastDir = -1; }
+    if (newVx > 5) { vis.setFlipX(false); this.lastDir = 1; }
 
-    // --- Springen: coyote time + jump buffer + variabele hoogte ---
+    // --- Springen (optioneel: voor de bonus-cadeautjes) ---
     const canJump = time - this.lastGroundedAt <= COYOTE_MS && body.velocity.y >= 0;
     const wantsJump = time - this.jumpPressedAt <= BUFFER_MS;
     if (wantsJump && canJump) this.jump();
-    if (!jumpHeld && body.velocity.y < -150 && this.jumpedByKey) {
+    if (!jumpHeld && body.velocity.y < -150 && this.jumpedByKey && time - this.jumpStartedAt > 90) {
       player.setVelocityY(body.velocity.y * JUMP_CUT);
       this.jumpedByKey = false;
     }
@@ -258,31 +416,57 @@ export default class LevelScene extends Phaser.Scene {
     }
     if (grounded && speedRatio > 0.8 && Math.random() < 0.08) this.dust.explode(1, player.x - Math.sign(newVx) * 10, player.y + 27);
 
-    if (Math.abs(newVx) > 5 && !this.hasMoved) {
-      this.hasMoved = true;
-      this.tweens.add({ targets: this.titleCard, alpha: 0, duration: 450, onComplete: () => this.titleCard.destroy() });
-      this.tweens.add({ targets: this.hud, alpha: 1, duration: 450, delay: 300 });
-      this.cameras.main.zoomTo(1, 900, 'Sine.easeInOut');
-    }
+    if (Math.abs(newVx) > 5) this.dismissTitle();
 
     // --- Camera kijkt vooruit in looprichting ---
     const cam = this.cameras.main;
-    const wantOffset = -Math.sign(newVx || (vis.flipX ? -1 : 1)) * LOOKAHEAD;
-    cam.followOffset.x = Phaser.Math.Linear(cam.followOffset.x, wantOffset, 0.03);
+    cam.followOffset.x = Phaser.Math.Linear(cam.followOffset.x, -this.lastDir * LOOKAHEAD, 0.03);
 
     const anim = !grounded ? 'jump' : Math.abs(newVx) > 5 ? 'run' : 'idle';
     vis.play(`${this.heroKey}-${anim}`, true);
 
-    // Parallax.
-    this.clouds.tilePositionX = cam.scrollX * 0.1;
-    this.hills.tilePositionX = cam.scrollX * 0.35;
+    this.updateParallax();
+
+    // Spring-hint bij een cadeautje in de buurt.
+    for (const b of this.bonuses) b.showHint(Math.abs(b.x - player.x) < 110 && grounded);
 
     this.updatePieces();
+    this.updateChapters();
+  }
+
+  updateParallax() {
+    const cam = this.cameras.main;
+    this.clouds.tilePositionX = cam.scrollX * 0.1;
+    this.hills.tilePositionX = cam.scrollX * 0.35;
+  }
+
+  /** Luchtkleur, tint van heuvels/wolken en sterren volgen de positie van de camera. */
+  updateSky() {
+    const x = this.cameras.main.midPoint.x;
+    const keys = this.skyKeys;
+    let i = 0;
+    while (i < keys.length - 2 && x > keys[i + 1][0]) i++;
+    const [x0, s0, t0] = keys[i];
+    const [x1, s1, t1] = keys[i + 1];
+    const f = Phaser.Math.Clamp((x - x0) / Math.max(1, x1 - x0), 0, 1);
+    const mix = (a, b) => {
+      const c = Phaser.Display.Color.Interpolate.ColorWithColor(Phaser.Display.Color.ValueToColor(a), Phaser.Display.Color.ValueToColor(b), 100, f * 100);
+      return Phaser.Display.Color.GetColor(c.r, c.g, c.b);
+    };
+    this.cameras.main.setBackgroundColor(mix(s0, s1));
+    const tint = mix(t0, t1);
+    this.hills.setTint(tint);
+    this.clouds.setTint(tint);
+    this.ground.setTint(tint);
+    const night = i === keys.length - 2 ? f : 0;
+    this.stars.setAlpha(night);
   }
 
   jump() {
     this.player.setVelocityY(-JUMP);
-    this.jumpedByKey = this.time.now - this.jumpPressedAt <= BUFFER_MS;
+    this.jumpedByKey = !this.jumpIsTap && this.game.loop.time - this.jumpPressedAt <= BUFFER_MS;
+    this.jumpIsTap = false;
+    this.jumpStartedAt = this.game.loop.time;
     this.jumpPressedAt = -1e9;
     this.lastGroundedAt = -1e9; // geen dubbele coyote-sprong
     this.dust.explode(6, this.player.x, this.player.y + 27);
@@ -298,29 +482,48 @@ export default class LevelScene extends Phaser.Scene {
     });
   }
 
-  /** Set pieces activeren als je in de buurt komt (animatie) en het paneel tonen waar dat hoort. */
+  /**
+   * Set pieces starten hun animatie zodra je erbij bent (of over hun knop loopt).
+   * De tekstbox hoort bij het dichtstbijzijnde onderdeel en blijft staan tot je bij het volgende bent.
+   */
   updatePieces() {
     const px = this.player.x;
-    let panelPiece = null;
+    const cam = this.cameras.main.worldView;
     for (const piece of this.pieces) {
-      const near = Math.abs(piece.x - px) < piece.range;
+      const visible = piece.x - piece.halfWidth < cam.right - 40 && piece.x + piece.halfWidth > cam.x;
+      const near = piece.triggerAt !== undefined
+        ? visible && px > piece.triggerAt && px < piece.x + piece.halfWidth + 200
+        : visible && Math.abs(piece.stopX - px) < piece.halfWidth + 260;
       if (near && !piece.active) piece.enter();
       if (!near && piece.active) piece.leave();
       piece.active = near;
-      if (near && piece.usesPanel) panelPiece = piece;
     }
 
     if (px >= this.finishX - 20) {
       if (!this.finished) {
         this.finished = true;
-        this.confetti.explode(60, this.finishX + 30, this.scale.height - 200);
+        this.confetti.explode(60, this.finishX + 30, BASE_H - 200);
       }
       showPanel('finish', stationHtml({ type: 'finish' }, this.cv));
-    } else if (panelPiece) {
-      showPanel(`station-${panelPiece.x}`, stationHtml(panelPiece.station, this.cv));
-    } else {
-      hidePanel();
+      return;
     }
+    // Dichtstbijzijnde onderdeel (gemeten vanaf de halteplaats); tekstbox alleen als dat onderdeel er een heeft.
+    let nearest = null;
+    for (const piece of this.pieces) {
+      const d = Math.abs(piece.stopX - px);
+      if (d < piece.halfWidth + 120 && (!nearest || d < Math.abs(nearest.stopX - px))) nearest = piece;
+    }
+    if (nearest?.usesPanel) showPanel(`station-${nearest.x}`, stationHtml(nearest.station, this.cv));
+    else hidePanel();
+  }
+
+  updateChapters() {
+    const px = this.player.x;
+    let current = 0;
+    this.chapters.forEach((c, i) => { if (px >= c.x - 80) current = i; });
+    if (current === this.currentChapter) return;
+    this.currentChapter = current;
+    [...this.dom.chapters.children].forEach((b, i) => b.classList.toggle('nu', i === current));
   }
 }
 
