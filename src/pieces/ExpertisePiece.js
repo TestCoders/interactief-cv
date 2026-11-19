@@ -15,13 +15,14 @@ export default class ExpertisePiece {
     this.x = x;
     this.range = 170;
     this.stopX = x - 140;
+    this.duration = 300 + 250 + Math.min(station.data.length, PER_COLUMN * 2) * 160 + 620;
     this.done = false;
     const { colors, font } = theme;
 
-    this.chest = scene.add.image(x, groundY, 'chest').setOrigin(0.5, 1);
+    this.chest = scene.add.image(x, groundY, theme.tex('chest')).setOrigin(0.5, 1);
     // Deksel scharniert aan de achterkant (links), zodat hij naar achteren openklapt.
     const lidLeft = x - this.chest.width / 2;
-    this.lid = scene.add.image(lidLeft, groundY - this.chest.height + 4, 'chestLid').setOrigin(0, 1);
+    this.lid = scene.add.image(lidLeft, groundY - this.chest.height + 4, theme.tex('chestLid')).setOrigin(0, 1);
     this.mouth = { x, y: groundY - this.chest.height };
 
     this.title = scene.add.text(x, 0, '★ EXPERTISE ★', {
@@ -53,7 +54,7 @@ export default class ExpertisePiece {
       return badge;
     });
 
-    this.sparks = scene.add.particles(0, 0, 'spark', {
+    this.sparks = scene.add.particles(0, 0, theme.tex('spark'), {
       speed: { min: 80, max: 220 }, angle: { min: 200, max: 340 }, lifespan: 600, scale: { start: 1.4, end: 0 }, gravityY: 300, emitting: false
     });
   }

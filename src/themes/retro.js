@@ -4,6 +4,17 @@ import { pixelTexture } from '../pixel.js';
 // de set pieces (src/pieces) gebruiken alleen deze sleutels, zodat elke stijl dezelfde gameplay heeft.
 export default {
   name: 'retro',
+  label: 'Retro',
+  tex: (key) => key, // retro-textures staan onder hun kale naam (deels gemaakt in BootScene)
+  // Dag → avond (zie LevelScene.updateSky)
+  sky: { dag: 0x9fd6ff, middag: 0xbfe0f0, zonsondergang: 0xff9e7a, avond: 0x2b2147 },
+  tint: { dag: 0xffffff, zonsondergang: 0xffc6a8, avond: 0x5a4f8a },
+  // DOM-overlay (tekstbox, knoppen, HUD)
+  css: {
+    '--pixel-font': '"Courier New", ui-monospace, monospace',
+    '--box': '#2b2147', '--box-hover': '#3a2d5e', '--box-text': '#f4e4c1',
+    '--box-title': '#ffd23f', '--box-dim': '#8f86b3', '--box-shadow': '#1a1430'
+  },
   font: '"Courier New", ui-monospace, monospace',
   colors: {
     board: 0x2b2147,

@@ -5,14 +5,14 @@ import { label, pop } from './draw.js';
 export default class Bonus {
   constructor(scene, x, groundY, { titel, items }, theme) {
     Object.assign(this, { scene, x, theme, titel, items, opened: false });
-    this.gift = scene.physics.add.staticImage(x, groundY - 178, 'gift').setDepth(6);
+    this.gift = scene.physics.add.staticImage(x, groundY - 178, theme.tex('gift')).setDepth(6);
     this.gift.refreshBody();
     scene.tweens.add({ targets: this.gift, y: this.gift.y - 8, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
     this.gift.setInteractive({ useHandCursor: true }).on('pointerdown', () => scene.requestJump());
     this.hint = label(scene, x, groundY - 225, '▲ SPRING', theme, { size: 12, color: '#ffffff' }).setOrigin(0.5).setStroke('#1a1430', 5).setAlpha(0).setDepth(6);
     scene.tweens.add({ targets: this.hint, alpha: { from: 0.3, to: 1 }, duration: 450, yoyo: true, repeat: -1, ease: 'Stepped', easeParams: [2] });
     this.hint.setVisible(false);
-    this.sparks = scene.add.particles(0, 0, 'spark', { speed: { min: 80, max: 260 }, lifespan: 600, scale: { start: 1.6, end: 0 }, gravityY: 300, emitting: false }).setDepth(7);
+    this.sparks = scene.add.particles(0, 0, theme.tex('spark'), { speed: { min: 80, max: 260 }, lifespan: 600, scale: { start: 1.6, end: 0 }, gravityY: 300, emitting: false }).setDepth(7);
   }
 
   showHint(on) { if (!this.opened) this.hint.setVisible(on); }

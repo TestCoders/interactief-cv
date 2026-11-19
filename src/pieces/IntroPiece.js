@@ -14,6 +14,7 @@ export default class IntroPiece {
     const h = 250;
     const left = x - W / 2;
     const top = groundY - 60 - h;
+    this.duration = 1700;
     this.stopX = x + 30; // kaart links van het midden; de tekstbox staat rechtsonder
 
     const g = scene.add.graphics();

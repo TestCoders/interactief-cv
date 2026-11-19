@@ -16,6 +16,7 @@ export default class SkillsPiece {
     this.done = false;
     const { titel, skills, meer } = station.data;
     this.stopX = x - 140;
+    this.duration = (skills.length - 1) * 140 + Math.round(((Math.max(...skills.map((s) => s.score ?? s.niveau ?? 0)) / 5) * SLOTS)) * 70 + 280;
     const { colors, font } = theme;
 
     const w = PAD * 2 + NAME_W + SLOTS * SLOT_W;
@@ -39,8 +40,8 @@ export default class SkillsPiece {
       const flowers = [];
       for (let j = 0; j < SLOTS; j++) {
         const sx = left + PAD + NAME_W + j * SLOT_W + SLOT_W / 2;
-        scene.add.image(sx, cy + 9, 'soil');
-        flowers.push(scene.add.image(sx, cy + 8, 'flower').setOrigin(0.5, 1).setScale(0));
+        scene.add.image(sx, cy + 9, theme.tex('soil'));
+        flowers.push(scene.add.image(sx, cy + 8, theme.tex('flower')).setOrigin(0.5, 1).setScale(0));
       }
       const count = Math.round(((s.score ?? s.niveau ?? 0) / 5) * SLOTS);
       return { flowers, count };
@@ -50,7 +51,7 @@ export default class SkillsPiece {
       scene.add.text(x, top + h - 22, `+ nog ${meer} — zie Klassiek CV`, { fontFamily: font, fontSize: '11px', color: colors.dim }).setOrigin(0.5, 0);
     }
 
-    this.sparks = scene.add.particles(0, 0, 'spark', {
+    this.sparks = scene.add.particles(0, 0, theme.tex('spark'), {
       speed: { min: 40, max: 120 }, lifespan: 450, scale: { start: 1, end: 0 }, gravityY: 150, emitting: false
     });
   }

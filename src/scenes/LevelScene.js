@@ -3,7 +3,7 @@ import { buildStations } from '../cv.js';
 import { showPanel, hidePanel, stationHtml } from '../ui.js';
 import { createPiece, widthOf, bonusFor } from '../pieces/index.js';
 import Bonus from '../pieces/Bonus.js';
-import retro from '../themes/retro.js';
+import { THEMES } from '../themes/index.js';
 import { heroKey } from '../heroes.js';
 
 const BASE_H = 540; // wereldhoogte; de camera zoomt dit op naar de schermhoogte (scherp, geen opgerekt canvas)
@@ -34,9 +34,9 @@ const STOP_SNAP = 260; // binnen deze afstand van een halteplaats glijdt de held
 const IDLE_BEFORE_SNAP = 140; // ms zonder input voordat de held naar de halteplaats glijdt
 const TRAVEL_MS = 750; // snelreis door de pipeline
 
-// --- Dag → avond: de dag verloopt met de loopbaan mee ---
-const SKY = { dag: 0x9fd6ff, middag: 0xbfe0f0, zonsondergang: 0xff9e7a, avond: 0x2b2147 };
-const TINT = { dag: 0xffffff, zonsondergang: 0xffc6a8, avond: 0x5a4f8a };
+// --- Scroll ↔ animatie: bij een onderdeel houdt de halteplaats je vast tot de animatie klaar is ---
+const FAST_FORWARD = 3; // doorscrollen tijdens de animatie spoelt hem zoveel keer sneller af
+const GATE_MAX_MS = 4000; // nooit langer vasthouden dan dit
 
 const CHAPTERS = [
   { type: 'profiel', label: 'Profiel' },
@@ -54,9 +54,12 @@ export default class LevelScene extends Phaser.Scene {
     super('level');
   }
 
-  init({ cv }) {
+  init({ cv, startX }) {
     this.cv = cv;
-    this.theme = retro;
+    this.theme = THEMES[this.registry.get('theme')] ?? THEMES.retro;
+    this.startX = startX;
+    this.gate = null;
+    this.ff = 1;
     this.registry.set('currentCv', cv);
     this.finished = false;
     this.intent = 0; // resterende afstand (px) die de held nog loopt; teken = richting
@@ -74,6 +77,7 @@ export default class LevelScene extends Phaser.Scene {
   }
 
   create() {
+    this.theme.createTextures(this); // eerst: grond, lucht en set pieces gebruiken thema-textures
     const groundY = BASE_H - GROUND_H;
     this.groundY = groundY;
     const stations = buildStations(this.cv);
@@ -100,15 +104,14 @@ export default class LevelScene extends Phaser.Scene {
     for (let i = 0; i < 160; i++) {
       this.stars.fillStyle(0xffffff, Phaser.Math.FloatBetween(0.4, 1)).fillRect(Phaser.Math.Between(-W, 3 * W), Phaser.Math.Between(-600, groundY - 200), 2, 2);
     }
-    this.clouds = this.add.tileSprite(0, 20, 10, 160, 'clouds').setOrigin(0, 0).setScrollFactor(0, 1);
-    this.hills = this.add.tileSprite(0, groundY - 260, 10, 300, 'hills').setOrigin(0, 0).setScrollFactor(0, 1);
+    this.clouds = this.add.tileSprite(0, 20, 10, 160, this.theme.tex('clouds')).setOrigin(0, 0).setScrollFactor(0, 1);
+    this.hills = this.add.tileSprite(0, groundY - 260, 10, 300, this.theme.tex('hills')).setOrigin(0, 0).setScrollFactor(0, 1);
 
     // --- Grond ---
-    this.ground = this.add.tileSprite(0, groundY, worldW, GROUND_H, 'ground').setOrigin(0, 0);
+    this.ground = this.add.tileSprite(0, groundY, worldW, GROUND_H, this.theme.tex('ground')).setOrigin(0, 0);
     this.physics.add.existing(this.ground, true);
 
     // --- Set pieces + bonussen ---
-    this.theme.createTextures(this);
     this.pieces = layout.map(({ st, x }) => {
       const piece = createPiece(this, x, groundY, st, this.theme);
       piece.station = st;
@@ -119,29 +122,32 @@ export default class LevelScene extends Phaser.Scene {
 
     // --- Finish ---
     this.finishX = finishX;
-    this.add.image(finishX, groundY, 'flag').setOrigin(0, 1);
+    this.add.image(finishX, groundY, this.theme.tex('flag')).setOrigin(0, 1);
     // Halteplaatsen: bij elk set piece, onder elk cadeautje en bij de finish.
     this.stops = [...this.pieces.map((p) => p.stopX), ...this.bonuses.map((b) => b.x), finishX + 40].sort((a, b) => a - b);
 
     // Dag → avond: keerpunten in de wereld.
     const firstWerk = this.pieces.find((p) => p.station.type === 'werk');
     const finale = this.pieces.find((p) => p.station.type === 'finale');
+    const { sky, tint } = this.theme;
     this.skyKeys = [
-      [0, SKY.dag, TINT.dag],
-      [firstWerk?.x ?? finishX * 0.5, SKY.middag, TINT.dag],
-      [(finale?.x ?? finishX) - 900, SKY.zonsondergang, TINT.zonsondergang],
-      [(finale?.x ?? finishX) - 250, SKY.avond, TINT.avond]
+      [0, sky.dag, tint.dag],
+      [firstWerk?.x ?? finishX * 0.5, sky.middag, tint.dag],
+      [(finale?.x ?? finishX) - 900, sky.zonsondergang, tint.zonsondergang],
+      [(finale?.x ?? finishX) - 250, sky.avond, tint.avond]
     ];
 
     // --- Speler ---
     // Hitbox en uiterlijk zijn gescheiden: squash & wiebel mogen de physics niet beïnvloeden.
     this.heroKey = heroKey(this.cv);
-    this.player = this.physics.add.sprite(120, groundY - 60, this.heroKey, 'idle0')
+    const startX = this.startX ?? 120;
+    this.player = this.physics.add.sprite(startX, groundY - 60, this.heroKey, 'idle0')
       .setScale(HERO_SCALE).setCollideWorldBounds(true).setVisible(false);
     this.player.body.setSize(10, 16).setOffset(3, 2);
-    this.vis = this.add.sprite(120, groundY, this.heroKey, 'idle0')
+    this.vis = this.add.sprite(startX, groundY, this.heroKey, 'idle0')
       .setOrigin(0.5, 1).setScale(HERO_SCALE).setDepth(5).play(`${this.heroKey}-idle`);
-    this.events.on('postupdate', () => this.vis.setPosition(this.player.x, this.player.y + 27 + this.sink));
+    this.syncVis = () => this.vis.setPosition(this.player.x, this.player.y + 27 + this.sink);
+    this.events.on('postupdate', this.syncVis);
     this.physics.add.collider(this.player, this.ground);
     for (const b of this.bonuses) this.physics.add.overlap(this.player, b.gift, () => b.open());
     this.cameras.main.startFollow(this.player, true, 0.09, 0.09, -LOOKAHEAD, 0);
@@ -157,7 +163,7 @@ export default class LevelScene extends Phaser.Scene {
       lifespan: 380, scale: { start: 0.9, end: 0 }, alpha: { start: 0.8, end: 0 }, tint: 0xe9e2d0, emitting: false
     }).setDepth(4);
 
-    this.confetti = this.add.particles(0, 0, 'flower', {
+    this.confetti = this.add.particles(0, 0, this.theme.tex('flower'), {
       speed: { min: 200, max: 500 }, angle: { min: 220, max: 320 }, gravityY: 700, rotate: { min: 0, max: 360 },
       lifespan: 1800, scale: { start: 1, end: 0.3 }, emitting: false
     });
@@ -166,9 +172,21 @@ export default class LevelScene extends Phaser.Scene {
     this.setupDom();
 
     this.layoutScreen();
-    this.cameras.main.setZoom(this.zoom * 1.35); // begin ingezoomd; bij de eerste stap zoomt de camera uit
+    if (this.startX !== undefined) {
+      // Na een stijlwissel: geen intro, direct verder waar je was.
+      this.hasMoved = true;
+      this.dom.titlecard.hidden = true;
+      this.dom.hud.hidden = false;
+      this.cameras.main.setZoom(this.zoom);
+      this.cameras.main.centerOn(startX + LOOKAHEAD, BASE_H / 2);
+    } else {
+      this.cameras.main.setZoom(this.zoom * 1.35); // begin ingezoomd; bij de eerste stap zoomt de camera uit
+    }
     this.scale.on('resize', this.layoutScreen, this);
     this.events.once('shutdown', () => {
+      this.events.off('postupdate', this.syncVis); // scene-events overleven een restart (stijlwissel)
+      this.tweens.timeScale = 1;
+      this.time.timeScale = 1;
       this.scale.off('resize', this.layoutScreen, this);
       hidePanel();
       this.dom.titlecard.hidden = true;
@@ -298,7 +316,7 @@ export default class LevelScene extends Phaser.Scene {
     this.glideTo = null;
     const cam = this.cameras.main;
     const from = this.player.x;
-    const pipeIn = this.add.image(from, this.groundY + 4, 'pipeline').setOrigin(0.5, 1).setDepth(6).setScale(1, 0);
+    const pipeIn = this.add.image(from, this.groundY + 4, this.theme.tex('pipeline')).setOrigin(0.5, 1).setDepth(6).setScale(1, 0);
     this.player.setVelocity(0);
     this.tweens.add({ targets: pipeIn, scaleY: 1, duration: 180, ease: 'Back.out' });
     this.tweens.add({ targets: this.vis, alpha: 0, duration: 200, delay: 220 });
@@ -312,7 +330,7 @@ export default class LevelScene extends Phaser.Scene {
           this.player.setPosition(destX, this.groundY - 30).setVelocity(0);
           this.lastDir = 1;
           cam.followOffset.x = -LOOKAHEAD;
-          const pipeOut = this.add.image(destX, this.groundY + 4, 'pipeline').setOrigin(0.5, 1).setDepth(6).setScale(1, 0);
+          const pipeOut = this.add.image(destX, this.groundY + 4, this.theme.tex('pipeline')).setOrigin(0.5, 1).setDepth(6).setScale(1, 0);
           this.tweens.add({ targets: pipeOut, scaleY: 1, duration: 180, ease: 'Back.out' });
           this.tweens.add({ targets: this.vis, alpha: 1, duration: 150, delay: 160 });
           this.tweens.add({
@@ -380,6 +398,8 @@ export default class LevelScene extends Phaser.Scene {
       this.intent -= Math.sign(this.intent) * travelled;
     }
 
+    this.updateGate(newVx, delta);
+
     if (newVx < -5) { vis.setFlipX(true); this.lastDir = -1; }
     if (newVx > 5) { vis.setFlipX(false); this.lastDir = 1; }
 
@@ -432,6 +452,53 @@ export default class LevelScene extends Phaser.Scene {
 
     this.updatePieces();
     this.updateChapters();
+  }
+
+  /**
+   * Scroll ↔ animatie. Loop je vooruit over de halteplaats van een onderdeel waarvan de animatie
+   * nog loopt, dan blijf je daar staan tot hij klaar is. Blijf je scrollen, dan spoelt de animatie
+   * sneller door (FAST_FORWARD) in plaats van dat je eraan voorbij loopt. Terug scrollen laat je meteen los.
+   */
+  updateGate(vx, delta) {
+    const player = this.player;
+    // Voortgang van alle lopende animaties bijhouden (in "animatietijd", dus incl. doorspoelen).
+    for (const p of this.pieces) {
+      if (p.done && !p.complete) {
+        p.elapsed = (p.elapsed ?? 0) + delta * this.ff;
+        if (p.elapsed >= (p.duration ?? 0)) p.complete = true;
+      }
+    }
+    const prevX = this.prevX ?? player.x;
+    this.prevX = player.x;
+    // Een sprong van >100 px in één frame is snelreis (pipeline) of een reset, geen lopen: niet vasthouden.
+    if (!this.gate && vx > 0 && player.x - prevX < 100) {
+      this.gate = this.pieces.find((p) => !p.complete && (p.duration ?? 0) > 0 && prevX < p.stopX && player.x >= p.stopX - 2) ?? null;
+      if (this.gate) {
+        if (!this.gate.done) { this.gate.enter(); this.gate.active = true; }
+        this.gateSince = 0;
+      }
+    }
+    if (!this.gate) return this.setFastForward(1);
+
+    this.gateSince += delta;
+    const forward = this.intent > 0.5 || this.glideTo !== null && this.glideTo > player.x;
+    const back = this.intent < -0.5;
+    if (this.gate.complete || back || this.gateSince > GATE_MAX_MS) {
+      this.gate = null;
+      return this.setFastForward(1);
+    }
+    // Vasthouden op de halteplaats; vooruit-input = doorspoelen.
+    player.setX(this.gate.stopX).setVelocityX(0);
+    this.glideTo = null;
+    this.setFastForward(forward || this.game.loop.time - this.lastInputAt < 200 ? FAST_FORWARD : 1);
+    if (this.intent > 0) this.intent = 0;
+  }
+
+  setFastForward(f) {
+    if (this.ff === f) return;
+    this.ff = f;
+    this.tweens.timeScale = f;
+    this.time.timeScale = f;
   }
 
   updateParallax() {

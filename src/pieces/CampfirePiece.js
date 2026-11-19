@@ -16,6 +16,7 @@ export default class CampfirePiece {
     const { interesses } = station.data;
     const voornaam = scene.cv.naam.split(' ')[0];
     this.stopX = x - 140; // vuur en wensballonnen gecentreerd in beeld
+    this.duration = 1400; // titel + eerste wensballonnen; het gesprek loopt daarna gewoon door
     this.groundY = groundY;
 
     // Gloed + vuur + houtblokken.
@@ -24,8 +25,8 @@ export default class CampfirePiece {
     const logs = scene.add.graphics();
     logs.fillStyle(0x5a3a22).fillRect(x - 30, groundY - 10, 60, 10);
     logs.fillStyle(0x7a5230).fillRect(x - 24, groundY - 16, 48, 8);
-    this.fire = scene.add.image(x, groundY - 12, 'fire0').setOrigin(0.5, 1);
-    scene.time.addEvent({ delay: 160, loop: true, callback: () => this.fire.setTexture(this.fire.texture.key === 'fire0' ? 'fire1' : 'fire0') });
+    this.fire = scene.add.image(x, groundY - 12, theme.tex('fire0')).setOrigin(0.5, 1);
+    scene.time.addEvent({ delay: 160, loop: true, callback: () => this.fire.setTexture(this.fire.texture.key === theme.tex('fire0') ? theme.tex('fire1') : theme.tex('fire0')) });
     scene.tweens.add({ targets: [this.glow, this.glow2], scale: 1.12, alpha: '+=0.05', duration: 300, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
 
     // Collega's op boomstammen, gezicht naar het vuur.
@@ -58,7 +59,7 @@ export default class CampfirePiece {
     const n = Math.min(8, interesses.length);
     this.lanterns = interesses.slice(0, n).map((txt, i) => {
       const glow = scene.add.circle(0, 0, 18, 0xffb347, 0.12).setBlendMode(Phaser.BlendModes.ADD);
-      const img = scene.add.image(0, 0, 'lantern');
+      const img = scene.add.image(0, 0, theme.tex('lantern'));
       const tl = label(scene, 0, 22, shorten(txt, 34), theme, { size: 12, color: '#ffe8b0', wrap: 150, align: 'center' }).setOrigin(0.5, 0).setStroke('#1a1430', 4);
       const c = scene.add.container(x, groundY - 30, [glow, img, tl]).setAlpha(0).setScale(0.4);
       const spread = n > 1 ? (i / (n - 1)) * 2 - 1 : 0; // -1..1

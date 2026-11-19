@@ -22,6 +22,7 @@ export default class ReleasePiece {
     this.plateX = x - 70;
     this.stopX = this.plateX;
     this.triggerAt = this.plateX - 10;
+    this.duration = 200 + Math.min(MAX_LINES, (w.werkzaamheden?.length || 1)) * 230 + 80 + 950;
     const plate = scene.add.graphics().setDepth(6);
     plate.fillStyle(0x1a1430).fillRect(this.plateX - 34, groundY - 8, 68, 8);
     this.plateTop = scene.add.rectangle(this.plateX, groundY - 8, 56, 8, 0xe4572e).setOrigin(0.5, 1).setDepth(6);
@@ -71,7 +72,7 @@ export default class ReleasePiece {
       const bg = scene.add.rectangle(0, 0, tt.width + 12, 20, 0xf4e4c1).setStrokeStyle(2, 0x1a1430);
       return scene.add.container(left + 52 + i * 104, top - 22, [bg, tt]).setScale(0).setDepth(3);
     });
-    this.sparks = scene.add.particles(0, 0, 'spark', { speed: { min: 60, max: 240 }, lifespan: 700, scale: { start: 1.6, end: 0 }, gravityY: 250, emitting: false }).setDepth(7);
+    this.sparks = scene.add.particles(0, 0, theme.tex('spark'), { speed: { min: 60, max: 240 }, lifespan: 700, scale: { start: 1.6, end: 0 }, gravityY: 250, emitting: false }).setDepth(7);
   }
 
   enter() {
