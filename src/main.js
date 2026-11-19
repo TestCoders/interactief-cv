@@ -16,9 +16,10 @@ const game = new Phaser.Game({
   height: GAME.height,
   backgroundColor: GAME.backgroundColor,
   pixelArt: true,
+  roundPixels: true,
   physics: { default: 'arcade', arcade: { gravity: { y: GAME.gravityY }, debug: false } },
-  // EXPAND: vult het hele venster; het basisvlak is altijd zichtbaar, bredere schermen zien meer wereld.
-  scale: { mode: Phaser.Scale.EXPAND, autoCenter: Phaser.Scale.CENTER_BOTH },
+  // Render op venstergrootte; het level zoomt de wereld naar schermhoogte.
+  scale: { mode: Phaser.Scale.RESIZE, width: window.innerWidth, height: window.innerHeight },
   scene: [BootScene, CharacterSelectScene, LevelScene]
 });
 

@@ -1,13 +1,18 @@
-import Phaser from 'phaser';
 import { EXPERTISE } from '../config/pieceConfig.js';
+import Phaser from 'phaser';
 
 // Expertise: een schatkist die schudt, openklapt en de expertises één voor één
 // als zwevende badges naar buiten laat vliegen. Inhoud staat in de wereld zelf (geen tekstbox).
+const stars = (score) => (score >= 5 ? ' ★★★' : score >= 3 ? ' ★★' : score > 0 ? ' ★' : '');
+
 export default class ExpertisePiece {
+  static width(station) { return station.data.length > EXPERTISE.perColumn ? 2 * EXPERTISE.columnDx + 380 : 420; }
+
   constructor(scene, x, groundY, station, theme) {
     this.scene = scene;
     this.x = x;
-    this.range = EXPERTISE.range;
+    this.range = 170;
+    this.stopX = x - 140;
     this.done = false;
     const { colors, font } = theme;
 
@@ -21,12 +26,15 @@ export default class ExpertisePiece {
       fontFamily: font, fontSize: '18px', fontStyle: 'bold', color: colors.title, stroke: '#1a1430', strokeThickness: 6
     }).setOrigin(0.5).setScale(0);
 
-    const items = station.data;
-    const { badgeGap, badgeZigzag } = EXPERTISE;
-    const stackTop = groundY - this.chest.height - EXPERTISE.stackOffsetAboveChest - (items.length - 1) * badgeGap;
+    const items = station.data.slice(0, EXPERTISE.perColumn * 2);
+    const cols = items.length > EXPERTISE.perColumn ? 2 : 1;
+    const rows = Math.ceil(items.length / cols);
+    const stackTop = groundY - this.chest.height - 70 - (rows - 1) * EXPERTISE.badgeGap;
     this.title.setY(stackTop - 44);
 
-    this.badges = items.map((label, i) => {
+    this.badges = items.map((item, i) => {
+      const naam = (item.naam ?? item).replace(/^Branchekennis: /, 'Branche: ');
+      const label = (naam.length > 24 ? naam.slice(0, 23) + '…' : naam) + stars(item.score ?? 0);
       const text = scene.add.text(0, 0, label, { fontFamily: font, fontSize: '14px', fontStyle: 'bold', color: colors.text }).setOrigin(0.5);
       const w = text.width + 28;
       const h = text.height + 14;
@@ -36,7 +44,10 @@ export default class ExpertisePiece {
       g.fillStyle(colors.board).fillRect(-w / 2, -h / 2, w, h);
       const badge = scene.add.container(this.mouth.x, this.mouth.y, [g, text]).setScale(0).setDepth(3);
       // Licht zigzaggend gestapeld, zodat het een speels torentje wordt.
-      badge.target = { x: x + (i % 2 === 0 ? -badgeZigzag : badgeZigzag), y: stackTop + i * badgeGap };
+      const col = cols === 2 ? Math.floor(i / rows) : 0;
+      const row = cols === 2 ? i % rows : i;
+      const cx = cols === 2 ? x + (col === 0 ? -EXPERTISE.columnDx : EXPERTISE.columnDx) : x;
+      badge.target = { x: cx + (row % 2 === 0 ? -10 : 10), y: stackTop + row * EXPERTISE.badgeGap };
       return badge;
     });
 
@@ -61,7 +72,7 @@ export default class ExpertisePiece {
 
         // 3. Badges vliegen eruit, met een boogje omhoog en een veerkrachtige landing.
         this.badges.forEach((b, i) => {
-          const delay = 250 + i * EXPERTISE.badgeDelayMs;
+          const delay = 250 + i * 160;
           scene.tweens.add({ targets: b, scale: 1, duration: 450, delay, ease: 'Back.out' });
           scene.tweens.add({ targets: b, x: b.target.x, duration: 520, delay, ease: 'Sine.out' });
           scene.tweens.add({
@@ -74,7 +85,7 @@ export default class ExpertisePiece {
         });
 
         // 4. Titel erboven als kroon.
-        scene.tweens.add({ targets: this.title, scale: 1, duration: 400, delay: 250 + this.badges.length * EXPERTISE.badgeDelayMs, ease: 'Back.out' });
+        scene.tweens.add({ targets: this.title, scale: 1, duration: 400, delay: 250 + this.badges.length * 160, ease: 'Back.out' });
       }
     });
   }

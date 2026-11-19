@@ -16,6 +16,7 @@ export default class Player {
     this.jumpedByKey = false;
     this.wasGrounded = false;
     this.lastVy = 0;
+    this.sink = 0;
     this.squashing = false;
 
     const { body } = PLAYER;
@@ -48,11 +49,12 @@ export default class Player {
   }
 
   syncVisual() {
-    this.visual.setPosition(this.sprite.x, this.feetY);
+    this.visual.setPosition(this.sprite.x, this.feetY + (this.sink ?? 0));
   }
 
   /** Springknop ingedrukt: wordt even onthouden (jump buffer). */
-  bufferJump(time) {
+  bufferJump(time, tap = false) {
+    this.jumpIsTap = tap;
     this.jumpPressedAt = time;
   }
 
@@ -84,7 +86,7 @@ export default class Player {
     const canJump = time - this.lastGroundedAt <= MOVEMENT.coyoteMs && body.velocity.y >= 0;
     const wantsJump = time - this.jumpPressedAt <= MOVEMENT.jumpBufferMs;
     if (wantsJump && canJump) this.jump(time);
-    if (!jumpHeld && body.velocity.y < -MOVEMENT.jumpCutMinUpSpeed && this.jumpedByKey) {
+    if (!jumpHeld && body.velocity.y < -MOVEMENT.jumpCutMinUpSpeed && this.jumpedByKey && time - this.jumpStartedAt > 90) {
       sprite.setVelocityY(body.velocity.y * MOVEMENT.jumpCut);
       this.jumpedByKey = false;
     }
@@ -92,7 +94,7 @@ export default class Player {
 
     // --- Landen: squash + stof ---
     if (grounded && !this.wasGrounded && this.lastVy > MOVEMENT.hardLandingSpeed) {
-      this.dust.explode(Math.min(14, Math.round(this.lastVy / 60)), sprite.x, this.feetY);
+      this.dust.explode(Math.min(14, Math.round(this.lastVy / 60)), sprite.x, this.feetY + (this.sink ?? 0));
       this.squash(1.25, 0.75);
     }
     this.wasGrounded = grounded;
@@ -111,7 +113,7 @@ export default class Player {
         visual.setAngle(Phaser.Math.Clamp(newVx / 40, -8, 8));
       }
     }
-    if (grounded && speedRatio > 0.8 && Math.random() < 0.08) this.dust.explode(1, sprite.x - Math.sign(newVx) * 10, this.feetY);
+    if (grounded && speedRatio > 0.8 && Math.random() < 0.08) this.dust.explode(1, sprite.x - Math.sign(newVx) * 10, this.feetY + (this.sink ?? 0));
 
     const anim = !grounded ? 'jump' : moving ? 'run' : 'idle';
     visual.play(heroAnim(this.textureKey, anim), true);
@@ -121,10 +123,12 @@ export default class Player {
 
   jump(time) {
     this.sprite.setVelocityY(-MOVEMENT.jumpVelocity);
-    this.jumpedByKey = time - this.jumpPressedAt <= MOVEMENT.jumpBufferMs;
+    this.jumpedByKey = !this.jumpIsTap && time - this.jumpPressedAt <= MOVEMENT.jumpBufferMs;
+    this.jumpIsTap = false;
+    this.jumpStartedAt = time;
     this.jumpPressedAt = NEVER;
     this.lastGroundedAt = NEVER; // geen dubbele coyote-sprong
-    this.dust.explode(6, this.sprite.x, this.feetY);
+    this.dust.explode(6, this.sprite.x, this.feetY + (this.sink ?? 0));
     this.squash(0.8, 1.2);
   }
 

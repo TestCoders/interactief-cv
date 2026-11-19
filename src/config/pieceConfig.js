@@ -12,7 +12,7 @@ export const SKILLS = {
   maxLevel: 5,
   rowHeight: 30,
   slotWidth: 22,
-  nameWidth: 140,
+  nameWidth: 190,
   padding: 20,
   headerHeight: 46,
   postHeight: 56,
@@ -21,7 +21,9 @@ export const SKILLS = {
 
 export const EXPERTISE = {
   range: 170,
-  badgeGap: 48,
+  perColumn: 6,
+  columnDx: 215,
+  badgeGap: 44,
   badgeZigzag: 14,
   stackOffsetAboveChest: 70,
   badgeDelayMs: 260
@@ -33,3 +35,8 @@ export const WORK_ENJOYMENT = {
   colleagueOffsetsX: [-150, -95, 95, 150],
   bannerOffsetY: 190
 };
+
+export const INTRO = { width: 440 };
+export const EDUCATION = { diplomaWidth: 250 };
+export const RELEASE = { boardWidth: 310, lineHeight: 20, maxLines: 4 };
+export const CAMPFIRE = { seats: [-190, -110, 110, 190] };
