@@ -1,6 +1,7 @@
 // Een station is één checkpoint in het level: { type, label, data }.
 // Het type bepaalt welk set piece (src/pieces/pieceRegistry.js) en welke paneltekst (src/ui/stationTemplates.js) erbij hoort.
 export const STATION_TYPES = {
+  host: 'host',
   profile: 'profile',
   expertise: 'expertise',
   skills: 'skills',
@@ -26,7 +27,8 @@ const MAX_SKILLS_PER_BORD = 6;
  * Kopjes uit het MVP-template: expertise/vaardigheden, opleidingen, ervaring, interesses (+ werkplezier).
  */
 export function buildStations(cv) {
-  const stations = [{ type: 'profile', data: cv }];
+  // Martijn (TestCoders) stelt de collega voor en vertelt het profiel; daarna de spelerskaart.
+  const stations = [{ type: 'host', data: cv }, { type: 'profile', data: cv }];
   if (cv.expertise.length) stations.push({ type: 'expertise', data: cv.expertise });
 
   const perCat = new Map();

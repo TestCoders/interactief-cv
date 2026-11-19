@@ -1,12 +1,12 @@
-import { EDUCATION } from '../config/pieceConfig.js';
 import { pixelBox, label, shorten, pop } from './draw.js';
 
 // Opleidingen: diploma's als oorkondes waar een afstudeerhoed op landt,
 // certificaten als medailles die één voor één aan een lijn komen te hangen.
+const DIPLOMA_W = 250;
 
 export default class EducationPiece {
   static width(station) {
-    return EDUCATION.diplomaWidth + 60 + Math.min(10, station.data.certificaten.length) * 34 + 80;
+    return DIPLOMA_W + 60 + Math.min(10, station.data.certificaten.length) * 34 + 80;
   }
 
   constructor(scene, x, groundY, station, theme) {
@@ -16,12 +16,13 @@ export default class EducationPiece {
     const totalW = EducationPiece.width(station) - 40;
     const left = x - totalW / 2;
     this.stopX = x - 60; // oorkondes én medailles in beeld, links van de tekstbox
+    this.duration = Math.max(Math.min(2, diplomas.length) * 250 + 1500, 300 + Math.min(10, certificaten.length) * 130 + 500);
 
     // Diploma's (max 2), gestapeld.
     this.diplomas = diplomas.slice(0, 2).map((d, i) => {
       const top = groundY - 110 - (i + 1) * 92;
       const g = scene.add.graphics();
-      pixelBox(g, 0, 0, EDUCATION.diplomaWidth, 76, { ...colors, board: 0xf4e4c1, boardEdge: 0x8a5a00 });
+      pixelBox(g, 0, 0, DIPLOMA_W, 76, { ...colors, board: 0xf4e4c1, boardEdge: 0x8a5a00 });
       const t1 = label(scene, 14, 10, shorten(d.titel, 28), theme, { size: 13, color: '#1a1430' });
       const t2 = label(scene, 14, 32, shorten(d.instituut, 30), theme, { size: 12, color: '#5a4a2a', bold: false });
       const t3 = label(scene, 14, 50, d.periode, theme, { size: 12, color: '#8a5a00' });
@@ -29,11 +30,11 @@ export default class EducationPiece {
       c.setScale(0, 1);
       return c;
     });
-    this.cap = scene.add.image(left + EDUCATION.diplomaWidth - 20, groundY, 'cap').setAlpha(0).setDepth(4);
-    this.capTarget = { x: left + EDUCATION.diplomaWidth - 16, y: groundY - 110 - Math.min(2, diplomas.length) * 92 - 4 };
+    this.cap = scene.add.image(left + DIPLOMA_W - 20, groundY, theme.tex('cap')).setAlpha(0).setDepth(4);
+    this.capTarget = { x: left + DIPLOMA_W - 16, y: groundY - 110 - Math.min(2, diplomas.length) * 92 - 4 };
 
     // Medaillelijn.
-    const rackLeft = left + EDUCATION.diplomaWidth + 60;
+    const rackLeft = left + DIPLOMA_W + 60;
     const n = Math.min(10, certificaten.length);
     const rackW = n * 34 + 20;
     const rackY = groundY - 230;
@@ -41,15 +42,15 @@ export default class EducationPiece {
     g.fillStyle(colors.post).fillRect(rackLeft - 6, rackY, 8, 230).fillRect(rackLeft + rackW - 2, rackY, 8, 230);
     g.lineStyle(3, 0xf4e4c1).lineBetween(rackLeft, rackY + 6, rackLeft + rackW, rackY + 6);
     this.medals = certificaten.slice(0, n).map((_, i) =>
-      scene.add.image(rackLeft + 20 + i * 34, rackY + 6, 'medal').setOrigin(0.5, 0).setAlpha(0)
+      scene.add.image(rackLeft + 20 + i * 34, rackY + 6, theme.tex('medal')).setOrigin(0.5, 0).setAlpha(0)
     );
     this.rackCaption = label(scene, rackLeft + rackW / 2, rackY + 100, `${certificaten.length} cursussen &\ncertificaten`, theme, {
-      size: 13, color: colors.title, align: 'center'
-    }).setOrigin(0.5, 0).setAlpha(0);
-    this.sparks = scene.add.particles(0, 0, 'spark', { speed: { min: 40, max: 140 }, lifespan: 450, scale: { start: 1.2, end: 0 }, emitting: false });
+      size: 13, color: colors.floatTitle ?? colors.title, align: 'center'
+    }).setOrigin(0.5, 0).setStroke(colors.floatStroke ?? '#1a1430', 4).setAlpha(0);
+    this.sparks = scene.add.particles(0, 0, theme.tex('spark'), { speed: { min: 40, max: 140 }, lifespan: 450, scale: { start: 1.2, end: 0 }, emitting: false });
   }
 
-  enter() {
+  start() {
     if (this.done) return;
     this.done = true;
     const { scene } = this;
@@ -74,5 +75,4 @@ export default class EducationPiece {
     scene.tweens.add({ targets: this.rackCaption, alpha: 1, duration: 300, delay: 300 + this.medals.length * 130 });
   }
 
-  leave() {}
 }

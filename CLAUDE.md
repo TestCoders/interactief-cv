@@ -14,3 +14,11 @@ Hackathonproject: het TestCoders-CV als side scroller (Phaser 3.90 + Vite, vanil
 - Textures worden gegenereerd in `src/graphics/` (aangeroepen vanuit `BootScene`), met sleutels uit `TEXTURES`; echte sprites horen in `public/assets/` en worden geladen in een `preload()`.
 - Gebruik alleen verzonnen data in voorbeelden (`@example.com`).
 - Controleer na wijzigingen met `npm run build`.
+
+## Sprint 2 (polish)
+- Besturing: pijltjes of muiswiel (de meeste bezoekers), WASD voor gamers. Lopen met toetsen is direct (loslaten = stoppen); scrollen heeft een kleine uitloop en glijdt naar een halteplaats vlakbij. ↓ en S doen niets.
+- Onderdelen hebben `stages` (zie `pieces/pieceRegistry.js`): ze spelen af als je erlangs loopt of aankomt; de halteplaats houdt je vast tot de animatie klaar is. Een stage met `dialogue: true` (Martijn) gaat met scroll/→ naar de volgende zin.
+- Gamestijlen in `src/themes/` (`retro`, `zakelijk` = Bjorns business isometric); alle textures via `theme.tex()`, helden via `theme.heroKey`, gastheer via `theme.hostKey`. Wisselknop in `src/ui/styleSwitcher.js`.
+- TestCoders-branding: `src/config/brand.js` + `public/brand/*.svg` (tijdelijk nagebouwd logo — vervang door het officiële bestand met dezelfde naam).
+- Geluid (Bjorn): `src/audio/`, pakket per thema via `theme.audio`.
+- `npm run test:e2e` (speelbaarheid) en `npm test` (cv-integratie) moeten groen blijven.

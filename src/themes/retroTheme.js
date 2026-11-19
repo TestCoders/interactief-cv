@@ -1,23 +1,105 @@
-import { pixelTexture } from '../graphics/pixelTexture.js';
+import { pixelTexture, pathTexture } from '../graphics/pixelTexture.js';
+import { createHeroTextures, heroKey, HOST_CV } from '../graphics/heroSprites.js';
 
-// Thema "retro pixel-art". Een thema levert kleuren, font en textures;
+// Thema "retro pixel-art" (design/retro-pixel-art). Een thema levert kleuren, font en textures;
 // de set pieces (src/pieces) gebruiken alleen deze sleutels, zodat elke stijl dezelfde gameplay heeft.
+
+// Pixel art uit het ontwerp: [kleur, pad] op een raster van 1 eenheid per pixel.
+const GROUND = [
+  ['#7a4a2a', 'M0 0h16v16h-16z'],
+  ['#4f2f1d', 'M3 8h2v1h-2zM10 11h3v1h-3zM6 13h1v1h-1zM13 7h1v1h-1zM1 14h2v1h-2z'],
+  ['#4fa84a', 'M0 0h16v4h-16z'],
+  ['#8fd45c', 'M0 0h16v1h-16zM2 1h1v1h-1zM7 1h2v1h-2zM12 1h1v1h-1z'],
+  ['#2f7a3a', 'M0 4h1v1h-1zM2 4h2v1h-2zM6 4h1v2h-1zM9 4h3v1h-3zM14 4h1v1h-1z']
+];
+const CLOUD = [
+  ['#f4f4ec', 'M8 0h6v2h-6zM15 1h4v1h-4zM4 2h16v2h-16zM1 4h22v2h-22zM0 6h24v1h-24z'],
+  ['#c9dff0', 'M0 7h24v1h-24zM20 5h3v1h-3z']
+];
+const HILLS = [
+  ['#8ccfa8', 'M0 60V34h8v-4h8v-4h12v-3h16v3h12v4h8v4h10v-3h8v-4h14v-3h18v3h10v4h8v5h14v-4h10v-5h16v-3h14v3h10v5h8v4h6H240V60z'],
+  ['#6fb391', 'M0 60V48h20v-6h16v-4h24v4h14v6h20v-5h18v-6h26v6h16v5h22v-4h20v-5h22v5h12H240V60z']
+];
+const SIGN = [
+  ['#7a4a2a', 'M7 10h2v9h-2z'],
+  ['#1b1f2e', 'M6 10h1v9h-1zM9 10h1v9h-1z'],
+  ['#3c8772', 'M1 1h14v8h-14z'],
+  ['#7fd1b9', 'M1 1h14v1h-14z'],
+  ['#f4f4ec', 'M2 2h12v6h-12z'],
+  ['#c9ccd6', 'M13 3h1v5h-1z'],
+  ['#1b1f2e', 'M1 0h14v1h-14zM0 1h1v8h-1zM15 1h1v8h-1zM1 9h14v1h-14z']
+];
+const FLAG = [
+  ['#f2b22e', 'M0 0h3v2h-3z'],
+  ['#d6d9e0', 'M1 2h1v20h-1z'],
+  ['#8a90a2', 'M2 2h1v20h-1z'],
+  ['#3c8772', 'M3 3h2v1h-2zM3 4h4v1h-4zM3 5h6v1h-6zM3 6h8v1h-8zM3 7h6v1h-6zM3 8h4v1h-4zM3 9h2v1h-2z'],
+  ['#7fd1b9', 'M3 3h2v1h-2zM3 4h1v3h-1z'],
+  ['#1b1f2e', 'M0 22h4v2h-4z']
+];
+
 export default {
   name: 'retro',
-  font: '"Courier New", ui-monospace, monospace',
+  label: 'Retro',
+  audio: 'retro', // geluidspakket in src/audio/packs
+  hostKey: heroKey(HOST_CV), // Martijn (Bjorns tekening, uiterlijk "martijn")
+  tex: (key) => key, // retro-textures staan onder hun kale naam (helden worden gemaakt in BootScene)
+  // Dag → avond (zie LevelScene.updateSky); overdag de luchtband uit het ontwerp.
+  sky: { dag: 0x5fb7f0, middag: 0x7cc6f3, zonsondergang: 0xff9e7a, avond: 0x2b2147 },
+  tint: { dag: 0xffffff, zonsondergang: 0xffc6a8, avond: 0x5a4f8a },
+  // DOM-overlay (tekstbox, knoppen, HUD): crème kaders met inktrand, zie [data-stijl="retro"] in style.css.
+  css: {
+    '--pixel-font': '"Pixelify Sans", "Courier New", monospace',
+    '--title-font': '"Press Start 2P", "Courier New", monospace',
+    '--box': '#f4f4ec', '--box-hover': '#ffffff', '--box-text': '#1b1f2e',
+    '--box-title': '#2f6f5d', '--box-dim': '#3b4561', '--box-shadow': '#1b1f2e'
+  },
+  font: '"Pixelify Sans", "Courier New", monospace',
+  titleFont: '"Press Start 2P", "Courier New", monospace',
+  titleUpper: true, // Press Start 2P: korte titels in hoofdletters
+  // Kaarten in het selectiescherm: crème pixelkader met inktrand, gekozen kaart met gele binnenrand.
+  card: {
+    fill: 0xf4f4ec, edge: 0x1b1f2e, border: 4, radius: 0, shadow: 0x3b4561, selectedShadow: 0x3b4561, shadowX: 6, shadowY: 6,
+    selected: 0x1b1f2e, ring: 4, ringColor: 0xf2b22e, text: '#1b1f2e', dim: '#3b4561'
+  },
   colors: {
-    board: 0x2b2147,
-    boardEdge: 0xf4e4c1,
-    boardShadow: 0x1a1430,
-    post: 0x7a5230,
-    text: '#f4e4c1',
-    title: '#ffd23f',
-    dim: '#8f86b3',
+    board: 0xf4f4ec,
+    boardEdge: 0x1b1f2e,
+    boardShadow: 0x3b4561,
+    post: 0x7a4a2a,
+    text: '#1b1f2e',
+    title: '#2f6f5d',
+    dim: '#3b4561',
+    // Titels die los in de lucht staan (niet op een bord).
+    floatTitle: '#ffe27a',
+    floatStroke: '#1b1f2e',
+    signText: '#1b1f2e',
+    selectTitle: '#1b1f2e',
+    selectText: '#1b1f2e',
+    marker: 0xffe27a,
     buildings: [0x5b6c8f, 0x8f5b5b, 0x5b8f74, 0x8f7a5b, 0x6c5b8f, 0x5b858f, 0x8f5b80],
     window: 0x1a1430,
     windowLit: 0xffd23f
   },
   createTextures(scene) {
+    // Wereld: grastegel, getrapte heuvels, wolken, bord en finishvlag uit het ontwerp.
+    pathTexture(scene, 'ground', 64, 64, GROUND, { scale: 4 });
+    pathTexture(scene, 'hills', 960, 300, HILLS, { scale: 4, dy: 60 });
+    if (!scene.textures.exists('clouds')) {
+      const tex = scene.textures.createCanvas('clouds', 960, 160);
+      const ctx = tex.getContext();
+      for (const [x, y, s] of [[40, 30, 5], [520, 74, 5], [800, 18, 4]]) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(s, s);
+        for (const [color, d] of CLOUD) { ctx.fillStyle = color; ctx.fill(new Path2D(d)); }
+        ctx.restore();
+      }
+      tex.refresh();
+    }
+    pathTexture(scene, 'sign', 96, 114, SIGN, { scale: 6 });
+    pathTexture(scene, 'flag', 72, 160, FLAG, { scale: 6, dy: 16 });
+
     pixelTexture(scene, 'flower', [
       '...ooo...',
       '..oPPPo..',
@@ -174,5 +256,14 @@ export default {
     const firePal = { r: '#c1121f', O: '#ff6b1a', Y: '#ffd166', w: '#fff3b0' };
     pixelTexture(scene, 'fire0', fire, firePal, 4);
     pixelTexture(scene, 'fire1', fire.map((r) => [...r].reverse().join('')), firePal, 4);
+
+    // Gastheer Martijn (zelfde tekening als het uiterlijk "martijn").
+    createHeroTextures(scene, [HOST_CV]);
+
+    // Snelreis-bug: groene kever die je opeet en verderop weer uitspuugt (bek dicht / open).
+    const bugPal = { K: '#1b1f2e', G: '#7cc242', g: '#4f8a2a', H: '#5aa62f', w: '#ffffff', k: '#1b1f2e', m: '#2a5a1a', r: '#c1121f' };
+    const bugTop = ['...KKKKK........', '..KGGgGGK.......', '.KGgGGGgGKKKK...', 'KGGGGgGGGKHHHK..', 'KGgGGGGGgKHwkHK.'];
+    pixelTexture(scene, 'bug0', [...bugTop, 'KGGGgGGGGKHHHHK.', '.KGGGGgGGKHmmHK.', '..KKKKKKKKKKKK..', '..K.K.K..K.K....', '.K..K..K..K..K..'], bugPal, 4);
+    pixelTexture(scene, 'bug1', [...bugTop, 'KGGGgGGGGKHHHKK.', '.KGGGGgGGKHrrrK.', '..KKKKKKKKKHHHK.', '...K.K.K..K.K...', '..K..K..K..K..K.'], bugPal, 4);
   }
 };

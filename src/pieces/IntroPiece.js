@@ -1,39 +1,40 @@
-import { INTRO } from '../config/pieceConfig.js';
 import { pixelBox, label, pop } from './draw.js';
 
 // Spelerskaart (zoals de kop van het TC-cv): naam, rol, LVL = jaren in het testvak met XP-balk,
 // talen en top-skills. Het profiel zelf staat in de tekstbox.
+const W = 440;
 
 export default class IntroPiece {
-  static width() { return INTRO.width; }
+  static width() { return W; }
 
   constructor(scene, x, groundY, station, theme) {
-    Object.assign(this, { scene, x, theme, done: false, usesPanel: true });
+    Object.assign(this, { scene, x, theme, done: false, usesPanel: false }); // profiel vertelt Martijn
     const cv = station.data;
     const { colors } = theme;
     const h = 250;
-    const left = x - INTRO.width / 2;
+    const left = x - W / 2;
     const top = groundY - 60 - h;
+    this.duration = 1700;
     this.stopX = x + 30; // kaart links van het midden; de tekstbox staat rechtsonder
 
     const g = scene.add.graphics();
-    g.fillStyle(colors.post).fillRect(left + 40, top + h, 12, 60).fillRect(left + INTRO.width - 52, top + h, 12, 60);
-    pixelBox(g, left, top, INTRO.width, h, colors);
+    g.fillStyle(colors.post).fillRect(left + 40, top + h, 12, 60).fillRect(left + W - 52, top + h, 12, 60);
+    pixelBox(g, left, top, W, h, colors);
 
     label(scene, left + 20, top + 16, 'SPELER 1', theme, { size: 12, color: colors.dim });
     label(scene, left + 20, top + 34, cv.naam.toUpperCase(), theme, { size: 22, color: colors.title });
     label(scene, left + 20, top + 64, cv.rol, theme, { size: 14 });
 
     // Level = jaren ervaring.
-    label(scene, left + INTRO.width - 120, top + 16, 'LVL', theme, { size: 14, color: colors.dim });
-    this.lvl = label(scene, left + INTRO.width - 76, top + 4, '0', theme, { size: 40, color: colors.title });
+    label(scene, left + W - 120, top + 16, 'LVL', theme, { size: 14, color: colors.dim });
+    this.lvl = label(scene, left + W - 76, top + 4, '0', theme, { size: 40, color: colors.title });
     label(scene, left + 20, top + 104, `In het testvak sinds ${cv.sinds}`, theme, { size: 12, color: colors.dim });
     this.xp = [];
     const blocks = 18;
     for (let i = 0; i < blocks; i++) {
       const bx = left + 20 + i * 20;
-      g.fillStyle(colors.boardShadow).fillRect(bx, top + 124, 16, 12);
-      this.xp.push(scene.add.rectangle(bx, top + 124, 16, 12, 0xffd23f).setOrigin(0).setAlpha(0));
+      g.fillStyle(colors.flat ? (colors.track ?? 0xece6dc) : colors.boardShadow).fillRect(bx, top + 124, 16, 12);
+      this.xp.push(scene.add.rectangle(bx, top + 124, 16, 12, colors.accent ?? 0xffd23f).setOrigin(0).setAlpha(0));
     }
     this.xpFill = Math.min(blocks, Math.round((cv.jarenErvaring / 15) * blocks)); // 15 jaar = volle balk
 
@@ -47,10 +48,10 @@ export default class IntroPiece {
     const ty = top + 184;
     label(scene, left + 20, ty - 14, 'SPECIALITEITEN', theme, { size: 10, color: colors.dim });
     for (const s of cv.topSkills) {
-      const t = label(scene, 0, 0, s.length > 14 ? s.slice(0, 13) + '…' : s, theme, { size: 12, color: '#1a1430' });
+      const t = label(scene, 0, 0, s.length > 14 ? s.slice(0, 13) + '…' : s, theme, { size: 12, color: colors.tagText ?? '#1a1430' });
       const tw = t.width + 14;
-      if (tx + tw > left + INTRO.width - 16) { t.destroy(); break; }
-      const bg = scene.add.rectangle(0, 0, tw, 22, 0xffd23f).setOrigin(0.5);
+      if (tx + tw > left + W - 16) { t.destroy(); break; }
+      const bg = scene.add.rectangle(0, 0, tw, 22, colors.tag ?? 0xffd23f).setOrigin(0.5);
       t.setOrigin(0.5);
       const c = scene.add.container(tx + tw / 2, ty + 14, [bg, t]);
       this.tags.push(c);
@@ -59,7 +60,7 @@ export default class IntroPiece {
     this.tags.forEach((c) => c.setScale(0));
   }
 
-  enter() {
+  start() {
     if (this.done) return;
     this.done = true;
     const { scene } = this;
@@ -72,5 +73,4 @@ export default class IntroPiece {
     this.tags.forEach((t, i) => pop(scene, t.setScale(1), 600 + i * 120));
   }
 
-  leave() {}
 }

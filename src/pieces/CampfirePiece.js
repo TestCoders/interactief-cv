@@ -1,12 +1,11 @@
-import { CAMPFIRE } from '../config/pieceConfig.js';
 import Phaser from 'phaser';
 import { label, shorten, pop } from './draw.js';
 import { TESTCODERS } from '../config/company.js';
-import { heroKey } from '../graphics/heroSprites.js';
 
 // Finale "Na het werk": het is avond, het team zit rond het kampvuur (werkplezier) en
 // de interesses stijgen als wensballonnen van licht op naar de sterrenhemel.
 // Eén collega praat tegelijk: rustig en leesbaar, geen gespring.
+const SEATS = [-190, -110, 110, 190];
 
 export default class CampfirePiece {
   static width() { return 980; }
@@ -16,6 +15,7 @@ export default class CampfirePiece {
     const { interesses } = station.data;
     const voornaam = scene.cv.naam.split(' ')[0];
     this.stopX = x - 140; // vuur en wensballonnen gecentreerd in beeld
+    this.duration = 2600; // titel + eerste wensballonnen; het gesprek loopt daarna gewoon door
     this.groundY = groundY;
 
     // Gloed + vuur + houtblokken.
@@ -24,18 +24,20 @@ export default class CampfirePiece {
     const logs = scene.add.graphics();
     logs.fillStyle(0x5a3a22).fillRect(x - 30, groundY - 10, 60, 10);
     logs.fillStyle(0x7a5230).fillRect(x - 24, groundY - 16, 48, 8);
-    this.fire = scene.add.image(x, groundY - 12, 'fire0').setOrigin(0.5, 1);
-    scene.time.addEvent({ delay: 160, loop: true, callback: () => this.fire.setTexture(this.fire.texture.key === 'fire0' ? 'fire1' : 'fire0') });
+    this.fire = scene.add.image(x, groundY - 12, theme.tex('fire0')).setOrigin(0.5, 1);
+    scene.time.addEvent({ delay: 160, loop: true, callback: () => this.fire.setTexture(this.fire.texture.key === theme.tex('fire0') ? theme.tex('fire1') : theme.tex('fire0')) });
     scene.tweens.add({ targets: [this.glow, this.glow2], scale: 1.12, alpha: '+=0.05', duration: 300, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
 
     // Collega's op boomstammen, gezicht naar het vuur.
     const others = (scene.registry.get('cvs') ?? []).filter((c) => c.id !== scene.cv.id);
     const bench = scene.add.graphics();
-    this.people = CAMPFIRE.seats.map((dx, i) => {
+    this.people = SEATS.map((dx, i) => {
       bench.fillStyle(0x5a3a22).fillRect(x + dx - 26, groundY - 12, 52, 12);
       const other = others[i % Math.max(1, others.length)];
-      const key = other ? heroKey(other) : heroKey(scene.cv);
-      const s = scene.add.sprite(x + dx, groundY - 8, key, 'idle0').setOrigin(0.5, 1).setScale(3).play(`${key}-idle`).setFlipX(dx > 0);
+      const key = scene.heroTex(other ?? scene.cv);
+      // Zelfde soort held als de speler in dit thema (pixel-held of kantoorheld).
+      const s = scene.add.sprite(x + dx, groundY - 8, key, 'idle0').setOrigin(0.5, theme.heroOriginY ?? 1)
+        .setScale(theme.heroScale ?? 3).play(`${key}-idle`).setFlipX(dx > 0);
       if (!other) s.setTint([0xe4572e, 0x6c5ce7, 0xffb400, 0x2e86de][i]);
       return s;
     });
@@ -48,9 +50,9 @@ export default class CampfirePiece {
     this.bubbleText = t;
     this.bubbleBg = bg;
     this.bubbleTail = tail;
-    this.lines = scene.cv.werkplezier?.length ? scene.cv.werkplezier : TESTCODERS.werkplezier;
+    this.lines = TESTCODERS.werkplezier;
 
-    this.title = label(scene, x, groundY - 420, 'NA HET WERK', theme, { size: 22, color: '#ffd23f' }).setOrigin(0.5).setStroke('#1a1430', 6).setScale(0);
+    this.title = label(scene, x, groundY - 420, 'NA HET WERK', theme, { size: 22, color: theme.colors.floatTitle ?? '#ffd23f' }).setOrigin(0.5).setStroke(theme.colors.floatStroke ?? '#1a1430', 6).setScale(0);
     this.subtitle = label(scene, x, groundY - 392, `Waar ${voornaam} warm voor loopt — en het team van TestCoders`, theme, { size: 13, color: '#f4e4c1' })
       .setOrigin(0.5).setStroke('#1a1430', 4).setAlpha(0);
 
@@ -58,7 +60,7 @@ export default class CampfirePiece {
     const n = Math.min(8, interesses.length);
     this.lanterns = interesses.slice(0, n).map((txt, i) => {
       const glow = scene.add.circle(0, 0, 18, 0xffb347, 0.12).setBlendMode(Phaser.BlendModes.ADD);
-      const img = scene.add.image(0, 0, 'lantern');
+      const img = scene.add.image(0, 0, theme.tex('lantern'));
       const tl = label(scene, 0, 22, shorten(txt, 34), theme, { size: 12, color: '#ffe8b0', wrap: 150, align: 'center' }).setOrigin(0.5, 0).setStroke('#1a1430', 4);
       const c = scene.add.container(x, groundY - 30, [glow, img, tl]).setAlpha(0).setScale(0.4);
       const spread = n > 1 ? (i / (n - 1)) * 2 - 1 : 0; // -1..1
@@ -80,27 +82,33 @@ export default class CampfirePiece {
     this.scene.tweens.add({ targets: p, y: p.y - 6, duration: 120, yoyo: true, repeat: 1 }); // knikje terwijl hij praat
   }
 
-  enter() {
+  start() {
     const { scene } = this;
-    if (!this.done) {
-      this.done = true;
-      pop(scene, this.title.setScale(1), 0, 500);
-      scene.tweens.add({ targets: this.subtitle, alpha: 1, duration: 600, delay: 400 });
-      this.lanterns.forEach((c, i) => {
-        scene.tweens.add({ targets: c, alpha: 1, scale: 1, duration: 400, delay: 600 + i * 650 });
-        scene.tweens.add({
-          targets: c, x: c.target.x, y: c.target.y, duration: 2600, delay: 600 + i * 650, ease: 'Sine.out',
-          onComplete: () => scene.tweens.add({ targets: c, y: c.target.y - 10, duration: 1800 + i * 120, yoyo: true, repeat: -1, ease: 'Sine.inOut' })
-        });
+    if (this.done) return;
+    this.done = true;
+    pop(scene, this.title.setScale(1), 0, 500);
+    scene.tweens.add({ targets: this.subtitle, alpha: 1, duration: 600, delay: 400 });
+    this.lanterns.forEach((c, i) => {
+      scene.tweens.add({ targets: c, alpha: 1, scale: 1, duration: 500, delay: 700 + i * 900 });
+      scene.tweens.add({
+        targets: c, x: c.target.x, y: c.target.y, duration: 3200, delay: 700 + i * 900, ease: 'Sine.out',
+        onComplete: () => scene.tweens.add({ targets: c, y: c.target.y - 10, duration: 1800 + i * 120, yoyo: true, repeat: -1, ease: 'Sine.inOut' })
       });
-    }
-    // Gesprek: om de beurt één regel, zolang je bij het vuur bent.
+    });
+    this.enter();
+  }
+
+  /** Gesprek: om de beurt één regel, zolang je bij het vuur bent. */
+  enter() {
+    if (!this.done || this.talking) return;
+    this.talking = true;
     let i = 0;
     this.say(i++);
-    this.timers.push(scene.time.addEvent({ delay: 2600, loop: true, callback: () => this.say(i++) }));
+    this.timers.push(this.scene.time.addEvent({ delay: 2800, loop: true, callback: () => this.say(i++) }));
   }
 
   leave() {
+    this.talking = false;
     this.timers.forEach((t) => t.remove());
     this.timers = [];
     this.scene.tweens.add({ targets: this.bubble, scale: 0, duration: 200 });

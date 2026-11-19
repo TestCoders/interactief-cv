@@ -1,27 +1,31 @@
 import Phaser from 'phaser';
 
-// Toetsenbord: ← → / A D lopen (↓ / S ook vooruit, net als scrollen), ↑ / W / spatie springen.
+// Toetsenbord: ← → of A D lopen (direct: loslaten = stoppen), spatie / ↑ / W springen.
 export default class KeyboardControls {
   constructor(scene) {
-    this.keys = scene.input.keyboard.addKeys('LEFT,RIGHT,UP,DOWN,SPACE,A,D,W,S');
+    this.keys = scene.input.keyboard.addKeys('LEFT,RIGHT,UP,SPACE,A,D,W');
   }
 
   /** -1 = links, 1 = rechts, 0 = geen looptoets. */
   direction() {
     const k = this.keys;
-    if (k.LEFT.isDown || k.A.isDown) return -1;
-    if (k.RIGHT.isDown || k.D.isDown || k.DOWN.isDown || k.S.isDown) return 1;
-    return 0;
+    const left = k.LEFT.isDown || k.A.isDown;
+    const right = k.RIGHT.isDown || k.D.isDown;
+    return left === right ? 0 : left ? -1 : 1;
+  }
+
+  /** → of D net ingedrukt (o.a. om Martijn verder te laten praten). */
+  forwardJustPressed() {
+    const justDown = Phaser.Input.Keyboard.JustDown;
+    return justDown(this.keys.RIGHT) || justDown(this.keys.D);
   }
 
   jumpJustPressed() {
-    const k = this.keys;
     const justDown = Phaser.Input.Keyboard.JustDown;
-    return justDown(k.UP) || justDown(k.SPACE) || justDown(k.W);
+    return justDown(this.keys.UP) || justDown(this.keys.SPACE) || justDown(this.keys.W);
   }
 
   jumpHeld() {
-    const k = this.keys;
-    return k.UP.isDown || k.SPACE.isDown || k.W.isDown;
+    return this.keys.UP.isDown || this.keys.SPACE.isDown || this.keys.W.isDown;
   }
 }

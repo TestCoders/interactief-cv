@@ -66,6 +66,7 @@ Werkt in `npm run dev` én in de build. Knop **AI / Markdown** in de topbar open
 |------|-----------|------------|
 | `naam`, `rol`, `profiel` | ja | Eerste bord |
 | `kleur` | nee | Kleur van je karakter (`"#rrggbb"`) |
+| `uiterlijk` | nee | Vast personage in plaats van het standaardpoppetje, in beide gamestijlen. Nu beschikbaar: `"martijn"` (kaal met bril, blauwe trui met TC-logo). Zie `src/config/uiterlijk.js` |
 | `opleiding[]` (`periode`, `titel`, `instituut`) | nee | Oorkondes bij het opleidingsonderdeel |
 | `werkervaring[]` (`periode`, `rol`, `opdrachtgever`, `omschrijving`, `tools[]`) | ja | Eén bord per opdracht — **nieuwste eerst** in de JSON, de game loopt van oud naar nieuw |
 | `expertise[]` (tekst of `naam`, `niveau`, `sinds`) | nee | Badges uit de schatkist |

@@ -1,21 +1,17 @@
-import { SIGN } from '../config/pieceConfig.js';
-import { TEXTURES } from '../graphics/worldTextures.js';
-
 // Standaard checkpoint: bord met label; de inhoud verschijnt in het paneel.
 // Placeholder tot elk CV-onderdeel een eigen set piece heeft.
 export default class SignPiece {
-  constructor(scene, x, groundY, station) {
+  constructor(scene, x, groundY, station, theme) {
     this.scene = scene;
     this.x = x;
-    this.range = SIGN.range;
+    this.range = 90;
     this.usesPanel = true;
-    scene.add.image(x, groundY, TEXTURES.sign).setOrigin(0.5, 1);
-    scene.add.text(x, groundY - SIGN.labelOffsetY, station.label, {
-      fontFamily: 'system-ui', fontSize: '11px', fontStyle: 'bold', color: '#1d2433', align: 'center', wordWrap: { width: SIGN.labelWidth }
+    const sign = scene.add.image(x, groundY, theme.tex('sign')).setOrigin(0.5, 1);
+    // Label midden op het bordvlak (bovenste ~55% van de texture).
+    scene.add.text(x, groundY - sign.height + 30, station.label, {
+      fontFamily: theme.font, fontSize: '12px', fontStyle: 'bold', color: theme.colors.signText ?? theme.colors.text,
+      align: 'center', wordWrap: { width: 76 }
     }).setOrigin(0.5);
   }
-
-  enter() {}
-
-  leave() {}
+  start() {}
 }

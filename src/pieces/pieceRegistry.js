@@ -1,5 +1,6 @@
 import { STATION_TYPES } from '../cv/stations.js';
 import SignPiece from './SignPiece.js';
+import HostPiece from './HostPiece.js';
 import IntroPiece from './IntroPiece.js';
 import ExpertisePiece from './ExpertisePiece.js';
 import SkillsPiece from './SkillsPiece.js';
@@ -9,6 +10,7 @@ import CampfirePiece from './CampfirePiece.js';
 
 // Welk set piece hoort bij welk CV-onderdeel. Niet genoemd = standaardbord (fallback).
 const PIECES = {
+  [STATION_TYPES.host]: HostPiece,
   [STATION_TYPES.profile]: IntroPiece,
   [STATION_TYPES.expertise]: ExpertisePiece,
   [STATION_TYPES.skills]: SkillsPiece,
@@ -24,6 +26,8 @@ export function createPiece(scene, x, groundY, station, theme, index) {
   const piece = new Piece(scene, x, groundY, station, theme, index);
   piece.stopX ??= x - 100;
   piece.halfWidth = widthOf(station) / 2;
+  // Stages: momenten waarop het onderdeel afspeelt als je erlangs loopt. Standaard één, op de halteplaats.
+  piece.stages ??= [{ x: piece.stopX, duration: piece.duration ?? 0, run: (instant) => piece.start?.(instant) }];
   return piece;
 }
 
