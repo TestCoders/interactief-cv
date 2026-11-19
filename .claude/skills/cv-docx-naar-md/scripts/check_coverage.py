@@ -22,7 +22,7 @@ LABELS = {
     "over", "mij", "persoonlijke", "gegevens", "geboren", "opdrachten",
     "opdrachtgever", "klant", "rol", "beschrijving", "taken", "technieken",
     "onderwerp", "niveau", "kennis", "kunde", "opleiding", "opleidingen",
-    "talen", "werkzaamheden",
+    "talen", "werkzaamheden", "beknopte", "samenvatting", "testsoorten",
 }
 # Extend LABELS when a new CV layout uses other field names: a label that
 # shows up here as "missing" is noise, a content word is a real gap.

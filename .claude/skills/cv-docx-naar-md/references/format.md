@@ -89,6 +89,17 @@ bron: <bestandsnaam van de docx>
 <informatie uit het bron-cv die onder geen enkel kopje past>
 ````
 
+## Wat vast is en wat mag afwijken
+
+- **Vast**: de frontmatter-velden, de `##`-kopjes en hun volgorde, de vaste `###`-kopjes
+  (`Talen`, `Bezochte conferenties`, `Diploma's`, `Cursussen en certificeringen`) en de
+  labels in Ervaring (`**Periode:**`, `**Werkzaamheden:**`, `**Proces:**`,
+  `**Programmeertalen:**`, `**Testvormen:**`, `**Tools:**`).
+- **Mag per cv verschillen**: de categorienamen onder `## Vaardigheden` (bv.
+  `Methoden/Technieken` of `Methodieken/Technieken`, `Tools` of `Tools & Frameworks`).
+  Neem de naam uit de bron over en hernoem niet naar een standaardlijst. De demo loopt
+  door alle `###`-blokken onder Vaardigheden heen en zoekt niet op een vaste naam.
+
 ## Details per kopje
 
 - **Frontmatter**: alleen de vier personalia-velden plus `bron`. Ontbreekt een

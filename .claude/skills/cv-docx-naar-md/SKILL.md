@@ -55,7 +55,7 @@ iets te verliezen of te verzinnen.
 | Kernwoorden | `## Profiel`, als `**Kernwoorden:**` |
 | Vakkennis-items op het **hoogste niveau** (Senior, of Expert in een schaal als Basis/Gevorderd/Expert) die een methode, techniek of testvorm zijn | `## Expertise` |
 | Vakkennis > Branchekennis (alle niveaus) | `## Expertise`, als `Branchekennis: ...` |
-| Vakkennis-categorieën (Methoden/Technieken, Testvormen, Branchekennis, Programmeertalen & Frameworks, Databases, Besturingssystemen, Tools, ...) | `## Vaardigheden`, één `###` per categorie, in de bronvolgorde |
+| Vakkennis-categorieën (Methoden/Technieken, Testvormen, Branchekennis, Programmeertalen & Frameworks, Databases, Besturingssystemen, Tools, ...) | `## Vaardigheden`, één `###` per categorie, in de bronvolgorde en met de categorienaam uit de bron (die mag per cv verschillen; zie `references/format.md`) |
 | Eigen presentaties, talks, blogs, publicaties | `## Overig` > `### Publicaties en presentaties` |
 | Rijbewijs en andere losse personalia buiten de frontmatter-velden | `## Overig`, als `**Rijbewijs:** B` |
 | Taalvaardigheid | `## Vaardigheden` > `### Talen` |
@@ -100,8 +100,10 @@ Een nieuwe opdracht begint bij een regel `Periode | ...`. Alles tot de volgende
   (`- | Teststrategie bepalen / | - | Overleggen met de stakeholders`) en sommige
   punten staan zonder streepje als losse alinea (stijl `Standaard1`) direct
   eronder. Maak er één schone opsomming van met één punt per werkzaamheid.
-- `Proces`, `Programmeertalen`, `Testvormen` en `Pakketten / Tools / DB` (ook
-  geschreven als `Pakketten/Tools/DB`) worden de vetgedrukte labelregels.
+- `Proces`, `Programmeertalen`, `Testvormen` (ook geschreven als `Testsoorten`) en
+  `Pakketten / Tools / DB` (ook `Pakketten/Tools/DB`) worden de vetgedrukte labelregels.
+  Gebruik altijd de labelnamen uit het formaat (`**Testvormen:**`, `**Tools:**`), ook als
+  de bron een variant gebruikt: de demo zoekt op deze labels.
 - In andere indelingen heten de velden anders: `Opdrachtgever`/`Klant` → bedrijf,
   `Rol` → functie, `Beschrijving` → omschrijving, `Taken` → werkzaamheden. Een
   gemengd veld als `Technieken` neem je letterlijk over als `**Tools:**`, zonder het
