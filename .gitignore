@@ -18,3 +18,12 @@ npm-debug.log*
 # OS files
 .DS_Store
 Thumbs.db
+
+# Bron-cv's (Word) bevatten persoonsgegevens; de repo is publiek
+input/cv/*.docx
+
+# Foto's voor de pixel-art helden (skill foto-naar-pixelart): ook persoonsgegevens
+input/foto/
+
+# Previews van npm run heroes
+out/heroes/

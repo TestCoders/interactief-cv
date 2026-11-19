@@ -1,5 +1,5 @@
 import { avatarOptions } from './graphics/avatarOptions.js';
-import { drawAvatarPreview } from './graphics/heroSprites.js';
+import { drawAvatarPreview } from './graphics/pixelHero.js';
 import { normalizeCv } from './cv/normalizeCv.js';
 import { loadCvs } from './cv/cvLoader.js';
 import { MAX_MARKDOWN_BYTES, parseMarkdownCv } from './cv/markdownCv.js';

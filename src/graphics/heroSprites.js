@@ -1,173 +1,11 @@
-import Phaser from 'phaser';
-import { UITERLIJKEN } from '../config/uiterlijk.js';
-
-// Eigen pixel-art helden (16×18 px per frame), getekend met code: geen externe assets nodig.
-// Elke CV krijgt een held met kleding in de CV-kleur; het kapsel wisselt per CV (kort, lang, pet).
-// Met "uiterlijk" in het CV kies je een vast personage (zie src/uiterlijk.js), bijvoorbeeld "martijn".
+// Helden als Phaser-textures: de pixel-held (retro, rasters uit pixelHero.js) en de kantoorheld (zakelijk).
+// "uiterlijk" in het CV kiest een vast personage (string, zie src/config/uiterlijk.js) of geeft kenmerken
+// uit een foto (object: kapsel, haarkleur, huid, bril, baard). Beide gamestijlen gebruiken dezelfde kenmerken.
 // Frames per held: idle0, idle1, run0–run3, jump. Animaties: <key>-idle, <key>-run, <key>-jump.
+import Phaser from 'phaser';
+import { HERO_H, HERO_W, avatarClothes, featuresOf, lookOf, mix, paintPixelFrame, pixelHeroFrames, shade } from './pixelHero.js';
 
-export const HERO_W = 16;
-export const HERO_H = 18;
-
-// Legenda: . leeg · K omlijning · H haar · C kleding · c kleding (schaduw)
-//          S huid · s huid (schaduw) · L huid (glans) · g brilmontuur · P broek · B schoenen
-//          T, G logo op de trui (T blauw, C grijs)
-const HEADS = [
-  // 0: kort haar
-  [
-    '....KKKKKK......',
-    '...KHHHHHHKK....',
-    '..KHHHHHHHHHK...',
-    '..KHHHHHHHHHK...',
-    '..KHHSSSSSSSK...',
-    '..KHSSSSKSKSK...',
-    '..KHSSSSKSKSK...',
-    '..KHsSSSSSSSK...',
-    '...KSSSSSSSK....',
-    '....KKKKKKK.....'
-  ],
-  // 1: lang haar
-  [
-    '....KKKKKK......',
-    '...KHHHHHHK.....',
-    '..KHHHHHHHHK....',
-    '.KHHHHHHHHHHK...',
-    '.KHHHHHSSSSSK...',
-    '.KHHHSSSKSKSK...',
-    '.KHHHSSSKSKSK...',
-    '.KHHHsSSSSSSK...',
-    '.KHHKSSSSSSK....',
-    '..KK.KKKKKK.....'
-  ],
-  // 2: pet in de CV-kleur
-  [
-    '....KKKKKK......',
-    '...KCCCCCCK.....',
-    '..KCCCCCCCCKKKK.',
-    '..KCCCCCCCCCCCK.',
-    '..KHHKKKKKKKKK..',
-    '..KHSSSSKSKSK...',
-    '..KHSSSSKSKSK...',
-    '..KHsSSSSSSSK...',
-    '...KSSSSSSSK....',
-    '....KKKKKKK.....'
-  ]
-];
-
-const HAIR = ['#6b3e26', '#e8b84a', '#2f2219'];
-
-// Vaste personages (pixel-held): eigen hoofd, kleuren en eventueel een logo op de trui.
-const PIXEL_LOOKS = {
-  martijn: {
-    head: [
-      '....KKKKKK......',
-      '...KSLLSSSKK....',
-      '..KSLSSSSSSSK...',
-      '..KsSSSSSSSSK...',
-      '..KsSSSSSSSSK...',
-      '..KsSgggSgggK...',
-      '..KsggKgggKgK...',
-      '..KsSgggSgggK...',
-      '...KSSSSSSSK....',
-      '....KKKKKKK.....'
-    ],
-    // TC-logo op de borst (3 rijen, vanaf rij 10): T in het blauw, C in het grijs.
-    logo: [
-      '.....TTT.GG.....',
-      '......T.G.......',
-      '......T..GG.....'
-    ],
-    colors: { C: '#1e3a6e', c: '#16305c', P: '#8fb3d9', B: '#6b3f22', L: '#fbe3cc', g: '#6a7fa8', T: '#4aa3ff', G: '#b8bec9' },
-    breathe: true // ademen: het bovenlijf zakt een pixel en komt weer omhoog
-  }
-};
-
-const ARMS_DOWN = ['....KCCCCCCK....', '...KcCCCCCCCK...', '...KSCCCCCCSK...'];
-const ARMS_SWING = ['....KCCCCCCK....', '...KcCCCCCCCK...', '..KSKCCCCCCKSK..'];
-const HIPS = '...KKPPPPPPKK...';
-
-const BODIES = {
-  idle: [...ARMS_DOWN, HIPS, '....KPPPPPPK....', '....KPPKKPPK....', '....KBBKKBBK....', '....KKKKKKKK....'],
-  runWide: [...ARMS_SWING, HIPS, '...KPPPKKPPPK...', '..KPPK....KPPK..', '.KBBK......KBBK.', '.KKK........KKK.'],
-  runMid: [...ARMS_DOWN, HIPS, '...KPPPKKPPPK...', '...KPPK..KPPK...', '..KBBK....KBBK..', '..KKK......KKK..'],
-  runPass: [...ARMS_DOWN, HIPS, '....KPPPPPPK....', '.....KPPPPK.....', '.....KBBBBK.....', '.....KKKKKK.....'],
-  runPassSwing: [...ARMS_SWING, HIPS, '....KPPPPPPK....', '.....KPPPPK.....', '.....KBBBBK.....', '.....KKKKKK.....'],
-  jump: [
-    '.KSKCCCCCCCKSK..',
-    '..KKcCCCCCCKK...',
-    '...KCCCCCCCCK...',
-    HIPS,
-    '...KPPPKKPPPK...',
-    '...KBBK..KPPK...',
-    '....KK...KBBK...',
-    '.........KKK....'
-  ]
-};
-
-// [framenaam, lichaam, verschuiving van het hoofd in px]
-const FRAMES = [
-  ['idle0', 'idle', 0],
-  ['idle1', 'idle', 1],
-  ['run0', 'runWide', 1],
-  ['run1', 'runPass', 0],
-  ['run2', 'runMid', 1],
-  ['run3', 'runPassSwing', 0],
-  ['jump', 'jump', 0]
-];
-
-const BASE = { K: '#1b1f2e', S: '#f2c79b', s: '#e0a77a', P: '#3b4561', B: '#4f2f1d' };
-
-function shade(hex, factor) {
-  const n = parseInt(hex.slice(1), 16);
-  const ch = (shift) => Math.round(((n >> shift) & 255) * factor);
-  return `rgb(${ch(16)}, ${ch(8)}, ${ch(0)})`;
-}
-
-function paint(ctx, rows, colors, ox, oy) {
-  rows.forEach((row, y) => {
-    [...row].forEach((ch, x) => {
-      const color = colors[ch];
-      if (!color) return;
-      ctx.fillStyle = color;
-      ctx.fillRect(ox + x, oy + y, 1, 1);
-    });
-  });
-}
-
-const AVATAR_HAIR = { brown: '#6b3e26', blond: '#e8b84a', black: '#2f2219', red: '#a6492c' };
-const FACE_PIXELS = {
-  glasses: [[6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [6, 6], [8, 6], [10, 6]],
-  freckles: [[6, 7], [8, 7], [10, 7]],
-  beard: [[5, 7], [6, 8], [7, 8], [8, 8], [9, 8], [10, 7]]
-};
-
-function paintHero(ctx, cv, variant, body, headY, ox, frame) {
-  const { avatar } = cv;
-  const look = PIXEL_LOOKS[lookOf(cv)];
-  const head = look?.head ?? HEADS[avatar ? Number(avatar.hair === 'long') : variant];
-  const fallbackOutfit = avatar?.person === 'woman' ? '#80519b' : '#3c8772';
-  const outfit = /^#[0-9a-f]{6}$/i.test(cv.kleur ?? '') ? cv.kleur : fallbackOutfit;
-  const hair = AVATAR_HAIR[avatar?.color] ?? HAIR[variant];
-  const colors = look ? { ...BASE, ...look.colors } : { ...BASE, H: hair, C: outfit, c: shade(outfit, 0.72) };
-  const torsoDy = look?.breathe && frame === 'idle1' ? 1 : 0;
-  paint(ctx, BODIES[body].slice(3), colors, ox, 13);
-  paint(ctx, BODIES[body].slice(0, 3), colors, ox, 10 + torsoDy);
-  if (look?.logo) paint(ctx, look.logo, colors, ox, 10 + torsoDy);
-  paint(ctx, head, colors, ox, headY);
-  if (avatar) {
-    // Positioneer gezichtsdetails op de huid zodat beide kapsels dezelfde opties ondersteunen.
-    ctx.fillStyle = avatar.face === 'beard' ? hair : avatar.face === 'freckles' ? '#ac6746' : BASE.K;
-    for (const [x, y] of FACE_PIXELS[avatar.face] ?? []) {
-      if ('SsK'.includes(head[y][x])) ctx.fillRect(ox + x, headY + y, 1, 1);
-    }
-  }
-}
-
-export function drawAvatarPreview(canvas, cv) {
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, HERO_W, HERO_H);
-  paintHero(ctx, cv, 0, 'idle', 0, 0);
-}
+export { HERO_H, HERO_W, lookOf };
 
 export const heroKey = (cv) => `hero-${cv.id}`;
 
@@ -176,9 +14,6 @@ export const heroAnim = (key, name) => `${key}-${name}`;
 
 /** Martijn van TestCoders als gastheer aan het begin: dezelfde tekening als het uiterlijk "martijn". */
 export const HOST_CV = { id: 'martijn', naam: 'Martijn', uiterlijk: 'martijn' };
-
-/** Het vaste uiterlijk van een CV ("uiterlijk" in de JSON), of null. */
-export const lookOf = (cv) => (cv?.uiterlijk && UITERLIJKEN[cv.uiterlijk] ? cv.uiterlijk : null);
 
 function addAnims(scene, key) {
   if (scene.anims.exists(`${key}-idle`)) return;
@@ -194,12 +29,12 @@ export function createHeroTextures(scene, cvs) {
     const key = heroKey(cv);
     if (scene.textures.exists(key)) return;
 
-    const variant = i % HEADS.length;
-    const tex = scene.textures.createCanvas(key, HERO_W * FRAMES.length, HERO_H);
+    const { frames, colors } = pixelHeroFrames(cv, i);
+    const tex = scene.textures.createCanvas(key, HERO_W * frames.length, HERO_H);
     const ctx = tex.getContext();
-    FRAMES.forEach(([name, body, headY], f) => {
+    frames.forEach(({ name, rows }, f) => {
       const ox = f * HERO_W;
-      paintHero(ctx, cv, variant, body, headY, ox, name);
+      paintPixelFrame(ctx, rows, colors, ox);
       tex.add(name, 0, ox, 0, HERO_W, HERO_H);
     });
     tex.refresh();
@@ -215,6 +50,9 @@ export const OFFICE_H = 56;
 const OFFICE_RES = 4;
 const OFFICE_HAIR = ['#3a2a20', '#d9a441', '#2a2019'];
 const SKIN = '#f1c8a0';
+const isHex = (v) => /^#[0-9a-f]{6}$/i.test(v ?? '');
+// Kapsel uit het uiterlijk → kantoorvariant (0 kort, 1 lang, 2 kuif); "kaal" en "pet" tekenen als kort.
+const OFFICE_VARIANT = { kort: 0, pet: 0, kaal: 0, lang: 1, staart: 1, opzij: 2, krullen: 2 };
 const SKIN_SHADE = '#e3b48e';
 
 const PAK = {
@@ -240,9 +78,24 @@ const OFFICE_POSES = [
   ['jump', 40, -150, 40, -10, 0]
 ];
 
+/** Baard van de kantoorheld (kenmerk "baard" uit het uiterlijk); getekend over het gezicht. */
+function drawOfficeBeard(ctx, look, path, box) {
+  if (!look.beard || look.beard === 'geen') return;
+  const color = look.beardColor ?? look.hair;
+  if (look.beard === 'snor') return box(14.6, 11.7, 3.6, 0.9, 0.45, color);
+  if (look.beard === 'sik') return box(14.2, 13.6, 2.4, 1.8, 0.9, color);
+  const full = 'M9.6 10.2Q9.4 15.6 13.6 15.7Q18.2 15.8 18.4 11.6L18.4 12.6Q16.4 12.2 14.2 12.8Q12 12.4 11.2 10.2Z';
+  ctx.save();
+  if (look.beard === 'stoppels') ctx.globalAlpha = 0.35;
+  path(full, color);
+  ctx.restore();
+}
+
 function drawOfficeWorker(ctx, look, [name, backArm, frontArm, backLeg, frontLeg, poseDy]) {
   // Ademen: bij idle telt de adem-factor van het personage mee.
   const dy = name.startsWith('idle') ? poseDy * look.breath : poseDy;
+  const skin = look.skin ?? SKIN;
+  const skinShade = look.skinShade ?? SKIN_SHADE;
   const rot = (deg, cx, cy, draw) => {
     ctx.save();
     ctx.translate(cx, cy);
@@ -255,13 +108,13 @@ function drawOfficeWorker(ctx, look, [name, backArm, frontArm, backLeg, frontLeg
   const dot = (cx, cy, r, fill) => { ctx.fillStyle = fill; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill(); };
   const path = (d, fill) => { ctx.fillStyle = fill; ctx.fill(new Path2D(d)); };
 
-  rot(backArm, 8, 20 + dy, () => { box(6, 19 + dy, 4, 15, 2, look.backArm); dot(8, 34.5 + dy, 1.9, SKIN_SHADE); });
+  rot(backArm, 8, 20 + dy, () => { box(6, 19 + dy, 4, 15, 2, look.backArm); dot(8, 34.5 + dy, 1.9, skinShade); });
   rot(backLeg, 10.8, 35, () => { box(8.6, 34, 4.4, 17, 2, look.legBack); box(7.8, 50, 6.4, 3.2, 1.6, look.shoeBack); });
   rot(frontLeg, 14.2, 35, () => { box(12, 34, 4.4, 17, 2, look.legFront); box(11.6, 50, 7.6, 3.2, 1.6, look.shoeFront); });
 
   ctx.save();
   ctx.translate(0, dy);
-  box(11, 14, 3.6, 4.5, 0, SKIN_SHADE);
+  box(11, 14, 3.6, 4.5, 0, skinShade);
   path('M7 21Q7 17.5 10.5 17.5H15Q18 17.5 18 21V36H7Z', look.body);
   if (look.kleding === 'pak') {
     path('M12.2 17.5H16L14.1 26Z', '#dbe7f0');
@@ -280,32 +133,26 @@ function drawOfficeWorker(ctx, look, [name, backArm, frontArm, backLeg, frontLeg
     ctx.fillStyle = '#b8bec9'; ctx.fillText('C', 11.3, 26.2);
   }
   ctx.restore();
-  rot(frontArm, 16, 20 + dy, () => { box(14, 19 + dy, 4, 15, 2, look.frontArm); dot(16, 34.5 + dy, 1.9, SKIN); });
+  rot(frontArm, 16, 20 + dy, () => { box(14, 19 + dy, 4, 15, 2, look.frontArm); dot(16, 34.5 + dy, 1.9, skin); });
 
   ctx.save();
   ctx.translate(0, dy);
-  box(8, 3, 10.5, 12.5, 4.5, SKIN);
-  dot(18.4, 10, 1.1, SKIN);
+  box(8, 3, 10.5, 12.5, 4.5, skin);
+  dot(18.4, 10, 1.1, skin);
   if (look.kaal) {
     // Kale kop: glans bovenop en een zachte schaduw aan de achterkant.
-    ctx.fillStyle = '#fbe3cc'; ctx.beginPath(); ctx.ellipse(12.2, 5.2, 2.6, 1.3, -0.25, 0, Math.PI * 2); ctx.fill();
-    path('M8 9Q8 5 10 3.6Q8.6 6 9.4 11.5L8 11.5Z', SKIN_SHADE);
-    dot(10.8, 9.6, 1.3, SKIN_SHADE);
+    ctx.fillStyle = look.skin ? mix(look.skin, '#ffffff', 0.55) : '#fbe3cc'; ctx.beginPath(); ctx.ellipse(12.2, 5.2, 2.6, 1.3, -0.25, 0, Math.PI * 2); ctx.fill();
+    path('M8 9Q8 5 10 3.6Q8.6 6 9.4 11.5L8 11.5Z', skinShade);
+    dot(10.8, 9.6, 1.3, skinShade);
   } else if (look.variant === 1) {
-    dot(10.8, 9.6, 1.3, SKIN_SHADE);
+    dot(10.8, 9.6, 1.3, skinShade);
     path('M7.6 6.5Q7.2 2.4 13.2 2.4Q18.8 2.4 18.6 6.6L14.2 6.2Q11.6 6.6 11.4 10L11.4 19Q11.2 21.5 9 21.5Q7 21.5 6.8 19Z', look.hair);
   } else if (look.variant === 2) {
     path('M7.8 11Q6.8 4 10.6 2.2Q14.8 0.2 19.2 2.6Q19.8 4.6 17.8 5.4L13.8 5.8Q11.2 6.2 10.9 9.2L10.6 11.5L8.2 11.5Z', look.hair);
-    dot(10.8, 9.6, 1.3, SKIN_SHADE);
+    dot(10.8, 9.6, 1.3, skinShade);
   } else {
     path('M7.6 10.5Q7 2.5 13.2 2.4Q18.8 2.4 18.6 6.2L13.8 6.2Q11.2 6.4 10.9 9.2L10.6 11.5L8 11.5Z', look.hair);
-    dot(10.8, 9.6, 1.3, SKIN_SHADE);
-  }
-  if (look.face === 'beard') path('M11.8 11Q14.5 12.8 18.4 11.8L17.6 14.5Q14.3 16.7 12.2 14Z', look.hair);
-  if (look.face === 'freckles') {
-    dot(13, 10.8, .35, '#ac6746');
-    dot(14, 11.3, .35, '#ac6746');
-    dot(15.1, 10.9, .35, '#ac6746');
+    dot(10.8, 9.6, 1.3, skinShade);
   }
   box(15.1, 8.2, 1.3, 1.7, 0.5, '#16202a');
   if (look.bril) {
@@ -313,7 +160,13 @@ function drawOfficeWorker(ctx, look, [name, backArm, frontArm, backLeg, frontLeg
     ctx.lineWidth = 0.7;
     ctx.beginPath(); ctx.roundRect(14.3, 7.6, 4, 2.9, 0.9); ctx.moveTo(14.3, 8.6); ctx.lineTo(11.6, 8.6); ctx.stroke();
   } else {
-    box(14.4, 6.8, 2.8, 0.8, 0.4, look.variant === 1 ? '#a87a2a' : look.hair);
+    box(14.4, 6.8, 2.8, 0.8, 0.4, look.brow ?? (look.variant === 1 ? '#a87a2a' : look.hair));
+  }
+  drawOfficeBeard(ctx, look, path, box);
+  if (look.freckles) {
+    dot(13, 10.8, .35, '#ac6746');
+    dot(14, 11.3, .35, '#ac6746');
+    dot(15.1, 10.9, .35, '#ac6746');
   }
   ctx.restore();
 }
@@ -322,17 +175,20 @@ function drawOfficeWorker(ctx, look, [name, backArm, frontArm, backLeg, frontLeg
 function officeLook(cv, i) {
   const fixed = OFFICE_LOOKS[lookOf(cv)];
   if (fixed) return fixed;
-  const { avatar } = cv;
-  const variant = avatar ? Number(avatar.hair === 'long') : i % OFFICE_HAIR.length;
-  const tie = /^#[0-9a-f]{6}$/i.test(cv.kleur ?? '') ? cv.kleur : '#3c8772';
-  return {
-    ...PAK,
-    tie: avatar?.person === 'woman' && !cv.kleur ? '#80519b' : tie,
-    variant,
-    hair: AVATAR_HAIR[avatar?.color] ?? OFFICE_HAIR[variant],
-    bril: avatar ? avatar.face === 'glasses' : variant === 2,
-    face: avatar?.face
-  };
+  const tie = avatarClothes(cv);
+  const u = featuresOf(cv);
+  if (u) {
+    // Kenmerken uit een foto: kapsel naar de dichtstbijzijnde kantoorvariant (0 kort, 1 lang, 2 kuif).
+    const variant = OFFICE_VARIANT[u.kapsel] ?? i % OFFICE_HAIR.length;
+    const hair = isHex(u.haarkleur) ? u.haarkleur : OFFICE_HAIR[variant];
+    const skin = isHex(u.huid) ? u.huid : undefined;
+    return {
+      ...PAK, tie, variant, hair, brow: shade(hair, 0.85), bril: u.bril === true, kaal: u.kapsel === 'kaal',
+      beard: u.baard, freckles: u.freckles, skin, skinShade: skin && shade(skin, 0.9)
+    };
+  }
+  const variant = i % OFFICE_HAIR.length;
+  return { ...PAK, tie, variant, hair: OFFICE_HAIR[variant], bril: variant === 2 };
 }
 
 /**
