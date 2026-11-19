@@ -1,4 +1,20 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
-.DS_Store
+
+# Logs
 *.log
+npm-debug.log*
+
+# Environment variables / secrets
+.env
+.env.*
+
+# Personal Claude Code settings (the shared skills in .claude/skills are committed)
+.claude/settings.local.json
+
+# OS files
+.DS_Store
+Thumbs.db
