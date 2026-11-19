@@ -14,7 +14,7 @@ import sys
 # Section titles and field labels from the TestCoders CV layout. They become
 # Markdown headings/labels under a different name, so they are not content.
 LABELS = {
-    "curriculum", "vitae", "personalia", "geboortedatum", "recente",
+    "curriculum", "vitae", "personalia", "recente",
     "werkervaring", "behaalde", "diploma’s", "diploma's", "vakopleidingen",
     "certificering", "taalvaardigheid", "vakkennis", "competentie",
     "kennisniveau", "bedrijf", "omschrijving", "pakketten", "db",
@@ -26,11 +26,12 @@ LABELS = {
 }
 # Extend LABELS when a new CV layout uses other field names: a label that
 # shows up here as "missing" is noise, a content word is a real gap.
-# Dutch month names: the birth date is converted to YYYY-MM-DD.
-MONTHS = {
-    "januari", "februari", "maart", "april", "mei", "juni", "juli",
-    "augustus", "september", "oktober", "november", "december",
-}
+# Personal data is deliberately left out of the Markdown (see SKILL.md,
+# "Persoonsgegevens"), so source lines with these labels are not checked.
+PERSONAL = re.compile(
+    r"(?i)^\s*(geboortedatum|geboren|geboorteplaats|leeftijd|woonplaats|adres|"
+    r"postcode|telefoon|mobiel|e-?mail|nationaliteit|burgerlijke staat|rijbewijs)\b"
+)
 
 
 def words(text):
@@ -61,9 +62,9 @@ def main(extract_path, md_path):
         if m and re.match(r"(?i)(kop|heading|titel|title|koptekst)", m.group(1)):
             continue  # section headings become the fixed Markdown headings
         content = re.sub(r"^(P\s+\S+\s+::|T\d+ R\d+:)", "", line)
-        birth = re.search(r"(?i)geboortedatum|geboren", content)
-        ignore = LABELS | (MONTHS if birth else set())
-        missing = sorted({norm(w) for w in words(content)} - md_words - ignore - {""})
+        if PERSONAL.match(content):
+            continue  # personal data is left out on purpose
+        missing = sorted({norm(w) for w in words(content)} - md_words - LABELS - {""})
         if missing:
             missing_lines.append((line, missing))
     if not missing_lines:

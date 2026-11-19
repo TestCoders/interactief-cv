@@ -50,14 +50,14 @@ iets te verliezen of te verzinnen.
 
 | In de docx | Kopje in de Markdown |
 |---|---|
-| Personalia: Naam, Geboortedatum, Woonplaats, Functie | frontmatter |
+| Personalia: Naam, Functie | frontmatter |
+| Overige personalia: geboortedatum, geboorteplaats, woonplaats, adres, telefoon, e-mail, nationaliteit, burgerlijke staat, rijbewijs | **weglaten** (zie "Persoonsgegevens") |
 | Profiel (de lopende alinea's na de personalia) | `## Profiel` |
 | Kernwoorden | `## Profiel`, als `**Kernwoorden:**` |
 | Vakkennis-items op het **hoogste niveau** (Senior, of Expert in een schaal als Basis/Gevorderd/Expert) die een methode, techniek of testvorm zijn | `## Expertise` |
 | Vakkennis > Branchekennis (alle niveaus) | `## Expertise`, als `Branchekennis: ...` |
 | Vakkennis-categorieën (Methoden/Technieken, Testvormen, Branchekennis, Programmeertalen & Frameworks, Databases, Besturingssystemen, Tools, ...) | `## Vaardigheden`, één `###` per categorie, in de bronvolgorde en met de categorienaam uit de bron (die mag per cv verschillen; zie `references/format.md`) |
 | Eigen presentaties, talks, blogs, publicaties | `## Overig` > `### Publicaties en presentaties` |
-| Rijbewijs en andere losse personalia buiten de frontmatter-velden | `## Overig`, als `**Rijbewijs:** B` |
 | Taalvaardigheid | `## Vaardigheden` > `### Talen` |
 | Passies, hobby's en vrije-tijdsbesteding uit het profiel | `## Interesses` (als korte opsomming) |
 | Bezochte conferenties | `## Interesses` > `### Bezochte conferenties` |
@@ -116,15 +116,31 @@ verbeteren (`Cucumberr`, `Reids` blijven staan) en geen dubbele items
 weghalen binnen een opsomming. De Markdown is een bron die later automatisch wordt
 ingelezen; als de conversie inhoud verandert, weet niemand meer wat er in het
 oorspronkelijke cv stond. Toegestaan zijn alleen: witruimte en opsommingstekens
-opschonen, gesplitste regels samenvoegen of samengevoegde regels splitsen, de
-geboortedatum naar `JJJJ-MM-DD` zetten en HTML-entiteiten (`&amp;`) terugzetten naar tekens.
+opschonen, gesplitste regels samenvoegen of samengevoegde regels splitsen en
+HTML-entiteiten (`&amp;`) terugzetten naar tekens.
 
 Zie je iets dat waarschijnlijk een fout is (een tikfout, een periode die niet klopt,
 een opdracht die "heden" loopt naast een andere "heden"), meld het dan in je rapport
 aan de gebruiker in plaats van het stilletjes aan te passen.
 
+## Persoonsgegevens
+
+De Markdown wordt gecommit in een publieke repo en gepubliceerd als AI-versie van
+het cv. Neem daarom **geen persoonsgegevens** over die niets zeggen over iemands
+vakmanschap: geboortedatum, leeftijd, geboorteplaats, woonplaats, adres, postcode,
+telefoonnummer, privé-e-mailadres, nationaliteit, burgerlijke staat en rijbewijs.
+Dat geldt ook als ze onder een andere kop staan ("Persoonlijke gegevens", "Over mij")
+of in een tabel. Ze komen ook niet onder `## Overig`: dit is de enige uitzondering op
+"verloren informatie is erger dan een rommelig Overig". Contact loopt altijd via
+TestCoders.
+
+Staat zo'n gegeven in een lopende tekst, bijvoorbeeld in het profiel ("woont met
+zijn vriendin en zoon in Harderwijk")? Neem de alinea dan letterlijk over en meld het
+in je rapport. Of zo'n zin weg mag, beslist de gebruiker, niet de conversie.
+
 ## Wat je weglaat
 
+- Persoonsgegevens (zie hierboven).
 - Kop- en voettekst (onder `# HEADER/FOOTER` in de extractie): daarin staan
   de bedrijfsgegevens van TestCoders en paginanummers, niet die van de persoon.
 - De titel "CURRICULUM VITAE", lege regels en losse `/`-regels (resten van
@@ -147,7 +163,7 @@ informatie is erger dan een rommelig kopje Overig.
 
 Wijkt een cv af (andere kopnamen, alles in één grote tabel, Engelstalig), groepeer
 dan op betekenis, niet op de letterlijke kopnaam: "Over mij" → Profiel,
-"Persoonlijke gegevens" → frontmatter, "Opdrachten" → Ervaring, "Kennis en kunde"
+"Persoonlijke gegevens" → naam en functie in de frontmatter (de rest weglaten), "Opdrachten" → Ervaring, "Kennis en kunde"
 → Vaardigheden, "Education" → Opleidingen, "Skills" → Vaardigheden,
 "Projects"/"Employment" → Ervaring. Staat de functie niet bij de personalia,
 gebruik dan de ondertitel onder de naam. Het doelformaat blijft

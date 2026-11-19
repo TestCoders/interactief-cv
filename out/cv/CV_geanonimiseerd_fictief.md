@@ -1,8 +1,6 @@
 ---
 naam: Robin Sterrenstof
 functie: Test Automation Engineer
-woonplaats: Wolkendam
-geboortedatum: 1988-05-25
 bron: CV_geanonimiseerd_fictief.docx
 ---
 

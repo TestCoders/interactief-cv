@@ -1,8 +1,6 @@
 ---
 naam: Jurgen Alebregtse
 functie: Test Automation Engineer
-woonplaats: Harderwijk
-geboortedatum: 1991-06-25
 bron: CV Jurgen Alebregtse-1.0.docx
 ---
 

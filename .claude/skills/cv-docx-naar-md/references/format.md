@@ -9,8 +9,6 @@ kopjes. Laat een kopje staan, ook als er niets onder valt, en zet er dan
 ---
 naam: <volledige naam>
 functie: <functie uit personalia>
-woonplaats: <woonplaats>
-geboortedatum: <JJJJ-MM-DD>
 bron: <bestandsnaam van de docx>
 ---
 
@@ -102,10 +100,10 @@ bron: <bestandsnaam van de docx>
 
 ## Details per kopje
 
-- **Frontmatter**: alleen de vier personalia-velden plus `bron`. Ontbreekt een
-  veld in de bron, laat de waarde dan leeg (`woonplaats:`) in plaats van te gokken.
-  Zet de geboortedatum om naar `JJJJ-MM-DD` (25 mei 1988 → 1988-05-25); dat is
-  de enige toegestane omzetting van een waarde.
+- **Frontmatter**: alleen `naam`, `functie` en `bron`. Ontbreekt de functie in de
+  bron, laat de waarde dan leeg (`functie:`) in plaats van te gokken. Geboortedatum,
+  woonplaats en andere persoonsgegevens neem je **niet** op (zie "Persoonsgegevens"
+  in `SKILL.md`).
 - **Ervaring**: één `###`-blok per opdracht, in dezelfde volgorde als in de
   bron (meestal nieuwste eerst). Labels zonder inhoud in de bron laat je weg
   binnen het blok (bijvoorbeeld geen `**Testvormen:**` als die er niet is).
