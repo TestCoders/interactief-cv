@@ -54,6 +54,7 @@ Besturing: ← → / A D lopen, spatie / ↑ / W springen. Knop **Klassiek CV** 
 |------|-----------|------------|
 | `naam`, `rol`, `profiel` | ja | Eerste bord |
 | `kleur` | nee | Kleur van je karakter (`"#rrggbb"`) |
+| `uiterlijk` | nee | Vast personage in plaats van het standaardpoppetje, in beide gamestijlen. Nu beschikbaar: `"martijn"` (kaal met bril, blauwe trui met TC-logo). Zie `src/uiterlijk.js` |
 | `opleiding[]` (`periode`, `titel`, `instituut`) | nee | Eén bord per opleiding |
 | `werkervaring[]` (`periode`, `rol`, `opdrachtgever`, `omschrijving`, `tools[]`) | ja | Eén bord per opdracht — **nieuwste eerst** in de JSON, de game loopt van oud naar nieuw |
 | `expertise[]` (tekst of `naam`, `niveau`, `sinds`) | nee | Badges uit de schatkist |
