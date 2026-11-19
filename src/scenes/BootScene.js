@@ -4,7 +4,7 @@ import { createHeroTextures } from '../graphics/heroSprites.js';
 import { createWorldTextures } from '../graphics/worldTextures.js';
 
 // Fonts van de gamestijlen (geladen via index.html). Eerst laden, anders tekent Phaser de tekst in een reservefont.
-const FONTS = ['16px "Press Start 2P"', '16px "Pixelify Sans"', '700 16px "Pixelify Sans"', '700 16px "Space Grotesk"', '16px Inter'];
+const FONTS = ['16px "Jersey 10"', '16px "Press Start 2P"', '16px "Pixelify Sans"', '700 16px "Pixelify Sans"', '700 16px "Space Grotesk"', '16px Inter'];
 const FONT_TIMEOUT_MS = 1500;
 
 // Maakt de gedeelde textures; de wereld (grond, lucht, set pieces) tekent elk thema zelf in createTextures().

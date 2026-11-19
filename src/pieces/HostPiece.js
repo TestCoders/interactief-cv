@@ -28,7 +28,7 @@ export default class HostPiece {
 
     // Tekstballon boven Martijn.
     this.text = label(scene, 0, 0, '', theme, { size: 14, color: '#16202a', wrap: 300, bold: false });
-    this.hint = label(scene, 0, 0, '▶ scroll of →', theme, { size: 10, color: '#8a8f99' }).setOrigin(1, 1);
+    this.hint = label(scene, 0, 0, '▶ scroll of →', theme, { size: 10, color: '#5b6475' }).setOrigin(1, 1);
     this.bg = scene.add.graphics();
     this.bubble = scene.add.container(x + 50, groundY - 90, [this.bg, this.text, this.hint]).setDepth(8).setScale(0);
 
