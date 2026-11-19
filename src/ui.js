@@ -13,9 +13,10 @@ const NIVEAUS = ['Beginner', 'Basis', 'Gevorderd', 'Ervaren', 'Expert'];
 const meters = (skills = []) =>
   `<ul class="meters">${skills
     .map((s) => {
-      const n = s.niveau ?? 0;
+      const n = s.score ?? (typeof s.niveau === 'number' ? s.niveau : 0);
       const blocks = [1, 2, 3, 4, 5].map((i) => `<i class="${i <= n ? 'on' : ''}"></i>`).join('');
-      return `<li><span>${esc(s.naam)}</span><b title="${NIVEAUS[n - 1] ?? ''}">${blocks}</b></li>`;
+      const titel = typeof s.niveau === 'string' ? s.niveau : NIVEAUS[n - 1] ?? '';
+      return `<li><span>${esc(s.naam)}</span><b title="${esc(titel)}">${blocks}</b></li>`;
     })
     .join('')}</ul>`;
 
@@ -55,27 +56,23 @@ function contactHtml() {
   return `<ul><li><a href="mailto:${t.email}">${t.email}</a></li><li>${esc(t.telefoon)}</li><li><a href="${t.website}" target="_blank" rel="noopener">testcoders.nl</a></li></ul>`;
 }
 
+const kort = (t = '', n = 280) => (t.length > n ? t.slice(0, t.lastIndexOf(' ', n)) + '…' : t);
+
+// Alleen onderdelen met extra tekst gebruiken de tekstbox; de rest staat in de wereld zelf.
 export function stationHtml(station, cv) {
   const d = station.data;
   switch (station.type) {
     case 'profiel':
-      return `<h2>${esc(cv.naam)}</h2><p class="meta">${esc(cv.rol)}</p><p>${esc(cv.profiel)}</p>`;
+      return `<h2>${esc(cv.naam)}</h2><p class="meta">${esc(cv.rol)} · in het testvak sinds ${esc(cv.sinds)}</p><p>${esc(kort(cv.profiel, 360))}</p>`;
     case 'opleiding':
-      return `<h2>🎓 ${esc(d.titel)}</h2><p class="meta">${esc(d.instituut)} · ${esc(d.periode)}</p>`;
+      return `<h2>🎓 Opleidingen</h2>
+        ${d.diplomas.length ? `<ul>${d.diplomas.map((o) => `<li>${esc(o.titel)}, ${esc(o.instituut)} (${esc(o.periode)})</li>`).join('')}</ul>` : ''}
+        ${d.certificaten.length ? `<h3>🏅 Cursussen & certificaten</h3>${chips(d.certificaten)}` : ''}`;
     case 'werk':
       return `<h2>${esc(d.rol)}</h2><p class="meta">${esc(d.opdrachtgever)} · ${esc(d.periode)}</p>
-        <p>${esc(d.omschrijving)}</p>${chips(d.tools)}`;
-    case 'certificeringen':
-      return `<h2>🏅 Certificeringen</h2><ul>${d.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>`;
-    case 'expertise':
-      return `<h2>🧠 Expertise</h2><ul>${d.map((e) => `<li>${esc(e)}</li>`).join('')}</ul>`;
-    case 'skills':
-      return `<h2>🛠️ Vaardigheden</h2>${meters(d)}`;
-    case 'interesses':
-    case 'hobbys':
-      return `<h2>🎈 Interesses</h2>${chips(d)}`;
-    case 'werkplezier':
-      return `<h2>🎉 Werkplezier bij TestCoders</h2><ul>${d.map((w) => `<li>${esc(w)}</li>`).join('')}</ul>`;
+        <p>${esc(kort(d.omschrijving))}</p>
+        ${d.werkzaamheden?.length ? `<ul>${d.werkzaamheden.slice(0, 4).map((w) => `<li>${esc(w)}</li>`).join('')}</ul>` : ''}
+        ${chips((d.tools ?? []).slice(0, 8))}`;
     case 'finish':
       return finishHtml(cv);
     default:
@@ -111,20 +108,29 @@ export function toast(text) {
 }
 
 export function classicHtml(cv) {
+  const lijst = (items) => `<ul>${items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>`;
   const werk = (cv.werkervaring ?? [])
     .map((w) => `<h3>${esc(w.rol)} — ${esc(w.opdrachtgever)}</h3><p class="meta">${esc(w.periode)}</p>
-      <p>${esc(w.omschrijving)}</p>${chips(w.tools)}`)
+      <p>${esc(w.omschrijving)}</p>${w.werkzaamheden?.length ? lijst(w.werkzaamheden) : ''}${chips(w.tools)}`)
     .join('');
-  const opl = (cv.opleiding ?? []).map((o) => `<li>${esc(o.titel)}, ${esc(o.instituut)} (${esc(o.periode)})</li>`).join('');
+  const perCat = new Map();
+  for (const s of cv.skills ?? []) perCat.set(s.categorie, [...(perCat.get(s.categorie) ?? []), s]);
+  const skills = [...perCat].map(([cat, items]) => `${perCat.size > 1 ? `<h3>${esc(cat)}</h3>` : ''}${meters(items)}`).join('');
+  const opl = (cv.opleiding ?? []).map((o) => `${o.titel}, ${o.instituut} (${o.periode})`);
+  const expertise = (cv.expertise ?? []).map((e) => (e.niveau ? `${e.naam} — ${e.niveau}${e.sinds ? `, sinds ${e.sinds}` : ''}` : e.naam));
+  const talen = (cv.talen ?? []).map((t) => `${t.taal}: ${t.niveau}`);
   return `
-    <h1>${esc(cv.naam)}</h1><p class="meta">${esc(cv.rol)}</p>
+    <h1>${esc(cv.naam)}</h1><p class="meta">${esc(cv.rol)} · in het testvak sinds ${esc(cv.sinds)}</p>
     <h2>Profiel</h2><p>${esc(cv.profiel)}</p>
-    <h2>Werkervaring</h2>${werk}
-    <h2>Vaardigheden</h2>${meters(cv.skills)}
-    ${cv.certificeringen?.length ? `<h2>Certificeringen</h2><ul>${cv.certificeringen.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>` : ''}
-    ${opl ? `<h2>Opleiding</h2><ul>${opl}</ul>` : ''}
-    ${cv.expertise?.length ? `<h2>Expertise</h2><ul>${cv.expertise.map((e) => `<li>${esc(e)}</li>`).join('')}</ul>` : ''}
-    ${(cv.interesses ?? cv.hobbys)?.length ? `<h2>Interesses</h2>${chips(cv.interesses ?? cv.hobbys)}` : ''}
-    ${cv.werkplezier?.length ? `<h2>Werkplezier</h2><ul>${cv.werkplezier.map((w) => `<li>${esc(w)}</li>`).join('')}</ul>` : ''}
+    ${cv.kernwoorden?.length ? chips(cv.kernwoorden) : ''}
+    ${expertise.length ? `<h2>Expertise</h2>${lijst(expertise)}` : ''}
+    <h2>Vaardigheden</h2>${skills}
+    ${talen.length ? `<h3>Talen</h3>${lijst(talen)}` : ''}
+    <h2>Ervaring</h2>${werk}
+    ${opl.length ? `<h2>Opleidingen</h2>${lijst(opl)}` : ''}
+    ${cv.certificeringen?.length ? `<h3>Cursussen en certificeringen</h3>${lijst(cv.certificeringen)}` : ''}
+    ${cv.interesses?.length ? `<h2>Interesses</h2>${chips(cv.interesses)}` : ''}
+    ${cv.conferenties?.length ? `<h3>Bezochte conferenties</h3>${lijst(cv.conferenties)}` : ''}
+    <h2>Werkplezier bij TestCoders</h2>${lijst(TESTCODERS.werkplezier)}
     <h2>Contact via TestCoders</h2>${contactHtml()}`;
 }

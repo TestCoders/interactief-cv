@@ -12,7 +12,10 @@ export default {
     post: 0x7a5230,
     text: '#f4e4c1',
     title: '#ffd23f',
-    dim: '#8f86b3'
+    dim: '#8f86b3',
+    buildings: [0x5b6c8f, 0x8f5b5b, 0x5b8f74, 0x8f7a5b, 0x6c5b8f, 0x5b858f, 0x8f5b80],
+    window: 0x1a1430,
+    windowLit: 0xffd23f
   },
   createTextures(scene) {
     pixelTexture(scene, 'flower', [
@@ -56,5 +59,120 @@ export default {
       'oLlLLLLLLLLLLlLo',
       'oooooooGGooooooo'
     ], chestPalette, 4);
+
+    // Medaille = behaald certificaat.
+    pixelTexture(scene, 'medal', [
+      'rr....rr',
+      '.rr..rr.',
+      '..rRRr..',
+      '..oGGo..',
+      '.oGYYGo.',
+      'oGYGGYGo',
+      'oGYGGYGo',
+      '.oGYYGo.',
+      '..oGGo..'
+    ], { r: '#e4572e', R: '#b83a1c', o: '#8a5a00', G: '#ffb400', Y: '#fff3b0' }, 3);
+
+    // Afstudeerhoed = diploma.
+    pixelTexture(scene, 'cap', [
+      '......KK......',
+      '....KKBBKK....',
+      '..KKBBBBBBKK..',
+      'KKBBBBBBBBBBKK',
+      '..KKBBBBBBKKy.',
+      '....KBBBBK..y.',
+      '....KBBBBK..y.',
+      '.....KKKK...Y.'
+    ], { K: '#1a1430', B: '#3a2d5e', y: '#ffb400', Y: '#ffd23f' }, 3);
+
+    // Ballon (wit, wordt getint) = interesse.
+    pixelTexture(scene, 'balloon', [
+      '..WWWWW..',
+      '.WwWWWWW.',
+      'WwwWWWWWW',
+      'WwWWWWWWW',
+      'WWWWWWWWW',
+      'WWWWWWWWW',
+      '.WWWWWWW.',
+      '..WWWWW..',
+      '...WWW...',
+      '....W....',
+      '....s....',
+      '...s.....',
+      '....s....',
+      '.....s...',
+      '....s....'
+    ], { W: '#d6d6d6', w: '#ffffff', s: '#5a5a5a' }, 3);
+
+    // Cadeautje = optionele bonus-inhoud (alleen voor wie springt).
+    pixelTexture(scene, 'gift', [
+      '...kk..kk...',
+      '....kkkk....',
+      '.bbbbkkbbbb.',
+      '.bBBBkkBBBb.',
+      '.bbbbkkbbbb.',
+      '..pppkkppp..',
+      '..pPPkkPPp..',
+      '..pPPkkPPp..',
+      '..pPPkkPPp..',
+      '..pPPkkPPp..',
+      '..pppkkppp..'
+    ], { k: '#ffd23f', b: '#b8336a', B: '#ff7eb6', p: '#4b3fb3', P: '#8f7cff' }, 3);
+
+    // CI/CD-pipeline (snelreis tussen hoofdstukken): metalen buis met teal band en groene status-led.
+    pixelTexture(scene, 'pipeline', [
+      'KKKKKKKKKKKKKKKK',
+      'KwMMMMMMMMMMMMmK',
+      'KMtttttttttttMmK',
+      'KMtgttttttttttmK',
+      'KmmmmmmmmmmmmmmK',
+      'KKKKKKKKKKKKKKKK',
+      '.KwMMMMMMMMMMmK.',
+      '.KwMMMMMMMMMMmK.',
+      '.KwMMMMMMMMMMmK.',
+      '.KwMMMMMMMMMMmK.',
+      '.KwMMMMMMMMMMmK.',
+      '.KwMMMMMMMMMMmK.',
+      '.KwMMMMMMMMMMmK.',
+      '.KwMMMMMMMMMMmK.',
+      '.KwMMMMMMMMMMmK.',
+      '.KwMMMMMMMMMMmK.',
+      '.KwMMMMMMMMMMmK.',
+      '.KwMMMMMMMMMMmK.',
+      '.KwMMMMMMMMMMmK.',
+      '.KwMMMMMMMMMMmK.',
+      '.KwMMMMMMMMMMmK.',
+      '.KKKKKKKKKKKKKK.'
+    ], { K: '#1a1430', w: '#e8eef2', M: '#9aa7b4', m: '#6b7785', t: '#2ec4b6', g: '#7cff6b' }, 3);
+
+    // Wensballon van licht (interesse die opstijgt).
+    pixelTexture(scene, 'lantern', [
+      '..KKKK..',
+      '.KyyyyK.',
+      'KyYYYYyK',
+      'KyYwwYyK',
+      'KyYYYYyK',
+      'KyYYYYyK',
+      '.KyyyyK.',
+      '..KooK..',
+      '...oo...'
+    ], { K: '#5a2a00', y: '#ff9f1c', Y: '#ffd166', w: '#fff3b0', o: '#ff5400' }, 3);
+
+    // Kampvuur (2 frames voor flakkeren).
+    const fire = [
+      '....r.....',
+      '...rr..r..',
+      '...rOr.rr.',
+      '..rOOrrOr.',
+      '..rOYOrOr.',
+      '.rOYYOOOr.',
+      '.rOYwYYOr.',
+      'rOYwwwYOOr',
+      'rOYwwwYYOr',
+      '.rOYYYYOr.'
+    ];
+    const firePal = { r: '#c1121f', O: '#ff6b1a', Y: '#ffd166', w: '#fff3b0' };
+    pixelTexture(scene, 'fire0', fire, firePal, 4);
+    pixelTexture(scene, 'fire1', fire.map((r) => [...r].reverse().join('')), firePal, 4);
   }
 };
