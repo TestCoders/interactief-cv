@@ -71,7 +71,11 @@ Context: TestCoders is een detacheringsbureau gespecialiseerd in testautomatiser
 ## 5. Nice-to-Have
 *Pas oppakken als de basis werkt.*
 
-- Verschillende gamestijlen.
+- Verschillende gamestijlen:
+  - **Retro pixel-art:** 8/16-bit gamelook, speels en herkenbaar.
+  - **Strak en zakelijk:** modern en professioneel, met game-elementen als accent.
+  - **Kleurrijk en speels:** vrolijke kleuren, ronde vormen, illustratief.
+  - **Donker en futuristisch:** neon-accenten op een donkere achtergrond.
 - Meerdere personen en cv's waaruit de klant kan kiezen.
 - Een Markdown-bestand als invoer gebruiken om de inhoud automatisch te vullen.
 - Eventueel een uploadmogelijkheid voor dat bestand.

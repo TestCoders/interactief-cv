@@ -3,11 +3,13 @@ import { buildStations } from '../cv.js';
 import { showPanel, hidePanel, stationHtml } from '../ui.js';
 import { createPiece } from '../pieces/index.js';
 import retro from '../themes/retro.js';
+import { heroKey } from '../heroes.js';
 
 const BASE_H = 540; // wereldhoogte; het venster mag groter zijn (Scale.EXPAND), de wereld schaalt niet mee
 const GROUND_H = 64;
 const STATION_GAP = 620;
 const START_X = 420;
+const HERO_SCALE = 3;
 
 // --- Game feel: alle knoppen om aan te draaien op één plek ---
 const MAX_SPEED = 300; // px/s
@@ -79,11 +81,13 @@ export default class LevelScene extends Phaser.Scene {
 
     // --- Speler ---
     // Hitbox en uiterlijk zijn gescheiden: squash & wiebel mogen de physics niet beïnvloeden.
-    const tint = Phaser.Display.Color.HexStringToColor(this.cv.kleur ?? '#3c8772').color;
-    this.player = this.physics.add.sprite(120, groundY - 60, 'player').setCollideWorldBounds(true).setVisible(false);
-    this.player.body.setSize(26, 42).setOffset(3, 2);
-    this.vis = this.add.image(120, groundY, 'player').setOrigin(0.5, 1).setTint(tint).setDepth(5);
-    this.events.on('postupdate', () => this.vis.setPosition(this.player.x, this.player.y + 22));
+    this.heroKey = heroKey(this.cv);
+    this.player = this.physics.add.sprite(120, groundY - 60, this.heroKey, 'idle0')
+      .setScale(HERO_SCALE).setCollideWorldBounds(true).setVisible(false);
+    this.player.body.setSize(10, 16).setOffset(3, 2);
+    this.vis = this.add.sprite(120, groundY, this.heroKey, 'idle0')
+      .setOrigin(0.5, 1).setScale(HERO_SCALE).setDepth(5).play(`${this.heroKey}-idle`);
+    this.events.on('postupdate', () => this.vis.setPosition(this.player.x, this.player.y + 27));
     this.physics.add.collider(this.player, this.ground);
     this.cameras.main.startFollow(this.player, true, 0.09, 0.09, -LOOKAHEAD, 0);
 
@@ -233,7 +237,7 @@ export default class LevelScene extends Phaser.Scene {
 
     // --- Landen: squash + stof ---
     if (grounded && !this.wasGrounded && this.lastVy > 250) {
-      this.dust.explode(Math.min(14, Math.round(this.lastVy / 60)), player.x, player.y + 22);
+      this.dust.explode(Math.min(14, Math.round(this.lastVy / 60)), player.x, player.y + 27);
       this.squash(1.25, 0.75);
     }
     this.wasGrounded = grounded;
@@ -244,15 +248,15 @@ export default class LevelScene extends Phaser.Scene {
     if (!this.squashing) {
       if (grounded) {
         const bob = Math.sin(time / 55) * 0.06 * speedRatio;
-        vis.setScale(1 + bob, 1 - bob);
+        vis.setScale(HERO_SCALE * (1 + bob), HERO_SCALE * (1 - bob));
         vis.setAngle(Math.sin(time / 110) * 5 * speedRatio);
       } else {
         const stretch = Phaser.Math.Clamp(Math.abs(body.velocity.y) / 2000, 0, 0.15);
-        vis.setScale(1 - stretch, 1 + stretch);
+        vis.setScale(HERO_SCALE * (1 - stretch), HERO_SCALE * (1 + stretch));
         vis.setAngle(Phaser.Math.Clamp(newVx / 40, -8, 8));
       }
     }
-    if (grounded && speedRatio > 0.8 && Math.random() < 0.08) this.dust.explode(1, player.x - Math.sign(newVx) * 10, player.y + 22);
+    if (grounded && speedRatio > 0.8 && Math.random() < 0.08) this.dust.explode(1, player.x - Math.sign(newVx) * 10, player.y + 27);
 
     if (Math.abs(newVx) > 5 && !this.hasMoved) {
       this.hasMoved = true;
@@ -266,6 +270,9 @@ export default class LevelScene extends Phaser.Scene {
     const wantOffset = -Math.sign(newVx || (vis.flipX ? -1 : 1)) * LOOKAHEAD;
     cam.followOffset.x = Phaser.Math.Linear(cam.followOffset.x, wantOffset, 0.03);
 
+    const anim = !grounded ? 'jump' : Math.abs(newVx) > 5 ? 'run' : 'idle';
+    vis.play(`${this.heroKey}-${anim}`, true);
+
     // Parallax.
     this.clouds.tilePositionX = cam.scrollX * 0.1;
     this.hills.tilePositionX = cam.scrollX * 0.35;
@@ -278,15 +285,15 @@ export default class LevelScene extends Phaser.Scene {
     this.jumpedByKey = this.time.now - this.jumpPressedAt <= BUFFER_MS;
     this.jumpPressedAt = -1e9;
     this.lastGroundedAt = -1e9; // geen dubbele coyote-sprong
-    this.dust.explode(6, this.player.x, this.player.y + 22);
+    this.dust.explode(6, this.player.x, this.player.y + 27);
     this.squash(0.8, 1.2);
   }
 
   squash(sx, sy) {
     this.squashing = true;
-    this.vis.setScale(sx, sy).setAngle(0);
+    this.vis.setScale(HERO_SCALE * sx, HERO_SCALE * sy).setAngle(0);
     this.tweens.add({
-      targets: this.vis, scaleX: 1, scaleY: 1, duration: 160, ease: 'Back.out',
+      targets: this.vis, scaleX: HERO_SCALE, scaleY: HERO_SCALE, duration: 160, ease: 'Back.out',
       onComplete: () => (this.squashing = false)
     });
   }

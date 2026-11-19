@@ -1,6 +1,7 @@
 // Controleert alle CV-bestanden in src/data/cv op verplichte velden. Exit-code 1 bij fouten.
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const dir = new URL('../src/data/cv/', import.meta.url);
 const files = readdirSync(dir).filter((f) => f.endsWith('.json'));
@@ -12,7 +13,7 @@ for (const file of files) {
   const err = (msg) => errors.push(`${file}: ${msg}`);
   let cv;
   try {
-    cv = JSON.parse(readFileSync(join(dir.pathname, file), 'utf8'));
+    cv = JSON.parse(readFileSync(join(fileURLToPath(dir), file), 'utf8'));
   } catch (e) {
     err(`geen geldige JSON (${e.message})`);
     continue;
