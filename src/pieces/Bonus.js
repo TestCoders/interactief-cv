@@ -1,4 +1,5 @@
 import { label, pop } from './draw.js';
+import { audio } from '../audio/index.js';
 
 // Bonus-inhoud: een zwevend cadeautje boven het pad. Niet nodig om het CV te begrijpen,
 // wel een leuke extra voor wie springt (spatie / ↑, of tikken op het cadeautje).
@@ -23,6 +24,7 @@ export default class Bonus {
     const { scene, theme } = this;
     this.hint.destroy();
     this.sparks.explode(26, this.gift.x, this.gift.y);
+    audio.play('bonus');
     scene.tweens.killTweensOf(this.gift);
     this.gift.disableBody(true, false);
     scene.tweens.add({ targets: this.gift, scale: 1.6, alpha: 0, duration: 260, ease: 'Quad.out' });

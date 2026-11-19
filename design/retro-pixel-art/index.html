@@ -39,6 +39,16 @@
   .frame { overflow-x: auto; background: var(--paper); box-shadow: 0 -4px 0 0 var(--ink), 0 4px 0 0 var(--ink), -4px 0 0 0 var(--ink), 4px 0 0 0 var(--ink); margin: 4px; max-width: max-content; }
   iframe { display: block; border: 0; width: 960px; height: 540px; }
   iframe.stijlgids { width: 1440px; height: 2680px; }
+  .geluid { display: flex; flex-wrap: wrap; gap: 16px; padding: 4px; margin: 0; }
+  .geluid button {
+    font-family: 'Press Start 2P', monospace; font-size: 11px; line-height: 1.4; min-height: 44px; padding: 12px 16px;
+    border: 0; cursor: pointer; color: var(--ink); background: var(--paper);
+    box-shadow: 0 -4px 0 0 var(--ink), 0 4px 0 0 var(--ink), -4px 0 0 0 var(--ink), 4px 0 0 0 var(--ink), inset -4px -4px 0 0 #c9ccd6;
+  }
+  .geluid button:hover { background: #ffffff; }
+  .geluid button:active { transform: translateY(2px); }
+  .geluid button[aria-pressed="true"] { color: #ffffff; background: var(--accent-dark); box-shadow: 0 -4px 0 0 var(--ink), 0 4px 0 0 var(--ink), -4px 0 0 0 var(--ink), 4px 0 0 0 var(--ink), inset -4px -4px 0 0 var(--accent-deep), inset 4px 4px 0 0 var(--accent); }
+  .geluid button:focus-visible { outline: 3px solid #f2b22e; outline-offset: 6px; }
 </style>
 </head>
 <body>
@@ -53,6 +63,7 @@
   <div role="tablist" aria-label="Onderdelen van het ontwerp">
     <button type="button" role="tab" id="tab-screens" aria-controls="screens" aria-selected="true">GAME-SCREENS</button>
     <button type="button" role="tab" id="tab-stijlgids" aria-controls="stijlgids" aria-selected="false" tabindex="-1">STIJLGIDS</button>
+    <button type="button" role="tab" id="tab-geluid" aria-controls="geluid" aria-selected="false" tabindex="-1">GELUID</button>
   </div>
 
   <div role="tabpanel" id="screens" aria-labelledby="tab-screens" tabindex="0">
@@ -73,7 +84,30 @@
       <div class="frame"><iframe class="stijlgids" src="stijlgids.html" title="Stijlgids retro pixel-art"></iframe></div>
     </section>
   </div>
+
+  <div role="tabpanel" id="geluid" aria-labelledby="tab-geluid" tabindex="0" hidden data-geluid="retro">
+    <section>
+      <h2>Achtergrondmuziek</h2>
+      <p>8-bit chiptune: een pulsgolf-melodie, een driehoeksbas en ruis als drums (C – Am – F – G, 132 bpm). Alles wordt live gegenereerd met de Web Audio API, net als in de game (<code>src/audio/packs/retro.js</code>). Werkt via <code>npm run design</code>.</p>
+      <div class="geluid"><button type="button" data-muziek aria-pressed="false">Muziek afspelen</button></div>
+    </section>
+    <section>
+      <h2>Geluidseffecten</h2>
+      <div class="geluid">
+        <button type="button" data-sfx="jump">Springen</button>
+        <button type="button" data-sfx="land">Landen</button>
+        <button type="button" data-sfx="enter">Onderdeel bereikt</button>
+        <button type="button" data-sfx="bonus">Cadeautje uitpakken</button>
+        <button type="button" data-sfx="travelIn">Pipeline in</button>
+        <button type="button" data-sfx="travelOut">Pipeline uit</button>
+        <button type="button" data-sfx="finish">Finish</button>
+        <button type="button" data-sfx="select">Kiezen</button>
+        <button type="button" data-sfx="confirm">Bevestigen</button>
+      </div>
+    </section>
+  </div>
 </main>
+<script type="module" src="../geluid.js"></script>
 
 <script>
   // Tabs: klik of pijltjestoetsen; de gekozen tab staat in de URL (#screens of #stijlgids).

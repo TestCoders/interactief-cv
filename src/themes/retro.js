@@ -5,6 +5,7 @@ import { pixelTexture } from '../pixel.js';
 export default {
   name: 'retro',
   label: 'Retro',
+  audio: 'retro', // geluidspakket in src/audio/packs
   tex: (key) => key, // retro-textures staan onder hun kale naam (deels gemaakt in BootScene)
   // Dag → avond (zie LevelScene.updateSky)
   sky: { dag: 0x9fd6ff, middag: 0xbfe0f0, zonsondergang: 0xff9e7a, avond: 0x2b2147 },

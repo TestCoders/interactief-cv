@@ -13,6 +13,7 @@ Hackathonproject: het TestCoders-CV als side scroller (Phaser 3.90 + Vite, vanil
 - Draai `npm run test:e2e` na gameplaywijzigingen.
 - Contact loopt altijd via TestCoders (`src/testcoders.js`), nooit rechtstreeks naar de consultant.
 - Tekst in de DOM-overlay altijd escapen met `esc()`.
+- Geluid wordt live gesynthetiseerd (Web Audio, geen bestanden) in `src/audio/`: één pakket per game-stijl in `src/audio/packs/` (`sfx` + `music`, optioneel `ambience`), gekozen via `theme.audio`. Speel effecten af met `audio.play('<naam>')`; nieuwe effectnamen in álle pakketten toevoegen en in de tab "Geluid" van `design/<stijl>/index.html`.
 - Textures worden gegenereerd in `BootScene`; echte sprites horen in `public/assets/` en worden geladen in een `preload()`.
 - Gebruik alleen verzonnen data in voorbeelden (`@example.com`).
 - Controleer na wijzigingen met `npm run build`.

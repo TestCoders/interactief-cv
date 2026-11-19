@@ -5,6 +5,7 @@ import { THEMES, THEME_IDS, applyThemeCss } from './themes/index.js';
 import BootScene from './scenes/BootScene.js';
 import SelectScene from './scenes/SelectScene.js';
 import LevelScene from './scenes/LevelScene.js';
+import { audio } from './audio/index.js';
 
 export const WIDTH = 960;
 export const HEIGHT = 540;
@@ -20,6 +21,7 @@ const game = new Phaser.Game({
   pixelArt: true,
   roundPixels: true, // camera en sprites op hele pixels: geen trillende tekst tijdens het lopen
   physics: { default: 'arcade', arcade: { gravity: { y: 1400 }, debug: false } },
+  audio: { noAudio: true }, // geluid loopt via src/audio (Web Audio-synthese), niet via Phaser
   // RESIZE: het canvas rendert op de echte venstergrootte (scherp); de LevelScene zoomt de wereld van 540 px hoog op naar schermhoogte.
   scale: { mode: Phaser.Scale.RESIZE, width: window.innerWidth, height: window.innerHeight },
   scene: [BootScene, SelectScene, LevelScene]
@@ -38,6 +40,7 @@ function setStyle(id) {
   const theme = THEMES[id] ?? THEMES.retro;
   game.registry.set('theme', theme.name);
   applyThemeCss(theme);
+  audio.setPack(theme.audio); // muziek en effecten wisselen mee met de stijl
   styleBtn.textContent = `Stijl: ${theme.label} ⇄`;
   store.set(theme.name);
 }
@@ -76,6 +79,17 @@ game.registry.events.on('changedata-currentCv', (_parent, cv) => {
   mdLink.href = cv ? `./cv/${cv.id}.md` : './llms.txt';
 });
 
+// --- Geluid: muziek start bij de eerste klik of toets (eerder laat de browser het niet toe) ---
+audio.music(true);
+for (const type of ['pointerdown', 'keydown', 'touchend']) window.addEventListener(type, () => audio.unlock(), { capture: true });
+const soundBtn = document.getElementById('btn-sound');
+const renderSound = () => (soundBtn.textContent = audio.isMuted() ? 'Geluid: uit' : 'Geluid: aan');
+soundBtn.addEventListener('click', () => {
+  audio.setMuted(!audio.isMuted());
+  renderSound();
+});
+renderSound();
+
 // --- Knoppen in de topbar ---
 const classic = document.getElementById('classic');
 document.getElementById('btn-classic').addEventListener('click', () => {
@@ -84,10 +98,12 @@ document.getElementById('btn-classic').addEventListener('click', () => {
   document.getElementById('classic-content').innerHTML = classicHtml(cv);
   classic.hidden = false;
   game.loop.sleep();
+  audio.pause();
 });
 document.getElementById('btn-close-classic').addEventListener('click', () => {
   classic.hidden = true;
   game.loop.wake();
+  audio.resume();
 });
 document.getElementById('btn-switch').addEventListener('click', () => {
   hidePanel();

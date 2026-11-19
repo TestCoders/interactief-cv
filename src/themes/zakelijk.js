@@ -12,6 +12,7 @@ const rr = (ctx, x, y, w, h, r) => { ctx.beginPath(); ctx.roundRect(x, y, w, h, 
 export default {
   name: 'zakelijk',
   label: 'Zakelijk',
+  audio: 'zakelijk', // geluidspakket in src/audio/packs
   tex: (key) => `z-${key}`,
   font: '"Space Grotesk", Inter, system-ui, sans-serif',
   colors: {

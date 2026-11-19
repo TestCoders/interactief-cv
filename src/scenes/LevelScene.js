@@ -5,6 +5,7 @@ import { createPiece, widthOf, bonusFor } from '../pieces/index.js';
 import Bonus from '../pieces/Bonus.js';
 import { THEMES } from '../themes/index.js';
 import { heroKey } from '../heroes.js';
+import { audio } from '../audio/index.js';
 
 const BASE_H = 540; // wereldhoogte; de camera zoomt dit op naar de schermhoogte (scherp, geen opgerekt canvas)
 const GROUND_H = 64;
@@ -57,6 +58,7 @@ export default class LevelScene extends Phaser.Scene {
   init({ cv, startX }) {
     this.cv = cv;
     this.theme = THEMES[this.registry.get('theme')] ?? THEMES.retro;
+    audio.setPack(this.theme.audio);
     this.startX = startX;
     this.gate = null;
     this.ff = 1;
@@ -318,6 +320,7 @@ export default class LevelScene extends Phaser.Scene {
     const from = this.player.x;
     const pipeIn = this.add.image(from, this.groundY + 4, this.theme.tex('pipeline')).setOrigin(0.5, 1).setDepth(6).setScale(1, 0);
     this.player.setVelocity(0);
+    audio.play('travelIn');
     this.tweens.add({ targets: pipeIn, scaleY: 1, duration: 180, ease: 'Back.out' });
     this.tweens.add({ targets: this.vis, alpha: 0, duration: 200, delay: 220 });
     this.tweens.add({
@@ -331,6 +334,7 @@ export default class LevelScene extends Phaser.Scene {
           this.lastDir = 1;
           cam.followOffset.x = -LOOKAHEAD;
           const pipeOut = this.add.image(destX, this.groundY + 4, this.theme.tex('pipeline')).setOrigin(0.5, 1).setDepth(6).setScale(1, 0);
+          audio.play('travelOut');
           this.tweens.add({ targets: pipeOut, scaleY: 1, duration: 180, ease: 'Back.out' });
           this.tweens.add({ targets: this.vis, alpha: 1, duration: 150, delay: 160 });
           this.tweens.add({
@@ -417,6 +421,7 @@ export default class LevelScene extends Phaser.Scene {
     if (grounded && !this.wasGrounded && this.lastVy > 250) {
       this.dust.explode(Math.min(14, Math.round(this.lastVy / 60)), player.x, player.y + 27);
       this.squash(1.25, 0.75);
+      audio.play('land');
     }
     this.wasGrounded = grounded;
     this.lastVy = body.velocity.y;
@@ -538,6 +543,7 @@ export default class LevelScene extends Phaser.Scene {
     this.lastGroundedAt = -1e9; // geen dubbele coyote-sprong
     this.dust.explode(6, this.player.x, this.player.y + 27);
     this.squash(0.8, 1.2);
+    audio.play('jump');
   }
 
   squash(sx, sy) {
@@ -561,7 +567,10 @@ export default class LevelScene extends Phaser.Scene {
       const near = piece.triggerAt !== undefined
         ? visible && px > piece.triggerAt && px < piece.x + piece.halfWidth + 200
         : visible && Math.abs(piece.stopX - px) < piece.halfWidth + 260;
-      if (near && !piece.active) piece.enter();
+      if (near && !piece.active) {
+        piece.enter();
+        audio.play('enter');
+      }
       if (!near && piece.active) piece.leave();
       piece.active = near;
     }
@@ -570,6 +579,7 @@ export default class LevelScene extends Phaser.Scene {
       if (!this.finished) {
         this.finished = true;
         this.confetti.explode(60, this.finishX + 30, BASE_H - 200);
+        audio.play('finish');
       }
       showPanel('finish', stationHtml({ type: 'finish' }, this.cv));
       return;

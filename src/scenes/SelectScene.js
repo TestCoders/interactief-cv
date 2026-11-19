@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { heroKey } from '../heroes.js';
+import { audio } from '../audio/index.js';
 
 // Karakterselectie: één karakter per CV-bestand.
 export default class SelectScene extends Phaser.Scene {
@@ -43,6 +44,7 @@ export default class SelectScene extends Phaser.Scene {
   move(dir) {
     this.index = Phaser.Math.Wrap(this.index + dir, 0, this.cards.length);
     this.highlight();
+    audio.play('select');
   }
 
   highlight() {
@@ -56,6 +58,7 @@ export default class SelectScene extends Phaser.Scene {
     const url = new URL(location.href);
     url.searchParams.set('cv', cv.id);
     history.replaceState(null, '', url);
+    audio.play('confirm');
     this.scene.start('level', { cv });
   }
 }
