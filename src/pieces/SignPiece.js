@@ -1,3 +1,5 @@
+import { textStyle } from './draw.js';
+
 // Standaard checkpoint: bord met label; de inhoud verschijnt in het paneel.
 // Placeholder tot elk CV-onderdeel een eigen set piece heeft.
 export default class SignPiece {
@@ -8,10 +10,9 @@ export default class SignPiece {
     this.usesPanel = true;
     const sign = scene.add.image(x, groundY, theme.tex('sign')).setOrigin(0.5, 1);
     // Label midden op het bordvlak (bovenste ~55% van de texture).
-    scene.add.text(x, groundY - sign.height + 30, station.label, {
-      fontFamily: theme.font, fontSize: '12px', fontStyle: 'bold', color: theme.colors.signText ?? theme.colors.text,
-      align: 'center', wordWrap: { width: 76 }
-    }).setOrigin(0.5);
+    scene.add.text(x, groundY - sign.height + 30, station.label, textStyle(theme, 12, {
+      color: theme.colors.signText ?? theme.colors.text, align: 'center', wordWrap: { width: 76 }
+    })).setOrigin(0.5);
   }
   start() {}
 }

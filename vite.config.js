@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import { localCvShares } from './server/localCvShares.js';
 import { CV_DIR, readCvs, cvToMarkdown, llmsTxt, llmsFullTxt } from './scripts/cv-to-md.mjs';
 
 // Publieke URL van de game; komt in de Markdown zodat een AI naar de interactieve versie kan verwijzen.
@@ -39,6 +40,6 @@ function aiMarkdown() {
 // Relatieve base: werkt op GitHub Pages (/<repo>/), op een eigen domein en lokaal.
 export default defineConfig({
   base: './',
-  plugins: [aiMarkdown()],
+  plugins: [aiMarkdown(), localCvShares()],
   build: { chunkSizeWarningLimit: 2000 }
 });

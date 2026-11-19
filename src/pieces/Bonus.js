@@ -1,5 +1,9 @@
+import Phaser from 'phaser';
 import { label, pop, pixelBox } from './draw.js';
 import { audio } from '../audio/index.js';
+
+const CARD_MARGIN = 12; // minimale ruimte tussen het kaartje en het bord ernaast
+const CARD_NEAR = 170; // binnen deze afstand van het cadeautje is het kaartje zichtbaar
 
 // Bonus-inhoud: een zwevend cadeautje boven het pad. Niet nodig om het CV te begrijpen,
 // wel een leuke extra voor wie springt (spatie / ↑, of tikken op het cadeautje).
@@ -36,13 +40,16 @@ export default class Bonus {
       scene.tweens.add({ targets: this.gift, scale: 1.6, alpha: 0, duration: 260, ease: 'Quad.out' });
     }
 
-    // Kaartje met de extra inhoud, boven het cadeautje.
+    // Kaartje met de extra inhoud, boven het cadeautje. Smal genoeg om tussen de buren te passen
+    // (niet over het bord van een ander onderdeel) en laag genoeg om onder de HUD te blijven.
     const items = this.items.slice(0, 12);
     const cols = items.length > 6 ? 2 : 1;
-    const colW = cols === 2 ? 200 : 240;
+    const colW = cols === 2 ? 148 : 240;
+    const maxChars = cols === 2 ? 19 : 26;
     const rows = Math.ceil(items.length / cols);
+    const rowH = Math.round(20 * Math.max(1, (theme.fontScale ?? 1) * 0.85));
     const w = cols * colW + 28;
-    const h = 44 + rows * 20 + 10;
+    const h = 44 + rows * rowH + 10;
     const g = scene.add.graphics();
     const { colors } = theme;
     g.fillStyle(colors.boardShadow).fillRect(-w / 2 + 4, -h + 4, w, h);
@@ -52,12 +59,34 @@ export default class Bonus {
     items.forEach((it, i) => {
       const col = Math.floor(i / rows);
       const row = i % rows;
-      const txt = it.length > 26 ? it.slice(0, 25) + '…' : it;
-      parts.push(label(scene, -w / 2 + 14 + col * colW, -h + 40 + row * 20, `· ${txt}`, theme, { size: 12, bold: false }));
+      const txt = it.length > maxChars ? it.slice(0, maxChars - 1) + '…' : it;
+      parts.push(label(scene, -w / 2 + 14 + col * colW, -h + 40 + row * rowH, `· ${txt}`, theme, { size: 12, bold: false }));
     });
-    const card = scene.add.container(this.x, this.gift.y + 20, parts).setDepth(8);
+    const card = scene.add.container(this.cardX(w), this.gift.y + 20, parts).setDepth(8);
+    this.card = card;
+    this.cardVisible = true;
     pop(scene, card, 80, 380);
     scene.tweens.add({ targets: card, y: card.y - 6, duration: 1200, yoyo: true, repeat: -1, ease: 'Sine.inOut', delay: 500 });
     scene.onBonusOpened?.();
+  }
+
+  /** Midden van het kaartje: zo dicht mogelijk boven het cadeautje, maar binnen de ruimte tussen de buren. */
+  cardX(w) {
+    const pieces = this.scene.pieces ?? [];
+    const prevRight = Math.max(-Infinity, ...pieces.filter((p) => p.x < this.x).map((p) => p.x + (p.halfWidth ?? 0)));
+    const nextLeft = Math.min(Infinity, ...pieces.filter((p) => p.x > this.x).map((p) => p.x - (p.halfWidth ?? 0)));
+    const lo = prevRight + w / 2 + CARD_MARGIN;
+    const hi = nextLeft - w / 2 - CARD_MARGIN;
+    if (lo <= hi) return Phaser.Math.Clamp(this.x, lo, hi);
+    return Number.isFinite(prevRight + nextLeft) ? (prevRight + nextLeft) / 2 : this.x;
+  }
+
+  /** Het kaartje is er alleen als je bij het cadeautje staat; loop je door, dan vervaagt het (en het bord erachter is leesbaar). */
+  follow(playerX) {
+    if (!this.card) return;
+    const near = Math.abs(playerX - this.x) < CARD_NEAR;
+    if (near === this.cardVisible) return;
+    this.cardVisible = near;
+    this.scene.tweens.add({ targets: this.card, alpha: near ? 1 : 0, duration: 250, ease: 'Quad.out' });
   }
 }

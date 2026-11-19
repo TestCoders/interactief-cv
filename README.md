@@ -7,6 +7,8 @@ Het TestCoders-CV als speelbare side scroller. Je loopt door iemands loopbaan: e
 
 ## Snel starten
 
+Op macOS kun je met [Start Interactief CV.command](./Start%20Interactief%20CV.command) de app starten. Je hebt Node.js met npm nodig.
+
 ```bash
 npm install
 npm run dev        # http://localhost:5173
@@ -20,6 +22,26 @@ npm run dev        # http://localhost:5173
 | `npm run preview` | Productiebuild lokaal bekijken |
 
 Besturing: ← → / A D lopen, spatie / ↑ / W springen. Knop **Klassiek CV** toont hetzelfde CV als gewone (printbare) pagina.
+
+## Eigen Markdown-cv spelen en delen
+
+Open de startpagina met `npm run dev`. Speel een voorbeeldpersoon of kies
+**Create your own**. Kies een avatar en upload een UTF-8 Markdown-bestand van
+maximaal 64 KB. De parser herkent een naam en rol in de kop, **Profiel**,
+**Vaardigheden** of **Skills**, en **Ervaring** of **Werkervaring**. Gebruik
+één kop per opdracht, met rol, opdrachtgever, periode en omschrijving.
+**Expertise**, **Opleidingen** en **Interesses** zijn optioneel. Retro pixel-art
+en Business isometric zijn speelbaar. De andere twee stijlen zijn toekomstig.
+
+Bij **Start game** wordt je eigen cv naar de lokale Vite-server verstuurd en
+komt de tijdelijke link beschikbaar onder **Deel je cv**. De avatar reist
+mee in de link.
+De server bewaart de ingelezen spelgegevens in het geheugen en verwijdert ze automatisch
+na zeven dagen. Stoppen of herstarten van de server wist ook de links. De link
+bevat een willekeurige code en werkt alleen als de ontvanger diezelfde draaiende
+server kan bereiken. Op `localhost` werkt hij alleen op dezelfde computer.
+De API werkt ook bij `npm run preview`. De statische GitHub Pages-site heeft
+geen lokale opslagserver.
 
 ## Hoe het level werkt
 
@@ -66,7 +88,7 @@ Werkt in `npm run dev` én in de build. Knop **AI / Markdown** in de topbar open
 |------|-----------|------------|
 | `naam`, `rol`, `profiel` | ja | Eerste bord |
 | `kleur` | nee | Kleur van je karakter (`"#rrggbb"`) |
-| `uiterlijk` | nee | Vast personage in plaats van het standaardpoppetje, in beide gamestijlen. Nu beschikbaar: `"martijn"` (kaal met bril, blauwe trui met TC-logo). Zie `src/config/uiterlijk.js` |
+| `uiterlijk` | nee | Vast personage in plaats van het standaardpoppetje, in beide gamestijlen. Nu beschikbaar: `"martijn"` (kaal met bril, blauwe trui met TC-logo). Zie `src/config/uiterlijk.js`. Of een object met kenmerken uit een foto (`kapsel`, `haarkleur`, `huid`, `bril`, `baard`): maak het met de skill `foto-naar-pixelart` en bekijk het met `npm run heroes` |
 | `opleiding[]` (`periode`, `titel`, `instituut`) | nee | Oorkondes bij het opleidingsonderdeel |
 | `werkervaring[]` (`periode`, `rol`, `opdrachtgever`, `omschrijving`, `tools[]`) | ja | Eén bord per opdracht — **nieuwste eerst** in de JSON, de game loopt van oud naar nieuw |
 | `expertise[]` (tekst of `naam`, `niveau`, `sinds`) | nee | Badges uit de schatkist |
@@ -111,6 +133,7 @@ src/themes/retroTheme.js       kleuren, font en textures van de retrostijl
 src/ui/                        DOM-overlay: paneel, templates, topbar, contactformulier
 src/data/cv/*.json             één CV per persoon
 scripts/validate-cv.mjs        validatie van de CV-bestanden
+scripts/hero-preview.mjs       PNG-preview van de pixel-art helden (npm run heroes)
 ```
 
 ## Voorstel taakverdeling (3 personen)

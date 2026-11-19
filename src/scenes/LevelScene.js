@@ -378,10 +378,13 @@ export default class LevelScene extends Phaser.Scene {
     if (Math.abs(newVx) > 5 || forwardPressed) this.dismissTitle();
 
     const cam = this.cameras.main;
-    cam.followOffset.x = Phaser.Math.Linear(cam.followOffset.x, -this.lastDir * CAMERA.lookahead, CAMERA.lookaheadLerp);
+    cam.followOffset.x = Phaser.Math.Linear(cam.followOffset.x, -this.lastDir * CAMERA.lookahead - this.panelShift(), CAMERA.lookaheadLerp);
     this.updateParallax();
 
-    for (const b of this.bonuses) b.showHint(Math.abs(b.x - player.x) < 110 && grounded);
+    for (const b of this.bonuses) {
+      b.showHint(Math.abs(b.x - player.x) < 110 && grounded);
+      b.follow?.(player.x);
+    }
     this.updateCoach();
     this.updatePieces();
     this.updateChapters();
@@ -447,6 +450,19 @@ export default class LevelScene extends Phaser.Scene {
     piece.active = true;
     if (!instant) audio.play('enter');
     this.sharpenText();
+  }
+
+  /**
+   * Staat de tekstbox rechts open, dan kijkt de camera een halve tekstbox verder vooruit,
+   * zodat het onderdeel links ervan in beeld staat in plaats van eronder.
+   * Niet op smalle schermen (tekstbox over de volle breedte) en niet bij het contactformulier (midden).
+   */
+  panelShift() {
+    const panel = document.getElementById('panel');
+    if (!panel || panel.hidden || !panel.classList.contains('in') || panel.querySelector('.contact-form')) return 0;
+    const width = panel.offsetWidth;
+    if (width > this.scale.width * 0.6) return 0;
+    return (width + 40) / 2 / this.cameras.main.zoom;
   }
 
   updateParallax() {

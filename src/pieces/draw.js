@@ -21,11 +21,21 @@ export function pixelBox(g, left, top, w, h, colors) {
   g.fillStyle(colors.board).fillRect(left, top, w, h);
 }
 
+/**
+ * Tekststijl van het thema voor tekst in de game. Leesbaarheid per thema:
+ * - minFontSize: nooit kleiner dan dit (retro: een pixelfont wordt klein onleesbaar);
+ * - fontScale: pixelfonts tekenen kleiner per px, dus groter zetten zodat ze even groot ogen;
+ * - boldText: false bij fonts met één gewicht (geen wazig namaak-vet).
+ */
+export function textStyle(theme, size, { bold = true, ...rest } = {}) {
+  const px = Math.round(Math.max(size, theme.minFontSize ?? 0) * (theme.fontScale ?? 1));
+  return { fontFamily: theme.font, fontSize: `${px}px`, fontStyle: bold && theme.boldText !== false ? 'bold' : 'normal', ...rest };
+}
+
 export function label(scene, x, y, text, theme, { size = 13, color, bold = true, wrap, align = 'left' } = {}) {
-  return scene.add.text(x, y, text, {
-    fontFamily: theme.font, fontSize: `${size}px`, fontStyle: bold ? 'bold' : 'normal',
-    color: color ?? theme.colors.text, align, wordWrap: wrap ? { width: wrap } : undefined
-  });
+  return scene.add.text(x, y, text, textStyle(theme, size, {
+    bold, color: color ?? theme.colors.text, align, wordWrap: wrap ? { width: wrap } : undefined
+  }));
 }
 
 export const shorten = (s, n) => (s.length > n ? s.slice(0, n - 1) + '…' : s);
