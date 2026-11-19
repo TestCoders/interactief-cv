@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spelvormen — Interactief cv</title>
+<link rel="icon" href="/brand/testcoders-mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #16202a; --muted: #55606b; --paper: #f6f7f5; --line: #dfe3e0; --accent: #2f6f5d; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: Inter, system-ui, sans-serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 56px 16px 80px; display: flex; flex-direction: column; gap: 32px; }
+  .kicker { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .kicker a { color: inherit; }
+  h1 { margin: 10px 0 8px; font-family: 'Space Grotesk', sans-serif; font-size: clamp(30px, 5vw, 44px); letter-spacing: -.02em; }
+  p { margin: 0; font-size: 18px; line-height: 1.5; color: var(--muted); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+  .card { display: flex; flex-direction: column; gap: 10px; padding: 24px; background: #ffffff; border: 1px solid var(--line); border-radius: 14px; color: inherit; text-decoration: none; }
+  a.card:hover { border-color: var(--accent); }
+  a.card:focus-visible { outline: 3px solid #9cc7b8; outline-offset: 2px; }
+  .card h2 { margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 22px; }
+  .card .num { font-size: 13px; color: var(--muted); }
+  .card p { font-size: 16px; }
+  .card code { font-size: 13px; background: #eef2ef; padding: 1px 6px; border-radius: 4px; }
+  .note { font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="kicker"><a href="../">Interactief cv · ontwerp</a> · proefversies</p>
+    <h1>Spelvormen</h1>
+    <p>Zelfde cv-data en TestCoders-frame, een andere manier van ontdekken. Werkende proefversies naast de sidescroller; nog niet in de game zelf.</p>
+  </header>
+  <div class="grid">
+    <a class="card" href="terminal.html">
+      <span class="num">Vorm 1</span>
+      <h2>Terminal</h2>
+      <p>Het cv als shell: <code>whoami</code>, <code>skills</code>, <code>git log</code>, <code>npm test</code>, <code>sudo hire</code>. Typen of klikken.</p>
+    </a>
+    <a class="card" href="testrapport.html">
+      <span class="num">Vorm 2</span>
+      <h2>Testrapport</h2>
+      <p>Het cv als testrun in Playwright-stijl: alles loopt live op groen, met filter en een flaky koffietest.</p>
+    </a>
+    <a class="card" href="dungeon.html">
+      <span class="num">Vorm 3</span>
+      <h2>Dungeon</h2>
+      <p>Top-down kerker met fakkellicht. Elke kamer is een cv-onderdeel; bugs fix je met spatie.</p>
+    </a>
+    <a class="card" href="wereld.html">
+      <span class="num">Vorm 4</span>
+      <h2>3D-wereld</h2>
+      <p>Rijd met pijltjes of WASD over een eiland langs kiosken per cv-onderdeel.</p>
+    </a>
+  </div>
+  <p class="note">Tip: <code>?cv=sam-voorbeeld</code> kiest een ander cv, <code>?stijl=retro</code> de retro-kleuren voor tekstbox en knoppen. Code: <code>design/spelvormen/js/</code>.</p>
+</main>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spelvorm: 3D-wereld — Interactief cv</title>
+<link rel="icon" href="/brand/testcoders-mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Press+Start+2P&family=Pixelify+Sans:wght@400;600;700&family=Poppins:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="/src/style.css">
+<link rel="stylesheet" href="./spelvormen.css">
+</head>
+<body>
+<section id="mode" class="vorm-wereld"></section>
+<aside id="panel" hidden aria-live="polite"></aside>
+<div id="hud" hidden></div>
+<div id="coach" hidden role="status"></div>
+<div id="toast" hidden></div>
+<nav class="sv-nav" aria-label="Spelvormen"><a href="./">← Spelvormen</a><span>3D-wereld</span><select id="sv-cv" aria-label="Kies een cv"></select></nav>
+<script type="module">import { boot } from './js/page.js'; boot('wereld');</script>
+</body>
+</html>

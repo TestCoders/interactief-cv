@@ -14,7 +14,8 @@
     "test": "node --test tests/cv-integration.test.mjs"
   },
   "dependencies": {
-    "phaser": "3.90.0"
+    "phaser": "3.90.0",
+    "three": "0.170.0"
   },
   "devDependencies": {
     "vite": "^6.3.5"
