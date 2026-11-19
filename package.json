@@ -9,7 +9,8 @@
     "design": "vite --open /design/",
     "check": "node scripts/validate-cv.mjs",
     "build": "node scripts/validate-cv.mjs && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "node tests/e2e.mjs"
   },
   "dependencies": {
     "phaser": "3.90.0"

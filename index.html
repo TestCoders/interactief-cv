@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Speel mijn CV — TestCoders</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" />
     <link rel="stylesheet" href="./src/style.css" />
     <link rel="alternate" type="text/markdown" href="./llms.txt" title="CV's voor AI (llms.txt)" />
   </head>
@@ -11,14 +13,18 @@
     <main id="stage">
       <div id="game"></div>
       <aside id="panel" hidden aria-live="polite"></aside>
+      <div id="hud" hidden></div>
+      <div id="titlecard" hidden></div>
       <div id="toast" hidden></div>
     </main>
 
     <nav class="topbar" aria-label="Weergave">
+      <button id="btn-style" type="button" title="Wissel van gamestijl">Stijl: Retro ⇄</button>
       <button id="btn-classic" type="button">Klassiek CV</button>
       <a id="btn-md" class="btn" href="./llms.txt" target="_blank" rel="noopener">AI / Markdown</a>
       <button id="btn-switch" type="button">Ander CV</button>
     </nav>
+    <nav id="chapters" aria-label="Snel naar" hidden></nav>
     <span class="brand">Test<b>Coders</b></span>
 
     <section id="classic" hidden>

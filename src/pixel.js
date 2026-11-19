@@ -16,3 +16,11 @@ export function pixelTexture(scene, key, rows, palette, scale = 2) {
   );
   tex.refresh();
 }
+
+// Vlakke (niet-pixel) texture tekenen met de canvas-API; voor strakke thema's.
+export function canvasTexture(scene, key, w, h, draw) {
+  if (scene.textures.exists(key)) return;
+  const tex = scene.textures.createCanvas(key, w, h);
+  draw(tex.getContext(), w, h);
+  tex.refresh();
+}

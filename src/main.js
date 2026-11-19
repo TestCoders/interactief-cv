@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { loadCvs } from './cv.js';
 import { classicHtml, hidePanel } from './ui.js';
+import { THEMES, THEME_IDS, applyThemeCss } from './themes/index.js';
 import BootScene from './scenes/BootScene.js';
 import SelectScene from './scenes/SelectScene.js';
 import LevelScene from './scenes/LevelScene.js';
@@ -17,13 +18,47 @@ const game = new Phaser.Game({
   height: HEIGHT,
   backgroundColor: '#9fd6ff',
   pixelArt: true,
+  roundPixels: true, // camera en sprites op hele pixels: geen trillende tekst tijdens het lopen
   physics: { default: 'arcade', arcade: { gravity: { y: 1400 }, debug: false } },
-  // EXPAND: vult het hele venster; het basisvlak van 960×540 is altijd zichtbaar, bredere schermen zien meer wereld.
-  scale: { mode: Phaser.Scale.EXPAND, autoCenter: Phaser.Scale.CENTER_BOTH },
+  // RESIZE: het canvas rendert op de echte venstergrootte (scherp); de LevelScene zoomt de wereld van 540 px hoog op naar schermhoogte.
+  scale: { mode: Phaser.Scale.RESIZE, width: window.innerWidth, height: window.innerHeight },
   scene: [BootScene, SelectScene, LevelScene]
 });
 
 game.registry.set('cvs', cvs);
+
+// --- Gamestijl: ?stijl=zakelijk in de URL, anders de laatst gekozen stijl ---
+const store = {
+  get: () => { try { return localStorage.getItem('cv-stijl'); } catch { return null; } },
+  set: (v) => { try { localStorage.setItem('cv-stijl', v); } catch { /* geen opslag: geen probleem */ } }
+};
+const wantedStyle = new URLSearchParams(location.search).get('stijl') ?? store.get();
+const styleBtn = document.getElementById('btn-style');
+function setStyle(id) {
+  const theme = THEMES[id] ?? THEMES.retro;
+  game.registry.set('theme', theme.name);
+  applyThemeCss(theme);
+  styleBtn.textContent = `Stijl: ${theme.label} ⇄`;
+  store.set(theme.name);
+}
+setStyle(wantedStyle);
+
+// Wisselknop: zelfde CV, zelfde plek, andere stijl.
+styleBtn.addEventListener('click', async () => {
+  const next = THEME_IDS[(THEME_IDS.indexOf(game.registry.get('theme')) + 1) % THEME_IDS.length];
+  // Webfonts eerst laden, anders rendert Phaser de tekst in het reservefont.
+  try { await Promise.race([document.fonts.load('700 16px "Space Grotesk"'), new Promise((r) => setTimeout(r, 800))]); } catch { /* offline: reservefont */ }
+  setStyle(next);
+  const url = new URL(location.href);
+  url.searchParams.set('stijl', next);
+  history.replaceState(null, '', url);
+  const level = game.scene.getScene('level');
+  if (level?.sys.isActive()) {
+    hidePanel();
+    level.scene.restart({ cv: level.cv, startX: level.player.x });
+  }
+  styleBtn.blur(); // spatie/enter mogen daarna niet nog eens wisselen
+});
 
 // Alleen in dev: handvat voor tests en debuggen in de console.
 if (import.meta.env.DEV) window.__game = game;
