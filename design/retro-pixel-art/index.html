@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Retro pixel-art</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;family=Pixelify+Sans:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #1b1f2e; --muted: #3b4561; --paper: #f4f4ec; --bg: #e6ece9; --accent-dark: #2f6f5d; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Pixelify Sans', system-ui, sans-serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 48px 16px 80px; display: flex; flex-direction: column; gap: 40px; }
+  .kicker { margin: 0; font-family: 'Press Start 2P', monospace; font-size: 11px; color: var(--accent-dark); }
+  h1 { margin: 12px 0 8px; font-family: 'Press Start 2P', monospace; font-weight: 400; font-size: clamp(22px, 5vw, 36px); line-height: 1.3; }
+  h2 { margin: 0; font-family: 'Press Start 2P', monospace; font-weight: 400; font-size: 14px; line-height: 1.6; }
+  p { font-size: 20px; line-height: 1.4; color: var(--muted); margin: 0; }
+  a { color: var(--accent-dark); }
+  a:hover { color: var(--ink); }
+  section { display: flex; flex-direction: column; gap: 14px; }
+  .head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .frame { overflow: auto; background: var(--paper); box-shadow: 0 -4px 0 0 var(--ink), 0 4px 0 0 var(--ink), -4px 0 0 0 var(--ink), 4px 0 0 0 var(--ink); margin: 4px; }
+  iframe { display: block; border: 0; width: 960px; height: 540px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="kicker">INTERACTIEF CV · STIJL 1 VAN 4</p>
+    <h1>Retro pixel-art</h1>
+    <p>Statische export van het ontwerp. De helden zijn dezelfde pixels als in <code>src/heroes.js</code>; animaties zie je in de game zelf.</p>
+  </header>
+
+  <section>
+    <div class="head"><h2>Selectiescherm</h2><a href="selectiescherm.html">Openen op ware grootte</a></div>
+    <div class="frame"><iframe src="selectiescherm.html" title="Selectiescherm" loading="lazy"></iframe></div>
+  </section>
+
+  <section>
+    <div class="head"><h2>Level met cv-paneel</h2><a href="level.html">Openen op ware grootte</a></div>
+    <div class="frame"><iframe src="level.html" title="Level met cv-paneel" loading="lazy"></iframe></div>
+  </section>
+
+  <section>
+    <div class="head"><h2>Stijlgids</h2><a href="stijlgids.html">Openen (1440 px breed)</a></div>
+    <p>Palet, typografie, sprites en UI-elementen.</p>
+  </section>
+</main>
+</body>
+</html>
