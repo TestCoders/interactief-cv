@@ -1,4 +1,4 @@
-import { pixelTexture } from '../pixel.js';
+import { pixelTexture } from '../graphics/pixelTexture.js';
 
 // Thema "retro pixel-art". Een thema levert kleuren, font en textures;
 // de set pieces (src/pieces) gebruiken alleen deze sleutels, zodat elke stijl dezelfde gameplay heeft.

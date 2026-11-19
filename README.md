@@ -68,15 +68,31 @@ Werkt in `npm run dev` én in de build. Knop **AI / Markdown** in de topbar open
 ## Projectstructuur
 
 ```
-index.html              pagina + DOM-overlays (paneel, toast, klassieke weergave)
-src/main.js             Phaser-config en topbar-knoppen
-src/cv.js               CV's laden + CV → lijst checkpoints
-src/ui.js               HTML voor panelen en klassieke weergave
-src/scenes/BootScene    genereert alle textures met code (nog geen assets nodig)
-src/scenes/SelectScene  karakterselectie
-src/scenes/LevelScene   het level: grond, borden, platforms, munten, finish
-src/data/cv/*.json      één CV per persoon
-scripts/validate-cv.mjs validatie van de CV-bestanden
+index.html                     pagina + DOM-overlays (paneel, toast, klassieke weergave)
+src/main.js                    start de game en koppelt de DOM-overlay
+src/config/                    alle afstelbare waarden op één plek
+  gameConfig.js                canvasformaat, zwaartekracht, scene-sleutels
+  levelConfig.js               wereld, speler, game feel, scroll-lopen, camera
+  pieceConfig.js               afmetingen van de set pieces
+  company.js                   contactgegevens TestCoders
+src/cv/
+  cvLoader.js                  CV's laden uit src/data/cv
+  stations.js                  CV → lijst checkpoints (stations) + stationtypes
+src/scenes/
+  BootScene.js                 maakt de textures en kiest de eerste scene
+  CharacterSelectScene.js      karakterselectie
+  LevelScene.js                het level: wereld, set pieces, finish
+src/level/                     onderdelen van het level
+  Player.js                    held: beweging, springen, squash & stof
+  KeyboardControls.js          toetsenbord
+  ScrollWalkInput.js           lopen door te scrollen/swipen
+  TitleCard.js                 titelkaart bij de start
+src/pieces/                    set pieces per CV-onderdeel (+ pieceRegistry.js)
+src/graphics/                  textures met code: helden, wereld, pixel art
+src/themes/retroTheme.js       kleuren, font en textures van de retrostijl
+src/ui/                        DOM-overlay: paneel, templates, topbar, contactformulier
+src/data/cv/*.json             één CV per persoon
+scripts/validate-cv.mjs        validatie van de CV-bestanden
 ```
 
 ## Voorstel taakverdeling (3 personen)
