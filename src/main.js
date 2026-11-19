@@ -25,6 +25,12 @@ const game = new Phaser.Game({
 game.registry.set('cvs', cvs);
 game.registry.set('currentCv', cvs[0]);
 
+// "AI / Markdown"-knop wijst naar de Markdown van het CV dat nu gespeeld wordt (of naar llms.txt).
+const mdLink = document.getElementById('btn-md');
+game.registry.events.on('changedata-currentCv', (_parent, cv) => {
+  mdLink.href = cv ? `./cv/${cv.id}.md` : './llms.txt';
+});
+
 // --- Knoppen in de topbar ---
 const classic = document.getElementById('classic');
 document.getElementById('btn-classic').addEventListener('click', () => {
@@ -45,4 +51,5 @@ document.getElementById('btn-switch').addEventListener('click', () => {
   history.replaceState(null, '', url);
   game.scene.getScenes(true).forEach((s) => s.scene.stop());
   game.scene.start('select');
+  mdLink.href = './llms.txt';
 });

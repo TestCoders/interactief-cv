@@ -21,6 +21,18 @@ npm run dev        # http://localhost:5173
 
 Besturing: ← → / A D lopen, spatie / ↑ / W springen. Knop **Klassiek CV** toont hetzelfde CV als gewone (printbare) pagina.
 
+## Versie voor AI
+
+De game is om indruk te maken; voor AI-agents (en wie snel wil scannen) wordt uit dezelfde JSON automatisch Markdown gegenereerd:
+
+| URL | Inhoud |
+|-----|--------|
+| `/llms.txt` | Index van alle CV's volgens [llmstxt.org](https://llmstxt.org) |
+| `/llms-full.txt` | Alle CV's in één bestand |
+| `/cv/<id>.md` | Eén CV als Markdown, met YAML-frontmatter (naam, rol, skills, certificeringen) |
+
+Werkt in `npm run dev` én in de build. Knop **AI / Markdown** in de topbar opent de Markdown van het CV dat je speelt.
+
 ## Je eigen CV toevoegen
 
 1. Kopieer `src/data/cv/sam-voorbeeld.json` naar `src/data/cv/<voornaam-achternaam>.json`.
