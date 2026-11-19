@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { pixelBox } from './draw.js';
+import { pixelBox, textStyle } from './draw.js';
 
 // Expertise: een schatkist die schudt, openklapt en de expertises één voor één
 // als zwevende badges naar buiten laat vliegen. Inhoud staat in de wereld zelf (geen tekstbox).
@@ -18,7 +18,7 @@ export default class ExpertisePiece {
     this.stopX = x - 140;
     this.duration = 300 + 250 + Math.min(station.data.length, PER_COLUMN * 2) * 160 + 620;
     this.done = false;
-    const { colors, font } = theme;
+    const { colors } = theme;
 
     this.chest = scene.add.image(x, groundY, theme.tex('chest')).setOrigin(0.5, 1);
     // Deksel scharniert aan de achterkant (links), zodat hij naar achteren openklapt.
@@ -27,7 +27,7 @@ export default class ExpertisePiece {
     this.mouth = { x, y: groundY - this.chest.height };
 
     this.title = scene.add.text(x, 0, '★ EXPERTISE ★', {
-      fontFamily: font, fontSize: '18px', fontStyle: 'bold', color: colors.floatTitle ?? colors.title, stroke: colors.floatStroke ?? '#1a1430', strokeThickness: 6
+      ...textStyle(theme, 18), color: colors.floatTitle ?? colors.title, stroke: colors.floatStroke ?? '#1a1430', strokeThickness: 6
     }).setOrigin(0.5).setScale(0);
 
     const items = station.data.slice(0, PER_COLUMN * 2);
@@ -39,7 +39,7 @@ export default class ExpertisePiece {
     this.badges = items.map((item, i) => {
       const naam = (item.naam ?? item).replace(/^Branchekennis: /, 'Branche: ');
       const label = (naam.length > 24 ? naam.slice(0, 23) + '…' : naam) + stars(item.score ?? 0);
-      const text = scene.add.text(0, 0, label, { fontFamily: font, fontSize: '14px', fontStyle: 'bold', color: colors.text }).setOrigin(0.5);
+      const text = scene.add.text(0, 0, label, textStyle(theme, 14, { color: colors.text })).setOrigin(0.5);
       const w = text.width + 28;
       const h = text.height + 14;
       const g = scene.add.graphics();

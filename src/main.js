@@ -6,6 +6,7 @@ import LevelScene from './scenes/LevelScene.js';
 import { initContactForm } from './ui/contactForm.js';
 import { initTopBar, releaseKeysWhileTyping } from './ui/topBar.js';
 import { initStyleSwitcher, initSound } from './ui/styleSwitcher.js';
+import { initScreenLayout } from './ui/screenLayout.js';
 
 export function startGame(cv, style) {
   const game = new Phaser.Game({
@@ -34,4 +35,5 @@ export function startGame(cv, style) {
   initTopBar(game);
   releaseKeysWhileTyping(game);
   initContactForm();
+  initScreenLayout();
 }

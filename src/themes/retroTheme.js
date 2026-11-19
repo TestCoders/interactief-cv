@@ -49,12 +49,16 @@ export default {
   tint: { dag: 0xffffff, zonsondergang: 0xffc6a8, avond: 0x5a4f8a },
   // DOM-overlay (tekstbox, knoppen, HUD): crème kaders met inktrand, zie [data-stijl="retro"] in style.css.
   css: {
-    '--pixel-font': '"Pixelify Sans", "Courier New", monospace',
+    '--pixel-font': '"Jersey 10", "Pixelify Sans", "Courier New", monospace',
     '--title-font': '"Press Start 2P", "Courier New", monospace',
     '--box': '#f4f4ec', '--box-hover': '#ffffff', '--box-text': '#1b1f2e',
     '--box-title': '#2f6f5d', '--box-dim': '#3b4561', '--box-shadow': '#1b1f2e'
   },
-  font: '"Pixelify Sans", "Courier New", monospace',
+  // Leesbaar pixelfont: Jersey 10 (duidelijke C/O en I/l, in tegenstelling tot Pixelify Sans). Eén gewicht, tekent kleiner per px.
+  font: '"Jersey 10", "Pixelify Sans", "Courier New", monospace',
+  minFontSize: 12, // nooit kleiner (vóór schaling)
+  fontScale: 1.35, // Jersey 10 op 1,35× oogt even groot als een gewoon font op 1×
+  boldText: false, // geen namaak-vet: Jersey 10 is al stevig
   titleFont: '"Press Start 2P", "Courier New", monospace',
   titleUpper: true, // Press Start 2P: korte titels in hoofdletters
   // Kaarten in het selectiescherm: crème pixelkader met inktrand, gekozen kaart met gele binnenrand.

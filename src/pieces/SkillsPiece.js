@@ -1,4 +1,4 @@
-import { pixelBox } from './draw.js';
+import { pixelBox, textStyle } from './draw.js';
 // Skillbord: per skill een "laadbalk" van plantvakjes die vollopen met bloemetjes
 // zodra de speler aankomt. Aantal bloemen = niveau (1–5) uit het CV, omgerekend naar SLOTS.
 const SLOTS = 10;
@@ -19,7 +19,7 @@ export default class SkillsPiece {
     const { titel, skills, meer } = station.data;
     this.stopX = x - 140;
     this.duration = (skills.length - 1) * 140 + Math.round(((Math.max(...skills.map((s) => s.score ?? s.niveau ?? 0)) / 5) * SLOTS)) * 70 + 280;
-    const { colors, font } = theme;
+    const { colors } = theme;
 
     const w = PAD * 2 + NAME_W + SLOTS * SLOT_W;
     const h = HEADER_H + skills.length * ROW_H + (meer > 0 ? 34 : 14);
@@ -32,11 +32,11 @@ export default class SkillsPiece {
     g.fillStyle(colors.post).fillRect(left + 28, top + h, 12, 56).fillRect(left + w - 40, top + h, 12, 56);
     pixelBox(g, left, top, w, h, colors);
 
-    scene.add.text(x, top + 14, titel.toUpperCase(), { fontFamily: font, fontSize: '16px', fontStyle: 'bold', color: colors.title }).setOrigin(0.5, 0);
+    scene.add.text(x, top + 14, titel.toUpperCase(), textStyle(theme, 16, { color: colors.title })).setOrigin(0.5, 0);
 
     this.rows = skills.map((s, i) => {
       const cy = top + HEADER_H + i * ROW_H + ROW_H / 2;
-      scene.add.text(left + PAD, cy, s.naam.length > 22 ? s.naam.slice(0, 21) + '…' : s.naam, { fontFamily: font, fontSize: '13px', fontStyle: 'bold', color: colors.text }).setOrigin(0, 0.5);
+      scene.add.text(left + PAD, cy, s.naam.length > 22 ? s.naam.slice(0, 21) + '…' : s.naam, textStyle(theme, 13, { color: colors.text })).setOrigin(0, 0.5);
       const flowers = [];
       for (let j = 0; j < SLOTS; j++) {
         const sx = left + PAD + NAME_W + j * SLOT_W + SLOT_W / 2;
@@ -48,7 +48,7 @@ export default class SkillsPiece {
     });
 
     if (meer > 0) {
-      scene.add.text(x, top + h - 22, `+ nog ${meer} — zie Klassiek CV`, { fontFamily: font, fontSize: '11px', color: colors.dim }).setOrigin(0.5, 0);
+      scene.add.text(x, top + h - 22, `+ nog ${meer} — zie Klassiek CV`, textStyle(theme, 11, { bold: false, color: colors.dim })).setOrigin(0.5, 0);
     }
 
     this.sparks = scene.add.particles(0, 0, theme.tex('spark'), {

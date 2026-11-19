@@ -3,6 +3,7 @@ import { SCENES } from '../config/gameConfig.js';
 import { heroKey } from '../graphics/heroSprites.js';
 import { audio } from '../audio/index.js';
 import { THEMES } from '../themes/index.js';
+import { textStyle } from '../pieces/draw.js';
 
 const GROUND_H = 64;
 
@@ -35,10 +36,9 @@ export default class CharacterSelectScene extends Phaser.Scene {
       fontFamily: theme.titleFont ?? theme.font, fontSize: theme.titleUpper ? '30px' : '40px', fontStyle: 'bold', color: colors.selectTitle
     }).setOrigin(0.5);
     if (theme.titleUpper) title.setShadow(4, 4, '#f4f4ec', 0, false, true);
-    this.add.text(width / 2, 112, theme.titleUpper ? 'KIES EEN TESTCODER · ← → EN ENTER' : 'Kies een TestCoder · ← → en Enter', {
-      fontFamily: theme.titleUpper ? theme.titleFont : theme.font, fontSize: theme.titleUpper ? '11px' : '16px', color: colors.selectText,
-      backgroundColor: theme.titleUpper ? undefined : 'rgba(255,255,255,0.85)', padding: theme.titleUpper ? undefined : { x: 10, y: 5 }
-    }).setOrigin(0.5);
+    this.add.text(width / 2, 112, 'Kies een TestCoder · ← → en Enter', textStyle(theme, 16, {
+      bold: false, color: colors.selectText, backgroundColor: 'rgba(255,255,255,0.85)', padding: { x: 10, y: 5 }
+    })).setOrigin(0.5);
 
     // Kaarten met de helden.
     const gap = Math.min(240, (width - 80) / Math.max(cvs.length, 1));
@@ -53,13 +53,12 @@ export default class CharacterSelectScene extends Phaser.Scene {
       const bg = this.add.graphics();
       const key = theme.tex(heroKey(cv));
       const sprite = this.add.sprite(x, top + 140, key, 'idle0').setOrigin(0.5, theme.heroOriginY ?? 1).setScale(heroScale).play(`${key}-idle`);
-      const name = this.add.text(x, top + 154, theme.titleUpper ? cv.naam.toUpperCase() : cv.naam, {
-        fontFamily: theme.titleFont ?? theme.font, fontSize: theme.titleUpper ? '10px' : '18px', fontStyle: 'bold',
-        color: card.text, align: 'center', wordWrap: { width: cardW - 16 }, lineSpacing: 4
-      }).setOrigin(0.5, 0);
-      const rol = this.add.text(x, top + 192, cv.rol, {
-        fontFamily: theme.font, fontSize: theme.titleUpper ? '15px' : '14px', color: card.dim, align: 'center', wordWrap: { width: cardW - 16 }
-      }).setOrigin(0.5, 0);
+      const name = this.add.text(x, top + 154, cv.naam, textStyle(theme, 18, {
+        color: card.text, align: 'center', wordWrap: { width: cardW - 16 }
+      })).setOrigin(0.5, 0);
+      const rol = this.add.text(x, top + 186, cv.rol, textStyle(theme, 14, {
+        bold: false, color: card.dim, align: 'center', wordWrap: { width: cardW - 16 }
+      })).setOrigin(0.5, 0);
       const hit = this.add.zone(x, top + cardH / 2, cardW, cardH).setInteractive({ useHandCursor: true }).on('pointerdown', () => this.choose(i));
       return { x, bg, sprite, name, rol, hit };
     });
