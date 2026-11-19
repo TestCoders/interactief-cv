@@ -109,3 +109,7 @@ html, body { height: 100%; overflow: hidden; background: #9fd6ff; }
 @media (max-width: 520px) { .contact-form { grid-template-columns: 1fr; } }
 #panel:has(.contact-form) { max-height: 82vh; bottom: 16px; }
 #panel:has(.contact-form)::after { display: none; }
+
+@media (max-width: 700px) {
+  #panel { overflow-wrap: anywhere; }
+}

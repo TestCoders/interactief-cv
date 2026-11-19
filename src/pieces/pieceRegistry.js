@@ -12,6 +12,8 @@ const PIECES = {
 };
 
 export function createPiece(scene, x, groundY, station, theme) {
-  const Piece = PIECES[station.type] ?? SignPiece;
+  const largeBoard = (station.type === STATION_TYPES.skills || station.type === STATION_TYPES.expertise)
+    && station.data.length > 8;
+  const Piece = largeBoard ? SignPiece : (PIECES[station.type] ?? SignPiece);
   return new Piece(scene, x, groundY, station, theme);
 }

@@ -104,6 +104,37 @@ function paint(ctx, rows, colors, ox, oy) {
   });
 }
 
+const AVATAR_HAIR = { brown: '#6b3e26', blond: '#e8b84a', black: '#2f2219', red: '#a6492c' };
+const FACE_PIXELS = {
+  glasses: [[6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [6, 6], [8, 6], [10, 6]],
+  freckles: [[6, 7], [8, 7], [10, 7]],
+  beard: [[5, 7], [6, 8], [7, 8], [8, 8], [9, 8], [10, 7]]
+};
+
+function paintHero(ctx, cv, variant, body, headY, ox) {
+  const { avatar } = cv;
+  const head = avatar ? Number(avatar.hair === 'long') : variant;
+  const fallbackOutfit = avatar?.person === 'woman' ? '#80519b' : DEFAULT_OUTFIT_COLOR;
+  const outfit = /^#[0-9a-f]{6}$/i.test(cv.kleur ?? '') ? cv.kleur : fallbackOutfit;
+  const hair = AVATAR_HAIR[avatar?.color] ?? HAIR[variant];
+  const colors = { ...BASE, H: hair, C: outfit, c: shade(outfit, 0.72) };
+  paint(ctx, BODIES[body], colors, ox, 10);
+  paint(ctx, HEADS[head], colors, ox, headY);
+  if (avatar) {
+    // Positioneer gezichtsdetails op de huid zodat beide kapsels dezelfde opties ondersteunen.
+    ctx.fillStyle = avatar.face === 'beard' ? hair : avatar.face === 'freckles' ? '#ac6746' : BASE.K;
+    for (const [x, y] of FACE_PIXELS[avatar.face] ?? []) {
+      if ('SsK'.includes(HEADS[head][y][x])) ctx.fillRect(ox + x, headY + y, 1, 1);
+    }
+  }
+}
+
+export function drawAvatarPreview(canvas, cv) {
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, HERO_W, HERO_H);
+  paintHero(ctx, cv, 0, 'idle', 0, 0);
+}
+
 export const heroKey = (cv) => `hero-${cv.id}`;
 
 /** Animatiesleutel voor een held, bv. heroAnim(key, 'run'). */
@@ -116,15 +147,11 @@ export function createHeroTextures(scene, cvs) {
     if (scene.textures.exists(key)) return;
 
     const variant = i % HEADS.length;
-    const outfit = /^#[0-9a-f]{6}$/i.test(cv.kleur ?? '') ? cv.kleur : DEFAULT_OUTFIT_COLOR;
-    const colors = { ...BASE, H: HAIR[variant], C: outfit, c: shade(outfit, 0.72) };
-
     const tex = scene.textures.createCanvas(key, HERO_W * FRAMES.length, HERO_H);
     const ctx = tex.getContext();
     FRAMES.forEach(([name, body, headY], f) => {
       const ox = f * HERO_W;
-      paint(ctx, BODIES[body], colors, ox, 10);
-      paint(ctx, HEADS[variant], colors, ox, headY);
+      paintHero(ctx, cv, variant, body, headY, ox);
       tex.add(name, 0, ox, 0, HERO_W, HERO_H);
     });
     tex.refresh();

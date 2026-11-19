@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { SCENES } from '../config/gameConfig.js';
-import { createHeroTextures } from '../graphics/heroSprites.js';
+import { createHeroTextures } from '../graphics/heroSprites.js?avatar-flow';
 import { createWorldTextures } from '../graphics/worldTextures.js';
 
 // Maakt alle textures aan en kiest daarna de eerste scene.
@@ -16,10 +16,6 @@ export default class BootScene extends Phaser.Scene {
     createHeroTextures(this, cvs);
     createWorldTextures(this);
 
-    // ?cv=<id> in de URL slaat het selectiescherm over (deelbare link per persoon).
-    const wanted = new URLSearchParams(location.search).get('cv');
-    const direct = cvs.find((c) => c.id === wanted) ?? (cvs.length === 1 ? cvs[0] : null);
-    if (direct) this.scene.start(SCENES.level, { cv: direct });
-    else this.scene.start(SCENES.characterSelect);
+    this.scene.start(SCENES.level, { cv: this.registry.get('currentCv') });
   }
 }

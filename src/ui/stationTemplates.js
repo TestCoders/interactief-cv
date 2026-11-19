@@ -9,6 +9,7 @@ const firstName = (cv) => cv.naam.split(' ')[0];
 // Contactformulier aan het eind: gaat naar TestCoders (zie ./contactForm.js).
 function finishHtml(cv) {
   const name = esc(firstName(cv));
+  if (cv.uploaded) return `<h2>🏁 Gehaald!</h2><p>Je hebt het CV van ${name} doorlopen.</p>`;
   return `<h2>🏁 Gehaald!</h2>
     <p>Je hebt het hele CV van ${name} doorlopen. Interesse in ${name} voor jouw team?</p>
     <form id="contact-form" class="contact-form" data-cv="${esc(cv.naam)}">
@@ -33,7 +34,7 @@ export function stationHtml(station, cv) {
     case T.profile:
       return `<h2>${esc(cv.naam)}</h2><p class="meta">${esc(cv.rol)}</p><p>${esc(cv.profiel)}</p>`;
     case T.education:
-      return `<h2>🎓 ${esc(d.titel)}</h2><p class="meta">${esc(d.instituut)} · ${esc(d.periode)}</p>`;
+      return `<h2>🎓 ${esc(d.titel)}</h2><p class="meta">${[d.instituut, d.periode].filter(Boolean).map(esc).join(' · ')}</p>`;
     case T.work:
       return `<h2>${esc(d.rol)}</h2><p class="meta">${esc(d.opdrachtgever)} · ${esc(d.periode)}</p>
         <p>${esc(d.omschrijving)}</p>${chips(d.tools)}`;
@@ -59,7 +60,7 @@ export function classicHtml(cv) {
     .map((job) => `<h3>${esc(job.rol)} — ${esc(job.opdrachtgever)}</h3><p class="meta">${esc(job.periode)}</p>
       <p>${esc(job.omschrijving)}</p>${chips(job.tools)}`)
     .join('');
-  const education = (cv.opleiding ?? []).map((o) => `<li>${esc(o.titel)}, ${esc(o.instituut)} (${esc(o.periode)})</li>`).join('');
+  const education = (cv.opleiding ?? []).map((o) => `<li>${[o.titel, o.instituut, o.periode].filter(Boolean).map(esc).join(' · ')}</li>`).join('');
   const interests = interestsOf(cv);
   return `
     <h1>${esc(cv.naam)}</h1><p class="meta">${esc(cv.rol)}</p>
@@ -71,5 +72,5 @@ export function classicHtml(cv) {
     ${cv.expertise?.length ? `<h2>Expertise</h2>${list(cv.expertise)}` : ''}
     ${interests?.length ? `<h2>Interesses</h2>${chips(interests)}` : ''}
     ${cv.werkplezier?.length ? `<h2>Werkplezier</h2>${list(cv.werkplezier)}` : ''}
-    <h2>Contact via TestCoders</h2>${contactHtml()}`;
+    ${cv.uploaded ? '' : `<h2>Contact via TestCoders</h2>${contactHtml()}`}`;
 }
