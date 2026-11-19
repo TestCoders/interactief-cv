@@ -1,14 +1,13 @@
 import Phaser from 'phaser';
+import { EXPERTISE } from '../config/pieceConfig.js';
 
 // Expertise: een schatkist die schudt, openklapt en de expertises één voor één
 // als zwevende badges naar buiten laat vliegen. Inhoud staat in de wereld zelf (geen tekstbox).
-const BADGE_GAP = 48;
-
 export default class ExpertisePiece {
   constructor(scene, x, groundY, station, theme) {
     this.scene = scene;
     this.x = x;
-    this.range = 170;
+    this.range = EXPERTISE.range;
     this.done = false;
     const { colors, font } = theme;
 
@@ -23,7 +22,8 @@ export default class ExpertisePiece {
     }).setOrigin(0.5).setScale(0);
 
     const items = station.data;
-    const stackTop = groundY - this.chest.height - 70 - (items.length - 1) * BADGE_GAP;
+    const { badgeGap, badgeZigzag } = EXPERTISE;
+    const stackTop = groundY - this.chest.height - EXPERTISE.stackOffsetAboveChest - (items.length - 1) * badgeGap;
     this.title.setY(stackTop - 44);
 
     this.badges = items.map((label, i) => {
@@ -36,7 +36,7 @@ export default class ExpertisePiece {
       g.fillStyle(colors.board).fillRect(-w / 2, -h / 2, w, h);
       const badge = scene.add.container(this.mouth.x, this.mouth.y, [g, text]).setScale(0).setDepth(3);
       // Licht zigzaggend gestapeld, zodat het een speels torentje wordt.
-      badge.target = { x: x + (i % 2 === 0 ? -14 : 14), y: stackTop + i * BADGE_GAP };
+      badge.target = { x: x + (i % 2 === 0 ? -badgeZigzag : badgeZigzag), y: stackTop + i * badgeGap };
       return badge;
     });
 
@@ -61,7 +61,7 @@ export default class ExpertisePiece {
 
         // 3. Badges vliegen eruit, met een boogje omhoog en een veerkrachtige landing.
         this.badges.forEach((b, i) => {
-          const delay = 250 + i * 260;
+          const delay = 250 + i * EXPERTISE.badgeDelayMs;
           scene.tweens.add({ targets: b, scale: 1, duration: 450, delay, ease: 'Back.out' });
           scene.tweens.add({ targets: b, x: b.target.x, duration: 520, delay, ease: 'Sine.out' });
           scene.tweens.add({
@@ -74,7 +74,7 @@ export default class ExpertisePiece {
         });
 
         // 4. Titel erboven als kroon.
-        scene.tweens.add({ targets: this.title, scale: 1, duration: 400, delay: 250 + this.badges.length * 260, ease: 'Back.out' });
+        scene.tweens.add({ targets: this.title, scale: 1, duration: 400, delay: 250 + this.badges.length * EXPERTISE.badgeDelayMs, ease: 'Back.out' });
       }
     });
   }

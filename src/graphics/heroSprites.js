@@ -85,6 +85,7 @@ const FRAMES = [
 ];
 
 const BASE = { K: '#1b1f2e', S: '#f2c79b', s: '#e0a77a', P: '#3b4561', B: '#4f2f1d' };
+const DEFAULT_OUTFIT_COLOR = '#3c8772'; // als het CV geen geldige kleur heeft
 
 function shade(hex, factor) {
   const n = parseInt(hex.slice(1), 16);
@@ -105,6 +106,9 @@ function paint(ctx, rows, colors, ox, oy) {
 
 export const heroKey = (cv) => `hero-${cv.id}`;
 
+/** Animatiesleutel voor een held, bv. heroAnim(key, 'run'). */
+export const heroAnim = (key, name) => `${key}-${name}`;
+
 /** Genereert per CV een spritesheet-texture plus de animaties. Aanroepen vanuit BootScene. */
 export function createHeroTextures(scene, cvs) {
   cvs.forEach((cv, i) => {
@@ -112,8 +116,8 @@ export function createHeroTextures(scene, cvs) {
     if (scene.textures.exists(key)) return;
 
     const variant = i % HEADS.length;
-    const kleur = /^#[0-9a-f]{6}$/i.test(cv.kleur ?? '') ? cv.kleur : '#3c8772';
-    const colors = { ...BASE, H: HAIR[variant], C: kleur, c: shade(kleur, 0.72) };
+    const outfit = /^#[0-9a-f]{6}$/i.test(cv.kleur ?? '') ? cv.kleur : DEFAULT_OUTFIT_COLOR;
+    const colors = { ...BASE, H: HAIR[variant], C: outfit, c: shade(outfit, 0.72) };
 
     const tex = scene.textures.createCanvas(key, HERO_W * FRAMES.length, HERO_H);
     const ctx = tex.getContext();
@@ -126,8 +130,8 @@ export function createHeroTextures(scene, cvs) {
     tex.refresh();
 
     const frames = (names) => names.map((frame) => ({ key, frame }));
-    scene.anims.create({ key: `${key}-idle`, frames: frames(['idle0', 'idle1']), frameRate: 2, repeat: -1 });
-    scene.anims.create({ key: `${key}-run`, frames: frames(['run0', 'run1', 'run2', 'run3']), frameRate: 10, repeat: -1 });
-    scene.anims.create({ key: `${key}-jump`, frames: frames(['jump']), frameRate: 1 });
+    scene.anims.create({ key: heroAnim(key, 'idle'), frames: frames(['idle0', 'idle1']), frameRate: 2, repeat: -1 });
+    scene.anims.create({ key: heroAnim(key, 'run'), frames: frames(['run0', 'run1', 'run2', 'run3']), frameRate: 10, repeat: -1 });
+    scene.anims.create({ key: heroAnim(key, 'jump'), frames: frames(['jump']), frameRate: 1 });
   });
 }
