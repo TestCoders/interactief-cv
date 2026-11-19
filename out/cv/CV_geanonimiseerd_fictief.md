@@ -6,21 +6,7 @@ bron: CV_geanonimiseerd_fictief.docx
 
 # Robin Sterrenstof
 
-## Profiel
-
-Robin is een enthousiaste digitale alleskunner die teams helpt om slimme oplossingen te bedenken en te bouwen. Sinds 2015 werkt Robin aan uiteenlopende softwareprojecten, van vrolijke webwinkels tot handige planningsapps. De rode draad: ingewikkelde uitdagingen begrijpelijk maken en samen iets moois opleveren.
-
-In teams let Robin op kwaliteit en gebruiksgemak. Robin bedenkt praktische testaanpakken, automatiseert terugkerende controles en helpt ontwikkelaars om hun werk soepel naar productie te brengen. Daarbij worden moderne programmeertalen, testtools en cloudplatformen ingezet.
-
-Robin werkt graag multidisciplinair en denkt mee over het hele ontwikkelproces: van eerste idee en ontwerp tot beheer en verbetering. Nieuwe technieken worden snel eigen gemaakt en kennis wordt met plezier gedeeld.
-
-In vrije momenten bezoekt Robin graag meetups, probeert nieuwe tools uit en experimenteert met kleine programmeerprojecten.
-
-Robin werkte in een multidisciplinair team aan het verbeteren en uitbreiden van een digitale toepassing. De werkzaamheden bestonden uit het afstemmen van wensen, bouwen van functionaliteit, automatiseren van controles en het oplossen van technische puzzels. Samen met collega’s werd gewerkt aan een betrouwbare en gebruiksvriendelijke oplossing.
-
-Robin heeft een passie voor testautomatisering, hij volgt actief de ontwikkelingen op dit gebied door het bezoeken van conferenties in binnen-en buitenland, meetups, het volgen van cursussen en middels zelfstudie.
-
-**Kernwoorden:** Kritisch, leergierig, analytisch, zelfstandig, proactief, pragmatisch, flexibel, multidisciplinair, behulpzaam, rustig, doorzettend, samenwerkend.
+![Pixel-art poppetje van Robin Sterrenstof](<CV_geanonimiseerd_fictief.png>)
 
 ## Expertise
 
@@ -410,13 +396,4 @@ Door de bijdrage van Robin aan het team is het ontwikkelteam een DevOps team gew
 
 ## Overig
 
-### Recente werkervaring (samenvattingstabel uit het bron-cv)
-
-| Functie | Gebruikte methodieken/technologieën | Periode |
-|---|---|---|
-| Digitale Avonturier / Test Engineer | Agile, samenwerken, slimme software, testen, automatiseren, Java, Python, webtechnologie, cloud en creatieve oplossingen | Juli 2024 - heden |
-| Digitale Avonturier / Test Engineer | Agile, samenwerken, slimme software, testen, automatiseren, Java, Python, webtechnologie, cloud en creatieve oplossingen | Nov 2023 – Juli 2024 |
-| Digitale Avonturier / Test Engineer | Agile, samenwerken, slimme software, testen, automatiseren, Java, Python, webtechnologie, cloud en creatieve oplossingen | Dec 2020 – Okt 2023 |
-| Digitale Avonturier / Test Engineer | Agile, samenwerken, slimme software, testen, automatiseren, Java, Python, webtechnologie, cloud en creatieve oplossingen | Jun 2020 – Nov 2020 |
-| Digitale Avonturier / Test Engineer | Agile, samenwerken, slimme software, testen, automatiseren, Java, Python, webtechnologie, cloud en creatieve oplossingen | Aug 2019 – Mei 2020 |
-| Digitale Avonturier / Test Engineer | Agile, samenwerken, slimme software, testen, automatiseren, Java, Python, webtechnologie, cloud en creatieve oplossingen | Dec 2015 – Aug 2019 |
+_Geen informatie in het bron-cv._

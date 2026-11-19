@@ -1,6 +1,6 @@
 ---
 name: cv-docx-naar-md
-description: Zet een cv in Word-formaat (.docx) om naar een Markdown-bestand met het vaste formaat dat het Interactief CV als invoer gebruikt (Personalia, Profiel, Expertise, Vaardigheden, Interesses, Opleidingen, Ervaring, Overig). Gebruik deze skill altijd wanneer iemand een cv, curriculum vitae, profiel of Word-bestand van een (TestCoders-)professional wil omzetten, inlezen, converteren of klaarmaken voor het interactieve cv, ook als het woord "Markdown" niet valt, bijvoorbeeld "maak hier een md van", "verwerk dit cv in input/cv" of "zet Robins cv om".
+description: Zet een cv in Word-formaat (.docx) om naar een Markdown-bestand met het vaste formaat dat het Interactief CV als invoer gebruikt (Personalia, Expertise, Vaardigheden, Interesses, Opleidingen, Ervaring, Overig). Gebruik deze skill altijd wanneer iemand een cv, curriculum vitae, profiel of Word-bestand van een (TestCoders-)professional wil omzetten, inlezen, converteren of klaarmaken voor het interactieve cv, ook als het woord "Markdown" niet valt, bijvoorbeeld "maak hier een md van", "verwerk dit cv in input/cv" of "zet Robins cv om".
 ---
 
 # CV (.docx) naar Markdown
@@ -31,20 +31,26 @@ iets te verliezen of te verzinnen.
    (bijvoorbeeld `out/cv/CV_geanonimiseerd_fictief.md`), tenzij de gebruiker
    een andere plek noemt.
 
-4. **Controleer de volledigheid**:
+4. **Maak het pixel-art poppetje** (zie "Pixel-art poppetje" hieronder): zoek de
+   foto op LinkedIn, zet `uiterlijk` in de frontmatter en genereer de PNG.
+
+5. **Controleer de volledigheid**:
 
    ```bash
    python3 <skill-dir>/scripts/check_coverage.py <scratchpad>/extract.txt <output.md>
    ```
 
-   Het script toont bronregels met woorden die niet in de Markdown staan. Werk
+   Het script toont bronregels met woorden die niet in de Markdown staan. Het meldt
+   ook als een persoonsgegeven uit de personalia (bijvoorbeeld de woonplaats) nog
+   ergens in de Markdown staat, ook in lopende tekst; haal dat dan weg. Werk
    die bij of kijk bewust of ze weg mogen (zie "Wat je weglaat"). Draai het opnieuw
    tot alleen bewuste weglatingen overblijven. Zijn dat alleen kop- en veldnamen
    uit de bron (bv. "Opdrachtgever", "Over mij"), dan is dat ruis; noem ze in je
    rapport en voeg ze toe aan `LABELS` in het script als ze vaker voorkomen.
 
-5. **Rapporteer** kort aan de gebruiker: waar het bestand staat, wat onder
-   `## Overig` terechtkwam, wat je bewust hebt weggelaten en eventuele twijfelgevallen.
+6. **Rapporteer** kort aan de gebruiker: waar het bestand staat, wat onder
+   `## Overig` terechtkwam, wat je bewust hebt weggelaten, welk LinkedIn-profiel je
+   voor het poppetje gebruikte (of waarom er geen foto was) en eventuele twijfelgevallen.
 
 ## Van bronsectie naar kopje
 
@@ -52,8 +58,9 @@ iets te verliezen of te verzinnen.
 |---|---|
 | Personalia: Naam, Functie | frontmatter |
 | Overige personalia: geboortedatum, geboorteplaats, woonplaats, adres, telefoon, e-mail, nationaliteit, burgerlijke staat, rijbewijs | **weglaten** (zie "Persoonsgegevens") |
-| Profiel (de lopende alinea's na de personalia) | `## Profiel` |
-| Kernwoorden | `## Profiel`, als `**Kernwoorden:**` |
+| Profiel of introductie (de lopende alinea's na de personalia, ook onder de kop "Beknopte samenvatting") | **weglaten**; alleen interesses eruit halen (zie hieronder) |
+| Samenvattingstabel "Recente werkervaring" | **weglaten** (zie "Wat je weglaat") |
+| Kernwoorden | **weglaten** |
 | Vakkennis-items op het **hoogste niveau** (Senior, of Expert in een schaal als Basis/Gevorderd/Expert) die een methode, techniek of testvorm zijn | `## Expertise` |
 | Vakkennis > Branchekennis (alle niveaus) | `## Expertise`, als `Branchekennis: ...` |
 | Vakkennis-categorieën (Methoden/Technieken, Testvormen, Branchekennis, Programmeertalen & Frameworks, Databases, Besturingssystemen, Tools, ...) | `## Vaardigheden`, één `###` per categorie, in de bronvolgorde en met de categorienaam uit de bron (die mag per cv verschillen; zie `references/format.md`) |
@@ -72,13 +79,15 @@ Waarom deze keuzes:
   iemand in uitblinkt (de kaart die een klant als eerste ziet); Vaardigheden is
   het volledige overzicht. Een Senior-item mag dus op beide plekken staan.
   Branchekennis hoort bij Expertise, omdat klanten juist daarop selecteren.
-- **Interesses worden afgeleid, het Profiel blijft heel.** Neem de profielalinea's
-  volledig over onder Profiel, ook een alinea die meer op een projectomschrijving
-  lijkt: de schrijver heeft hem daar gezet. Haal daarnaast de onderwerpen waar de persoon
-  enthousiast van wordt als korte opsommingspunten naar Interesses: een zelfstandig
+- **Het profiel gaat er niet in, de interesses wel.** Het profiel (introductieverhaal)
+  en de kernwoorden komen niet in de Markdown: het is een verhaal over de persoon, vaak
+  met privéleven erin, en het interactieve cv vertelt dat verhaal zelf. Haal wel de
+  onderwerpen waar de persoon enthousiast van wordt als korte opsommingspunten naar
+  Interesses: een zelfstandig
   naamwoord of korte zinsnede met een hoofdletter, in de woorden van de bron
   ("Passie voor testautomatisering", "Meetups", "Klimmen op de klimmuur"). Dit is de
-  enige plek waar je inkort; je verzint geen nieuwe interesses.
+  enige plek waar je inkort; je verzint geen nieuwe interesses en neemt geen
+  privézaken over (gezin, woning).
 - **Expertise is een selectie, geen herindeling.** Neem het hoogste niveau van de
   schaal die het cv gebruikt. Heeft het cv geen categorieën (één platte tabel),
   kies dan de items die een methode, techniek, testvorm of branche zijn en laat
@@ -116,8 +125,9 @@ verbeteren (`Cucumberr`, `Reids` blijven staan) en geen dubbele items
 weghalen binnen een opsomming. De Markdown is een bron die later automatisch wordt
 ingelezen; als de conversie inhoud verandert, weet niemand meer wat er in het
 oorspronkelijke cv stond. Toegestaan zijn alleen: witruimte en opsommingstekens
-opschonen, gesplitste regels samenvoegen of samengevoegde regels splitsen en
-HTML-entiteiten (`&amp;`) terugzetten naar tekens.
+opschonen, gesplitste regels samenvoegen of samengevoegde regels splitsen,
+HTML-entiteiten (`&amp;`) terugzetten naar tekens en persoonsgegevens uit lopende tekst
+halen (zie "Persoonsgegevens").
 
 Zie je iets dat waarschijnlijk een fout is (een tikfout, een periode die niet klopt,
 een opdracht die "heden" loopt naast een andere "heden"), meld het dan in je rapport
@@ -134,9 +144,25 @@ of in een tabel. Ze komen ook niet onder `## Overig`: dit is de enige uitzonderi
 "verloren informatie is erger dan een rommelig Overig". Contact loopt altijd via
 TestCoders.
 
-Staat zo'n gegeven in een lopende tekst, bijvoorbeeld in het profiel ("woont met
-zijn vriendin en zoon in Harderwijk")? Neem de alinea dan letterlijk over en meld het
-in je rapport. Of zo'n zin weg mag, beslist de gebruiker, niet de conversie.
+Staat een **woon- of geboorteplaats** in een lopende tekst die wel in de Markdown komt,
+zoals een opdrachtomschrijving? Haal dan de plaatsnaam uit de zin en verander verder zo weinig mogelijk.
+Dit is een uitzondering op "letterlijk overnemen":
+
+- Vervang de plaatsnaam door een neutrale omschrijving die in de zin past, of laat het
+  voorzetsel met de plaatsnaam weg als de zin dan nog klopt.
+  "woont samen met zijn vriendin en zoon in Harderwijk waar hij veel heeft geklust"
+  → "woont samen met zijn vriendin en zoon in hun huis waar hij veel heeft geklust".
+  "Geboren en getogen in Zwolle, ..." → "Geboren en getogen in Overijssel, ..." is
+  **niet** goed (de provincie verraadt nog steeds waar iemand woont); gebruik
+  "Geboren en getogen in Nederland" of laat de bijzin weg.
+- Laat de rest van de zin en de alinea staan, ook gezinsleden en hobby's; die zeggen
+  iets over de persoon en het werkplezier.
+- Plaatsen die **niet** zeggen waar iemand woont of geboren is, blijven staan: de
+  vestiging van een opdrachtgever, een opleidingsinstituut, een conferentie.
+- Meld elke aangepaste zin in je rapport, met de oorspronkelijke en de nieuwe versie.
+
+Andere persoonsgegevens in lopende tekst (een leeftijd, een geboortejaar) behandel je
+op dezelfde manier: haal het gegeven eruit, laat de zin verder heel en meld het.
 
 ## Wat je weglaat
 
@@ -147,22 +173,55 @@ in je rapport. Of zo'n zin weg mag, beslist de gebruiker, niet de conversie.
   regeleinden).
 - Kolomkoppen zoals `Competentie | Kennisniveau | Ervaring sinds` en
   `Taalvaardigheid | Spreken | Schrijven`: die worden de tabelkoppen.
-- Een samenvattingstabel "Recente werkervaring", **alleen als** alles erin (titels,
-  technologieën, perioden) ook in de opdrachtblokken onder Werkervaring staat: dan is
-  die dubbel. Bevat de tabel iets wat daar niet staat (een andere titel, een technologie
-  zoals Python, afwijkende perioden), zet de hele tabel dan als
-  `### Recente werkervaring (samenvattingstabel uit het bron-cv)` onder `## Overig`,
-  met de kolommen Functie | Gebruikte methodieken/technologieën | Periode. Zet hem niet
-  onder Ervaring: de opdrachtblokken blijven de bron voor de demo, en de tabel spreekt
-  ze soms tegen. Meld de afwijkingen in je rapport.
+- De samenvattingstabel "Recente werkervaring" (Functie | Gebruikte
+  methodieken/technologieën | Periode). Die vat de opdrachtblokken samen en hoort
+  **nooit** in de Markdown, ook niet onder `## Overig`: de opdrachtblokken onder
+  Ervaring zijn de bron. Bevat de tabel iets wat niet in de opdrachtblokken staat (een
+  andere titel, een technologie zoals Python, afwijkende perioden), meld dat dan in je
+  rapport, zodat de gebruiker kan beslissen of het docx-cv moet worden aangepast.
+  `check_coverage.py` slaat deze tabel over.
+- Het profiel: de kop "Profiel" of "Beknopte samenvatting", de alinea's eronder en
+  de kernwoorden. Alleen de interesses haal je eruit (zie "Van bronsectie naar kopje").
+  `check_coverage.py` slaat het profiel over.
 
 Twijfel je of iets ergens past, zet het dan onder `## Overig`. Verloren
 informatie is erger dan een rommelig kopje Overig.
 
+## Pixel-art poppetje
+
+Elk cv krijgt een pixel-art poppetje: dezelfde held als in het spel (`src/heroes.js`),
+met het uiterlijk van de persoon. Je maakt geen verkleinde foto, maar leest kenmerken af.
+
+1. **Zoek de foto op LinkedIn** met de naam uit het cv. Gebruik de browser (Claude in
+   Chrome of de ingebouwde browser; lees eerst de bijbehorende skill), want LinkedIn
+   werkt alleen met de login van de gebruiker. Zoek op `<naam> TestCoders`.
+   - Gebruik een profiel alleen als het **zeker** dezelfde persoon is: de naam klopt
+     en TestCoders staat als werkgever, of de functie en opdrachtgevers komen overeen
+     met het cv. Twijfel je (meerdere kandidaten, geen TestCoders), vraag het dan aan
+     de gebruiker en gok niet.
+   - Bekijk alleen de profielfoto (screenshot of de foto openen). Sla de foto niet op in
+     de repo en neem verder niets van het profiel over in de Markdown.
+   - Geen profiel of geen foto? Vraag de gebruiker een foto in `input/foto/` te zetten,
+     of laat `uiterlijk` weg: dan krijgt het poppetje het standaarduiterlijk.
+2. **Lees de kenmerken af** met de tabellen in
+   `.claude/skills/foto-naar-pixelart/references/kenmerken.md` (kapsel, haarkleur, huid,
+   bril, baard) en zet ze als `uiterlijk` in de frontmatter (zie `references/format.md`).
+   Beschrijf alleen wat de pixel art toont, geen leeftijd, geslacht of etniciteit.
+3. **Genereer de PNG** naast de Markdown:
+
+   ```bash
+   node scripts/hero-preview.mjs --md <output.md>
+   ```
+
+   Dat schrijft `<output>.png` (het poppetje, 8× vergroot, transparante achtergrond).
+   Bekijk de PNG met de Read-tool naast de foto; valt een kenmerk weg, kies dan een kleur
+   met meer contrast uit het palet.
+4. **Zet de afbeelding** direct onder de `# <naam>`-kop (zie `references/format.md`).
+
 ## Andere cv-indelingen
 
 Wijkt een cv af (andere kopnamen, alles in één grote tabel, Engelstalig), groepeer
-dan op betekenis, niet op de letterlijke kopnaam: "Over mij" → Profiel,
+dan op betekenis, niet op de letterlijke kopnaam: "Over mij" → weglaten (alleen interesses eruit halen),
 "Persoonlijke gegevens" → naam en functie in de frontmatter (de rest weglaten), "Opdrachten" → Ervaring, "Kennis en kunde"
 → Vaardigheden, "Education" → Opleidingen, "Skills" → Vaardigheden,
 "Projects"/"Employment" → Ervaring. Staat de functie niet bij de personalia,

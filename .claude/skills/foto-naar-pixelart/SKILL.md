@@ -16,9 +16,11 @@ animaties, omlijning en stijl houdt als de andere helden.
 1. **Zoek de foto.** De standaardplek is `input/foto/<cv-id>.<jpg|png|webp>`. Die map
    staat in `.gitignore`, want foto's zijn persoonsgegevens en de repo is publiek. Zet
    een foto daarom nooit in `src/`, `public/` of een andere map die wordt gecommit.
-   Zijn er geen foto's? Vraag de gebruiker ze in `input/foto/` te zetten. Download ze
-   niet zelf van LinkedIn of andere sociale media: dat werkt niet zonder login en valt
-   onder scraping van persoonsgegevens.
+   Is er geen foto, zoek dan de profielfoto op LinkedIn op naam, via de browser met de
+   login van de gebruiker (Claude in Chrome of de ingebouwde browser). Gebruik een
+   profiel alleen als het zeker dezelfde persoon is (bijvoorbeeld TestCoders als
+   werkgever). Bekijk de foto alleen; sla hem niet op in de repo. Werkt dat niet, vraag
+   de gebruiker dan een foto in `input/foto/` te zetten.
 
 2. **Zoek het CV.** Het uiterlijk hoort in `src/data/cv/<cv-id>.json` (het `cv-id` is de
    bestandsnaam). Bestaat dat bestand nog niet, meld het dan en ga niet verder voor die

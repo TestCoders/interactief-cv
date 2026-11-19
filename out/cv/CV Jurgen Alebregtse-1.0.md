@@ -6,15 +6,7 @@ bron: CV Jurgen Alebregtse-1.0.docx
 
 # Jurgen Alebregtse
 
-## Profiel
-
-Na een opleiding Commerciele Economie, is Jurgen al snel de IT ingerold. Affiniteit met IT had hij altijd al, maar dit is nog extra getriggerd door een stage bij een online marketingbureau waarin hij veel met Excel aan de slag ging. Jurgen woont nu ongeveer 3 jaar samen met zijn vriendin en zoon in Harderwijk waar hij veel heeft geklust en waar hij nu een eigen plekje van heeft gemaakt. Hij is sportief en houdt van hardlopen. Hij daagt zichzelf hierin continu uit door steeds nieuwe doelen te stellen. Iets wat ook in zijn professionele loopbaan terugkomt, zo zet hij altijd een stap extra voor zijn team. Dit doet hij door bijvoorbeeld kennissessies te organiseren of door naast zijn reguliere werkzaamheden, de Scrummaster of DevOps rol op te pakken. Daarnaast blijft hij zich ontwikkelen met cursussen en trainingen (ISTQB Testautomation Engineer) en heeft hij zelf ook diverse trainingen en presentaties gegeven over testautomation (Cucumber, Python voor testers), maar ook bijvoorbeeld over home automation, een hobby waar Jurgen zich ook buiten werk graag mee bezig houdt.
-
-Jurgen heeft ervaringen opgedaan bij verschillende klanten, van de Belastingdienst tot de Rabobank, en heeft daar frameworks opgezet met o.a. Robot Framework en Cucumber. Hij heeft zich daarbij ontwikkelt als een consultant die een belangrijke bijdragen kan leveren in het team. Of dit nou is om frameworks van de grond af op te bouwen, of door als DevOps-er CI/CD pipelines in te richten. Het is voor hem vooral belangrijk om het hele team mee te krijgen en duidelijk te communiceren. Jurgen heeft daarbij altijd een echte quality-driven mindset.
-
-Ruim 8 jaar na de eerste stappen in de IT is Jurgen een stevige test automation engineer met veel ervaring. Niet alleen in het opzetten van frameworks, maar ook in het meenemen en opleiden van collega’s in het gebruik van deze frameworks. Hij heeft affiniteit met code en programmeren in o.a. Python, .NET en Java, en hij streeft er daarnaast in zijn opdrachten ook naar om verbeteringen op elk niveau van de organisatie door te voeren. Door zijn sociale en communicatieve houding ligt hij goed in een groep en doordat hij opbouwend kritisch is, weet hij belangrijke zaken boven water te krijgen.
-
-**Kernwoorden:** Communicatief, proactief, nieuwsgierig, eerlijk, samenwerkend, gedreven, sociaal
+![Pixel-art poppetje van Jurgen Alebregtse](<CV Jurgen Alebregtse-1.0.png>)
 
 ## Expertise
 
@@ -291,11 +283,4 @@ Bij ViQiT heeft Jurgen een interne opleiding gedaan met als focus testen en basi
 
 ## Overig
 
-### Recente werkervaring (samenvattingstabel uit het bron-cv)
-
-| Functie | Gebruikte methodieken/technologieën | Periode |
-|---|---|---|
-| Test Automation Developer / Rabobank | IT4IT, Agile/Scrum, Testautomatisering, BDD, Gherkin, Azure DevOps, CI/CD, .NET, YAML, Powershell, SpecFlow, ssl, Azure KeyVault | juli 2022 – september 2024 |
-| Test Automation Consultant / EDSN | Agile/Scrum, Testautomatisering, BDD, Gherkin, Azure DevOps, CI/CD, Robot Framework, Grafana, Jenkins, Python, SQL | februari 2021 – juni 2022 |
-| Test Automation Engineer / Belastingdienst | Agile/Scrum, Testautomatisering, BDD, Gherkin, TMap, SAFe, Java, Robot Framework, Jmeter, Fitnesse, webservices | maart 2019 – januari 2021 |
-| Test Automation Engineer / Universiteit Utrecht | Agile/Scrum, Testautomatisering, BDD, Gherkin, TMap, Java, Selenium, Cucumber, SpecFlow, Jira, Linux | oktober 2016 – januari 2019 |
+_Geen informatie in het bron-cv._
