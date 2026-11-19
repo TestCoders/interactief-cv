@@ -11,17 +11,17 @@ const store = {
 
 // Wisselknop voor de gamestijl: zelfde cv, zelfde plek, andere skin (en ander geluid).
 // ?stijl=zakelijk in de URL kiest direct een stijl; anders de laatst gekozen stijl.
-export function initStyleSwitcher(game) {
+export function initStyleSwitcher(game, initialStyle) {
   const btn = document.getElementById('btn-style');
   const set = (id) => {
-    const theme = THEMES[id] ?? THEMES.retro;
+    const theme = Object.hasOwn(THEMES, id) ? THEMES[id] : THEMES.retro;
     game.registry.set('theme', theme.name);
     applyThemeCss(theme);
     audio.setPack(theme.audio);
     btn.textContent = `Stijl: ${theme.label} ⇄`;
     store.set(theme.name);
   };
-  set(new URLSearchParams(location.search).get('stijl') ?? store.get());
+  set(initialStyle ?? new URLSearchParams(location.search).get('stijl') ?? store.get());
 
   btn.addEventListener('click', async () => {
     const next = THEME_IDS[(THEME_IDS.indexOf(game.registry.get('theme')) + 1) % THEME_IDS.length];

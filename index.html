@@ -3,17 +3,97 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer" />
     <title>Speel mijn CV — TestCoders</title>
     <link rel="icon" href="./brand/testcoders-mark.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Press+Start+2P&family=Pixelify+Sans:wght@400;600;700&family=Poppins:wght@500;600;700;800&family=Open+Sans:wght@400;600&display=swap" />
     <link rel="stylesheet" href="./src/style.css" />
+    <script>
+      let theme;
+      try { theme = localStorage.getItem('cv-kleurmodus'); } catch {}
+      document.documentElement.dataset.theme = theme === 'dark' || theme === 'light'
+        ? theme : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    </script>
+    <link rel="stylesheet" href="./src/landing.css?theme" />
+    <link rel="stylesheet" href="./src/avatar.css" />
     <link rel="alternate" type="text/markdown" href="./llms.txt" title="CV's voor AI (llms.txt)" />
   </head>
   <body>
+    <div id="landing">
+      <div class="window-bar">
+        <span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="window-title">Interactief cv</span>
+        <button id="landing-theme" type="button" aria-label="Donker thema" aria-pressed="false"><span aria-hidden="true">☾</span> <span class="theme-label">dark</span></button>
+      </div>
+      <div class="landing-scroll">
+        <div class="landing-window">
+          <header>
+            <nav class="landing-nav" aria-label="TestCoders">
+              <a href="https://testcoders.nl/" aria-label="TestCoders homepage">
+                <img id="landing-logo" src="./src/assets/testcoders/logo-light.svg" alt="" width="80" height="32" />
+              </a>
+            </nav>
+          </header>
+          <main class="landing-content">
+            <h1>Speel een <span>cv.</span></h1>
+            <p>Ontdek iemands ervaring, vaardigheden en interesses in game!</p>
+            <div id="cv-source" class="start-options">
+              <section class="launch-card" aria-labelledby="source-heading">
+                <h2 id="source-heading">Speel een cv</h2>
+                <p>Kies een voorbeeldpersoon.</p>
+                <div id="examples" class="example-list"></div>
+              </section>
+              <section class="launch-card" aria-labelledby="own-heading">
+                <h2 id="own-heading">Create your own</h2>
+                <p>Maak een avatar en speel je eigen cv.</p>
+                <button id="create-own" type="button">Maak je eigen cv-game</button>
+              </section>
+            </div>
+            <section id="own-cv" class="launch-card" aria-labelledby="avatar-heading" hidden>
+              <button id="back-from-avatar" class="back-button" type="button">← Terug</button>
+              <h2 id="avatar-heading" tabindex="-1">Maak je avatar</h2>
+              <form id="upload-form">
+                <div class="avatar-picker">
+                  <canvas id="avatar-preview" width="16" height="18" role="img" aria-label="Voorbeeld van je avatar"></canvas>
+                  <div class="avatar-options">
+                    <label>Avatar
+                      <select name="person"><option value="man">Man</option><option value="woman">Vrouw</option></select>
+                    </label>
+                    <label>Haarlengte
+                      <select name="hair"><option value="short">Kort</option><option value="long">Lang</option></select>
+                    </label>
+                    <label>Haarkleur
+                      <select name="color"><option value="brown">Bruin</option><option value="blond">Blond</option><option value="black">Zwart</option><option value="red">Rood</option></select>
+                    </label>
+                    <label>Gezichtskenmerk
+                      <select name="face"><option value="none">Geen</option><option value="glasses">Bril</option><option value="freckles">Sproeten</option><option value="beard">Baard</option></select>
+                    </label>
+                  </div>
+                </div>
+                <label for="markdown-file">Upload je Markdown-cv</label>
+                <p id="file-help">Een .md- of .markdown-bestand van maximaal 64 KB.</p>
+                <input id="markdown-file" type="file" accept=".md,.markdown,text/markdown" aria-describedby="file-help" required />
+                <button type="submit">Kies een gamestijl</button>
+              </form>
+            </section>
+            <section id="style-picker" class="launch-card" aria-labelledby="style-heading" hidden>
+              <button id="back-to-source" type="button">Ander cv kiezen</button>
+              <h2 id="style-heading" tabindex="-1">Kies een gamestijl</h2>
+              <p id="chosen-cv"></p>
+              <div id="game-styles" class="style-grid"></div>
+              <p id="share-notice" hidden>Bij het starten maak je een link waarmee iedereen met de link dit cv maximaal zeven dagen kan spelen.</p>
+            </section>
+            <p id="launch-error" role="alert" hidden></p>
+            <p id="launch-status" role="status"></p>
+          </main>
+        </div>
+      </div>
+    </div>
+    <div id="game-view" hidden>
     <main id="stage">
       <div id="game"></div>
-      <aside id="panel" hidden aria-live="polite"></aside>
+      <aside id="panel" hidden tabindex="0" aria-label="CV-informatie" aria-live="polite"></aside>
       <div id="hud" hidden></div>
       <div id="titlecard" hidden></div>
       <div id="coach" hidden role="status"></div>
@@ -24,6 +104,7 @@
       <button id="btn-style" type="button" title="Wissel van gamestijl">Stijl: Retro ⇄</button>
       <button id="btn-classic" type="button">Klassiek CV</button>
       <a id="btn-md" class="btn" href="./llms.txt" target="_blank" rel="noopener">AI / Markdown</a>
+      <button id="btn-share" type="button" hidden>Deel je cv</button>
       <button id="btn-switch" type="button">Ander CV</button>
       <button id="btn-sound" type="button">Geluid: aan</button>
     </nav>
@@ -35,6 +116,20 @@
       <article id="classic-content"></article>
     </section>
 
-    <script type="module" src="./src/main.js"></script>
+    </div>
+    <dialog id="share-dialog" aria-labelledby="share-heading">
+      <form method="dialog">
+        <h2 id="share-heading">Deel je cv-game</h2>
+        <label for="share-url">Tijdelijke link</label>
+        <input id="share-url" type="url" readonly />
+        <p id="share-expiry"></p>
+        <p id="share-status" role="status"></p>
+        <div class="share-actions">
+          <button id="copy-share" type="button">Kopieer link</button>
+          <button value="close">Sluiten</button>
+        </div>
+      </form>
+    </dialog>
+    <script type="module" src="./src/startPage.js?theme"></script>
   </body>
 </html>

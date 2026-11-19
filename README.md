@@ -21,6 +21,26 @@ npm run dev        # http://localhost:5173
 
 Besturing: ← → / A D lopen, spatie / ↑ / W springen. Knop **Klassiek CV** toont hetzelfde CV als gewone (printbare) pagina.
 
+## Eigen Markdown-cv spelen en delen
+
+Open de startpagina met `npm run dev`. Speel een voorbeeldpersoon of kies
+**Create your own**. Kies een avatar en upload een UTF-8 Markdown-bestand van
+maximaal 64 KB. De parser herkent een naam en rol in de kop, **Profiel**,
+**Vaardigheden** of **Skills**, en **Ervaring** of **Werkervaring**. Gebruik
+één kop per opdracht, met rol, opdrachtgever, periode en omschrijving.
+**Expertise**, **Opleidingen** en **Interesses** zijn optioneel. Retro pixel-art
+en Business isometric zijn speelbaar. De andere twee stijlen zijn toekomstig.
+
+Bij **Start game** wordt je eigen cv naar de lokale Vite-server verstuurd en
+komt de tijdelijke link beschikbaar onder **Deel je cv**. De avatar reist
+mee in de link.
+De server bewaart de ingelezen spelgegevens in het geheugen en verwijdert ze automatisch
+na zeven dagen. Stoppen of herstarten van de server wist ook de links. De link
+bevat een willekeurige code en werkt alleen als de ontvanger diezelfde draaiende
+server kan bereiken. Op `localhost` werkt hij alleen op dezelfde computer.
+De API werkt ook bij `npm run preview`. De statische GitHub Pages-site heeft
+geen lokale opslagserver.
+
 ## Hoe het level werkt
 
 **Ontwerpregels:** extreem makkelijk (alleen scrollen is genoeg, je kunt niets missen of vastlopen) en elke mechanic heeft een reden.

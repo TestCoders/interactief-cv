@@ -3,7 +3,7 @@
 // uit een foto (object: kapsel, haarkleur, huid, bril, baard). Beide gamestijlen gebruiken dezelfde kenmerken.
 // Frames per held: idle0, idle1, run0–run3, jump. Animaties: <key>-idle, <key>-run, <key>-jump.
 import Phaser from 'phaser';
-import { HERO_H, HERO_W, featuresOf, lookOf, mix, pixelHeroFrames, shade } from './pixelHero.js';
+import { HERO_H, HERO_W, avatarClothes, featuresOf, lookOf, mix, paintPixelFrame, pixelHeroFrames, shade } from './pixelHero.js';
 
 export { HERO_H, HERO_W, lookOf };
 
@@ -34,11 +34,7 @@ export function createHeroTextures(scene, cvs) {
     const ctx = tex.getContext();
     frames.forEach(({ name, rows }, f) => {
       const ox = f * HERO_W;
-      rows.forEach((row, y) => [...row].forEach((ch, x) => {
-        if (!colors[ch]) return;
-        ctx.fillStyle = colors[ch];
-        ctx.fillRect(ox + x, y, 1, 1);
-      }));
+      paintPixelFrame(ctx, rows, colors, ox);
       tex.add(name, 0, ox, 0, HERO_W, HERO_H);
     });
     tex.refresh();
@@ -167,6 +163,11 @@ function drawOfficeWorker(ctx, look, [name, backArm, frontArm, backLeg, frontLeg
     box(14.4, 6.8, 2.8, 0.8, 0.4, look.brow ?? (look.variant === 1 ? '#a87a2a' : look.hair));
   }
   drawOfficeBeard(ctx, look, path, box);
+  if (look.freckles) {
+    dot(13, 10.8, .35, '#ac6746');
+    dot(14, 11.3, .35, '#ac6746');
+    dot(15.1, 10.9, .35, '#ac6746');
+  }
   ctx.restore();
 }
 
@@ -174,7 +175,7 @@ function drawOfficeWorker(ctx, look, [name, backArm, frontArm, backLeg, frontLeg
 function officeLook(cv, i) {
   const fixed = OFFICE_LOOKS[lookOf(cv)];
   if (fixed) return fixed;
-  const tie = /^#[0-9a-f]{6}$/i.test(cv.kleur ?? '') ? cv.kleur : '#3c8772';
+  const tie = avatarClothes(cv);
   const u = featuresOf(cv);
   if (u) {
     // Kenmerken uit een foto: kapsel naar de dichtstbijzijnde kantoorvariant (0 kort, 1 lang, 2 kuif).
@@ -183,7 +184,7 @@ function officeLook(cv, i) {
     const skin = isHex(u.huid) ? u.huid : undefined;
     return {
       ...PAK, tie, variant, hair, brow: shade(hair, 0.85), bril: u.bril === true, kaal: u.kapsel === 'kaal',
-      beard: u.baard, skin, skinShade: skin && shade(skin, 0.9)
+      beard: u.baard, freckles: u.freckles, skin, skinShade: skin && shade(skin, 0.9)
     };
   }
   const variant = i % OFFICE_HAIR.length;

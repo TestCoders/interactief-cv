@@ -1,16 +1,12 @@
-import { SCENES } from '../config/gameConfig.js';
-import { hidePanel } from './panel.js';
 import { classicHtml } from './stationTemplates.js';
-
-const DEFAULT_MD_LINK = './llms.txt';
 
 // Knoppen in de topbar (index.html): klassiek CV, AI / Markdown en ander CV kiezen.
 export function initTopBar(game) {
   // "AI / Markdown"-knop wijst naar de Markdown van het CV dat nu gespeeld wordt (of naar llms.txt).
   const mdLink = document.getElementById('btn-md');
-  game.registry.events.on('changedata-currentCv', (_parent, cv) => {
-    mdLink.href = cv ? `./cv/${cv.id}.md` : DEFAULT_MD_LINK;
-  });
+  const cv = game.registry.get('currentCv');
+  mdLink.hidden = Boolean(cv.uploaded);
+  if (!cv.uploaded) mdLink.href = `./cv/${cv.id}.md`;
 
   const classic = document.getElementById('classic');
   document.getElementById('btn-classic').addEventListener('click', () => {
@@ -26,13 +22,7 @@ export function initTopBar(game) {
   });
 
   document.getElementById('btn-switch').addEventListener('click', () => {
-    hidePanel();
-    const url = new URL(location.href);
-    url.searchParams.delete('cv');
-    history.replaceState(null, '', url);
-    game.scene.getScenes(true).forEach((s) => s.scene.stop());
-    game.scene.start(SCENES.characterSelect);
-    mdLink.href = DEFAULT_MD_LINK;
+    location.assign(location.pathname);
   });
 }
 

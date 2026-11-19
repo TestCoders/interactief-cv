@@ -180,6 +180,12 @@ const FRAMES = [
 
 const BASE = { K: '#1b1f2e', S: '#f2c79b', s: '#e0a77a', P: '#3b4561', B: '#4f2f1d', G: '#8a96ab' };
 const DEFAULT_CLOTHES = '#3c8772';
+const AVATAR_HAIR = { brown: '#6b3e26', blond: '#e8b84a', black: '#2f2219', red: '#a6492c' };
+const FRECKLES = [[7, 6, 'F'], [7, 8, 'F'], [7, 10, 'F']];
+
+export function avatarClothes(cv) {
+  return isHex(cv?.kleur) ? cv.kleur : cv?.avatar?.person === 'woman' ? '#80519b' : DEFAULT_CLOTHES;
+}
 const isHex = (v) => /^#[0-9a-f]{6}$/i.test(v ?? '');
 
 export function shade(hex, factor) {
@@ -200,6 +206,16 @@ export const lookOf = (cv) => (typeof cv?.uiterlijk === 'string' && Object.hasOw
 
 /** De kenmerken uit een foto ("uiterlijk": { kapsel, haarkleur, ... }), of null. */
 export const featuresOf = (cv) => {
+  if (cv?.avatar) {
+    const { hair, color, face } = cv.avatar;
+    return {
+      kapsel: hair === 'long' ? 'lang' : 'kort',
+      haarkleur: AVATAR_HAIR[color],
+      bril: face === 'glasses',
+      baard: face === 'beard' ? 'vol' : 'geen',
+      freckles: face === 'freckles'
+    };
+  }
   const u = cv?.uiterlijk;
   return u && typeof u === 'object' && !Array.isArray(u) ? u : null;
 };
@@ -210,15 +226,15 @@ function pixelLook(cv, index) {
   if (fixed) return { head: fixed.head, colors: { ...BASE, ...fixed.colors }, logo: fixed.logo, breathe: fixed.breathe };
 
   const u = featuresOf(cv) ?? {};
-  const clothes = isHex(cv?.kleur) ? cv.kleur : DEFAULT_CLOTHES;
+  const clothes = avatarClothes(cv);
   const style = HAIRSTYLES[u.kapsel] ? u.kapsel : DEFAULT_HAIRSTYLES[index % DEFAULT_HAIRSTYLES.length];
   const hair = isHex(u.haarkleur) ? u.haarkleur : DEFAULT_HAIR[DEFAULT_HAIRSTYLES.indexOf(style)] ?? DEFAULT_HAIR[0];
   const skin = isHex(u.huid) ? u.huid : null;
 
   const head = HAIRSTYLES[style].map((row) => [...row]);
-  for (const [r, c, ch] of [...(u.bril ? GLASSES : []), ...(BEARDS[u.baard] ?? [])]) if ('Ss'.includes(head[r][c])) head[r][c] = ch;
+  for (const [r, c, ch] of [...(u.bril ? GLASSES : []), ...(BEARDS[u.baard] ?? []), ...(u.freckles ? FRECKLES : [])]) if ('Ss'.includes(head[r][c])) head[r][c] = ch;
 
-  const colors = { ...BASE, H: hair, C: clothes, c: shade(clothes, 0.72), b: mix(skin ?? BASE.S, hair, 0.55) };
+  const colors = { ...BASE, H: hair, F: '#ac6746', C: clothes, c: shade(clothes, 0.72), b: mix(skin ?? BASE.S, hair, 0.55) };
   if (skin) Object.assign(colors, { S: skin, s: shade(skin, 0.88) });
   return { head: head.map((row) => row.join('')), colors };
 }
@@ -238,4 +254,19 @@ export function pixelHeroFrames(cv, index = 0) {
     return { name, rows: grid.map((row) => row.join('')) };
   });
   return { frames, colors };
+}
+
+export function paintPixelFrame(ctx, rows, colors, offsetX = 0) {
+  rows.forEach((row, y) => [...row].forEach((pixel, x) => {
+    if (!colors[pixel]) return;
+    ctx.fillStyle = colors[pixel];
+    ctx.fillRect(offsetX + x, y, 1, 1);
+  }));
+}
+
+export function drawAvatarPreview(canvas, cv) {
+  const ctx = canvas.getContext('2d');
+  const { frames, colors } = pixelHeroFrames(cv);
+  ctx.clearRect(0, 0, HERO_W, HERO_H);
+  paintPixelFrame(ctx, frames[0].rows, colors);
 }

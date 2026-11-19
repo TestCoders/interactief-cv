@@ -1,0 +1,83 @@
+.start-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 23rem), 1fr));
+  gap: 1rem;
+}
+
+#own-cv #upload-form { margin: 0; padding: 0; border: 0; }
+.back-button { margin-bottom: 1rem; }
+.avatar-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: 1.25rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+#avatar-preview {
+  justify-self: center;
+  width: 128px;
+  height: 144px;
+  border-radius: 6px;
+  background: var(--glass);
+  image-rendering: pixelated;
+}
+
+.avatar-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+  gap: .75rem;
+}
+
+.avatar-options select {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin-top: .3rem;
+  padding: .5rem;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--glass);
+  color: var(--ink);
+  font: inherit;
+}
+
+#share-dialog {
+  width: min(36rem, calc(100% - 2rem));
+  padding: 1.5rem;
+  border: 1px solid #14121026;
+  border-radius: 6px;
+  background: #f7f4ef;
+  color: #1c1a18;
+  font: 1rem 'Open Sans', system-ui, sans-serif;
+}
+
+#share-dialog::backdrop { background: #141210a0; }
+#share-dialog h2 { margin-top: 0; font: 600 1.5rem Poppins, system-ui, sans-serif; }
+#share-url { width: 100%; min-height: 44px; border-color: #14121026; background: white; color: #1c1a18; }
+.share-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.share-actions button {
+  min-height: 44px;
+  padding: .5rem .75rem;
+  border: 1px solid #0a57a4;
+  border-radius: 3px;
+  background: white;
+  color: #0a57a4;
+  font: inherit;
+  cursor: pointer;
+}
+#copy-share { background: #0a57a4; color: white; }
+
+.example-list button.with-avatar {
+  grid-template-columns: 36px minmax(0, 1fr);
+  align-items: center;
+  gap: .65rem;
+}
+.example-list .with-avatar strong, .example-list .with-avatar span { display: block; }
+.example-avatar {
+  width: 36px;
+  height: auto;
+  background: var(--glass);
+  border-radius: 3px;
+  image-rendering: pixelated;
+}
