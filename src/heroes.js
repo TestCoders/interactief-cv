@@ -1,3 +1,5 @@
+import Phaser from 'phaser';
+
 // Eigen pixel-art helden (16×18 px per frame), getekend met code: geen externe assets nodig.
 // Elke CV krijgt een held met kleding in de CV-kleur; het kapsel wisselt per CV (kort, lang, pet).
 // Frames per held: idle0, idle1, run0–run3, jump. Animaties: <key>-idle, <key>-run, <key>-jump.
@@ -104,6 +106,114 @@ function paint(ctx, rows, colors, ox, oy) {
 }
 
 export const heroKey = (cv) => `hero-${cv.id}`;
+
+// ---------- Kantoorheld (business isometric, design/strak-zakelijk) ----------
+// Vectorfiguur op een raster van 24×56, getekend op OFFICE_RES× resolutie. Pak, overhemd en stropdas in de CV-kleur;
+// kapsel per CV: kort, lang, of kuif met bril.
+export const OFFICE_W = 24;
+export const OFFICE_H = 56;
+const OFFICE_RES = 4;
+const OFFICE_HAIR = ['#3a2a20', '#d9a441', '#2a2019'];
+const SKIN = '#f1c8a0';
+const SKIN_SHADE = '#e3b48e';
+
+// Houdingen: graden voor achterarm, voorarm, achterbeen, voorbeen; dy = op-en-neer van het bovenlijf.
+const OFFICE_POSES = [
+  ['idle0', 0, 0, 0, 0, 0],
+  ['idle1', 0, 0, 0, 0, 0.4],
+  ['run0', 30, -30, 28, -28, 0],
+  ['run1', 0, 0, 0, 0, -0.6],
+  ['run2', -30, 30, -28, 28, 0],
+  ['run3', 0, 0, 0, 0, -0.6],
+  ['jump', 40, -150, 40, -10, 0]
+];
+
+function drawOfficeWorker(ctx, { tie, variant }, [, backArm, frontArm, backLeg, frontLeg, dy]) {
+  const rot = (deg, cx, cy, draw) => {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate((deg * Math.PI) / 180);
+    ctx.translate(-cx, -cy);
+    draw();
+    ctx.restore();
+  };
+  const box = (x, y, w, h, r, fill) => { ctx.fillStyle = fill; ctx.beginPath(); ctx.roundRect(x, y, w, h, r); ctx.fill(); };
+  const dot = (cx, cy, r, fill) => { ctx.fillStyle = fill; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill(); };
+  const path = (d, fill) => { ctx.fillStyle = fill; ctx.fill(new Path2D(d)); };
+  const hair = OFFICE_HAIR[variant];
+
+  rot(backArm, 8, 20 + dy, () => { box(6, 19 + dy, 4, 15, 2, '#132536'); dot(8, 34.5 + dy, 1.9, SKIN_SHADE); });
+  rot(backLeg, 10.8, 35, () => { box(8.6, 34, 4.4, 17, 2, '#132536'); box(7.8, 50, 6.4, 3.2, 1.6, '#3a2418'); });
+  rot(frontLeg, 14.2, 35, () => { box(12, 34, 4.4, 17, 2, '#1d3349'); box(11.6, 50, 7.6, 3.2, 1.6, '#5a3420'); });
+
+  ctx.save();
+  ctx.translate(0, dy);
+  box(11, 14, 3.6, 4.5, 0, SKIN_SHADE);
+  path('M7 21Q7 17.5 10.5 17.5H15Q18 17.5 18 21V36H7Z', '#1d3349');
+  path('M12.2 17.5H16L14.1 26Z', '#dbe7f0');
+  path('M13.4 18.2H14.8L15.3 25.5L14.1 27.5L12.9 25.5Z', tie);
+  ctx.restore();
+  rot(frontArm, 16, 20 + dy, () => { box(14, 19 + dy, 4, 15, 2, '#24405c'); dot(16, 34.5 + dy, 1.9, SKIN); });
+
+  ctx.save();
+  ctx.translate(0, dy);
+  box(8, 3, 10.5, 12.5, 4.5, SKIN);
+  dot(18.4, 10, 1.1, SKIN);
+  if (variant === 1) {
+    dot(10.8, 9.6, 1.3, SKIN_SHADE);
+    path('M7.6 6.5Q7.2 2.4 13.2 2.4Q18.8 2.4 18.6 6.6L14.2 6.2Q11.6 6.6 11.4 10L11.4 19Q11.2 21.5 9 21.5Q7 21.5 6.8 19Z', hair);
+  } else if (variant === 2) {
+    path('M7.8 11Q6.8 4 10.6 2.2Q14.8 0.2 19.2 2.6Q19.8 4.6 17.8 5.4L13.8 5.8Q11.2 6.2 10.9 9.2L10.6 11.5L8.2 11.5Z', hair);
+    dot(10.8, 9.6, 1.3, SKIN_SHADE);
+  } else {
+    path('M7.6 10.5Q7 2.5 13.2 2.4Q18.8 2.4 18.6 6.2L13.8 6.2Q11.2 6.4 10.9 9.2L10.6 11.5L8 11.5Z', hair);
+    dot(10.8, 9.6, 1.3, SKIN_SHADE);
+  }
+  box(15.1, 8.2, 1.3, 1.7, 0.5, '#16202a');
+  if (variant === 2) {
+    ctx.strokeStyle = '#16202a';
+    ctx.lineWidth = 0.7;
+    ctx.beginPath(); ctx.roundRect(14.3, 7.6, 4, 2.9, 0.9); ctx.moveTo(14.3, 8.6); ctx.lineTo(11.6, 8.6); ctx.stroke();
+  } else {
+    box(14.4, 6.8, 2.8, 0.8, 0.4, variant === 1 ? '#a87a2a' : hair);
+  }
+  ctx.restore();
+}
+
+/**
+ * Kantoorhelden voor het zakelijke thema: texture `${prefix}hero-<id>` met dezelfde frames en animaties
+ * als de pixel-held, zodat LevelScene ze zonder verschil kan afspelen.
+ */
+export function createOfficeHeroTextures(scene, cvs, prefix) {
+  const fw = OFFICE_W * OFFICE_RES;
+  const fh = OFFICE_H * OFFICE_RES;
+  cvs.forEach((cv, i) => {
+    const key = prefix + heroKey(cv);
+    if (scene.textures.exists(key)) return;
+    const tie = /^#[0-9a-f]{6}$/i.test(cv.kleur ?? '') ? cv.kleur : '#3c8772';
+    const tex = scene.textures.createCanvas(key, fw * OFFICE_POSES.length, fh);
+    const ctx = tex.getContext();
+    OFFICE_POSES.forEach((pose, f) => {
+      ctx.save();
+      ctx.translate(f * fw, 0);
+      ctx.scale(OFFICE_RES, OFFICE_RES);
+      drawOfficeWorker(ctx, { tie, variant: i % OFFICE_HAIR.length }, pose);
+      ctx.restore();
+      tex.add(pose[0], 0, f * fw, 0, fw, fh);
+    });
+    tex.refresh();
+    tex.setFilter(Phaser.Textures.FilterMode.LINEAR);
+
+    if (scene.anims.exists(`${key}-idle`)) return;
+    const frames = (names) => names.map((frame) => ({ key, frame }));
+    scene.anims.create({ key: `${key}-idle`, frames: frames(['idle0', 'idle1']), frameRate: 2, repeat: -1 });
+    scene.anims.create({ key: `${key}-run`, frames: frames(['run0', 'run1', 'run2', 'run3']), frameRate: 10, repeat: -1 });
+    scene.anims.create({ key: `${key}-jump`, frames: frames(['jump']), frameRate: 1 });
+  });
+}
+
+/** Schaal waarop een kantoorheld even hoog is als in het ontwerp (84 px in het level). */
+export const OFFICE_SCALE = 84 / (OFFICE_H * OFFICE_RES);
 
 /** Genereert per CV een spritesheet-texture plus de animaties. Aanroepen vanuit BootScene. */
 export function createHeroTextures(scene, cvs) {

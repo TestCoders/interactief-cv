@@ -141,13 +141,16 @@ export default class LevelScene extends Phaser.Scene {
 
     // --- Speler ---
     // Hitbox en uiterlijk zijn gescheiden: squash & wiebel mogen de physics niet beïnvloeden.
-    this.heroKey = heroKey(this.cv);
+    // De hitbox gebruikt altijd de pixel-held (zelfde gameplay in elk thema); wat je ziet is de held van het thema.
+    const bodyKey = heroKey(this.cv);
+    this.heroKey = this.theme.tex(bodyKey);
+    this.visScale = this.theme.heroScale ?? HERO_SCALE;
     const startX = this.startX ?? 120;
-    this.player = this.physics.add.sprite(startX, groundY - 60, this.heroKey, 'idle0')
+    this.player = this.physics.add.sprite(startX, groundY - 60, bodyKey, 'idle0')
       .setScale(HERO_SCALE).setCollideWorldBounds(true).setVisible(false);
     this.player.body.setSize(10, 16).setOffset(3, 2);
     this.vis = this.add.sprite(startX, groundY, this.heroKey, 'idle0')
-      .setOrigin(0.5, 1).setScale(HERO_SCALE).setDepth(5).play(`${this.heroKey}-idle`);
+      .setOrigin(0.5, this.theme.heroOriginY ?? 1).setScale(this.visScale).setDepth(5).play(`${this.heroKey}-idle`);
     this.syncVis = () => this.vis.setPosition(this.player.x, this.player.y + 27 + this.sink);
     this.events.on('postupdate', this.syncVis);
     this.physics.add.collider(this.player, this.ground);
@@ -431,11 +434,11 @@ export default class LevelScene extends Phaser.Scene {
     if (!this.squashing) {
       if (grounded) {
         const bob = Math.sin(time / 55) * 0.06 * speedRatio;
-        vis.setScale(HERO_SCALE * (1 + bob), HERO_SCALE * (1 - bob));
+        vis.setScale(this.visScale * (1 + bob), this.visScale * (1 - bob));
         vis.setAngle(Math.sin(time / 110) * 5 * speedRatio);
       } else {
         const stretch = Phaser.Math.Clamp(Math.abs(body.velocity.y) / 2000, 0, 0.15);
-        vis.setScale(HERO_SCALE * (1 - stretch), HERO_SCALE * (1 + stretch));
+        vis.setScale(this.visScale * (1 - stretch), this.visScale * (1 + stretch));
         vis.setAngle(Phaser.Math.Clamp(newVx / 40, -8, 8));
       }
     }
@@ -548,9 +551,9 @@ export default class LevelScene extends Phaser.Scene {
 
   squash(sx, sy) {
     this.squashing = true;
-    this.vis.setScale(HERO_SCALE * sx, HERO_SCALE * sy).setAngle(0);
+    this.vis.setScale(this.visScale * sx, this.visScale * sy).setAngle(0);
     this.tweens.add({
-      targets: this.vis, scaleX: HERO_SCALE, scaleY: HERO_SCALE, duration: 160, ease: 'Back.out',
+      targets: this.vis, scaleX: this.visScale, scaleY: this.visScale, duration: 160, ease: 'Back.out',
       onComplete: () => (this.squashing = false)
     });
   }

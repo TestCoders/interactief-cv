@@ -45,8 +45,8 @@ export default class EducationPiece {
       scene.add.image(rackLeft + 20 + i * 34, rackY + 6, theme.tex('medal')).setOrigin(0.5, 0).setAlpha(0)
     );
     this.rackCaption = label(scene, rackLeft + rackW / 2, rackY + 100, `${certificaten.length} cursussen &\ncertificaten`, theme, {
-      size: 13, color: colors.title, align: 'center'
-    }).setOrigin(0.5, 0).setAlpha(0);
+      size: 13, color: colors.floatTitle ?? colors.title, align: 'center'
+    }).setOrigin(0.5, 0).setStroke(colors.floatStroke ?? '#1a1430', 4).setAlpha(0);
     this.sparks = scene.add.particles(0, 0, theme.tex('spark'), { speed: { min: 40, max: 140 }, lifespan: 450, scale: { start: 1.2, end: 0 }, emitting: false });
   }
 

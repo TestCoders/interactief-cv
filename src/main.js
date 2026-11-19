@@ -60,6 +60,8 @@ styleBtn.addEventListener('click', async () => {
     hidePanel();
     level.scene.restart({ cv: level.cv, startX: level.player.x });
   }
+  const select = game.scene.getScene('select');
+  if (select?.sys.isActive()) select.scene.restart();
   styleBtn.blur(); // spatie/enter mogen daarna niet nog eens wisselen
 });
 

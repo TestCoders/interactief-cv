@@ -161,7 +161,9 @@ try {
   check((await ev(`__game.registry.get('theme')`)) === 'zakelijk', 'knop wisselt naar "Zakelijk"');
   check(await ev(`(${L}.ground.displayTexture ?? ${L}.ground.texture).key === 'z-ground'`), 'wereld gebruikt de zakelijke textures');
   check(Math.abs((await ev(`${L}.player.x`)) - xBefore) < 8, 'held blijft op dezelfde plek');
-  check((await ev(`getComputedStyle(document.documentElement).getPropertyValue('--box').trim()`)) === '#1b1f3b', 'tekstbox en knoppen volgen de stijl');
+  check((await ev(`getComputedStyle(document.documentElement).getPropertyValue('--box').trim()`)) === '#ffffff', 'tekstbox en knoppen volgen de stijl');
+  check((await ev(`document.documentElement.dataset.stijl`)) === 'zakelijk', 'stijlregels per thema actief (data-stijl)');
+  check(await ev(`${L}.vis.texture.key.startsWith('z-hero-')`), 'held is de kantoorheld uit het ontwerp');
   await ev(`document.getElementById('btn-style').click()`); await sleep(1800);
   check((await ev(`__game.registry.get('theme')`)) === 'retro', 'en weer terug naar "Retro"');
 

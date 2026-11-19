@@ -6,9 +6,11 @@ export default class SignPiece {
     this.x = x;
     this.range = 90;
     this.usesPanel = true;
-    scene.add.image(x, groundY, theme.tex('sign')).setOrigin(0.5, 1);
-    scene.add.text(x, groundY - 83, station.label, {
-      fontFamily: 'system-ui', fontSize: '11px', fontStyle: 'bold', color: '#1d2433', align: 'center', wordWrap: { width: 80 }
+    const sign = scene.add.image(x, groundY, theme.tex('sign')).setOrigin(0.5, 1);
+    // Label midden op het bordvlak (bovenste ~55% van de texture).
+    scene.add.text(x, groundY - sign.height + 30, station.label, {
+      fontFamily: theme.font, fontSize: '12px', fontStyle: 'bold', color: theme.colors.signText ?? theme.colors.text,
+      align: 'center', wordWrap: { width: 76 }
     }).setOrigin(0.5);
   }
   enter() {}

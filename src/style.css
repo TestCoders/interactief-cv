@@ -155,3 +155,91 @@ html, body { height: 100%; overflow: hidden; background: #9fd6ff; }
 /* tekstbox boven de hoofdstukbalk */
 #panel { bottom: 72px; max-height: calc(100vh - 170px); }
 .brand { display: none; }
+
+/* ==========================================================================
+   Stijlregels per gamestijl (data-stijl op <html>, gezet door applyThemeCss).
+   Volgen de ontwerpen in design/retro-pixel-art en design/strak-zakelijk.
+   ========================================================================== */
+
+/* ---------- Retro pixel-art: crème kaders met gekartelde inktrand ---------- */
+[data-stijl="retro"] { --notch: 0 -4px 0 0 #1b1f2e, 0 4px 0 0 #1b1f2e, -4px 0 0 0 #1b1f2e, 4px 0 0 0 #1b1f2e; }
+[data-stijl="retro"] .topbar { gap: 16px; top: 18px; right: 18px; }
+[data-stijl="retro"] .topbar button, [data-stijl="retro"] .topbar .btn, [data-stijl="retro"] .close {
+  font: 400 10px/1.4 var(--title-font); padding: 10px 12px; min-height: 40px; border: 0; color: #1b1f2e; background: #f4f4ec;
+  box-shadow: var(--notch), inset -4px -4px 0 0 #c9ccd6;
+}
+[data-stijl="retro"] .topbar button:hover, [data-stijl="retro"] .topbar .btn:hover, [data-stijl="retro"] .close:hover { background: #ffffff; }
+[data-stijl="retro"] .topbar button:active, [data-stijl="retro"] .topbar .btn:active, [data-stijl="retro"] .close:active { transform: translateY(4px); box-shadow: var(--notch); }
+[data-stijl="retro"] #panel {
+  border: 0; outline: 0; background: #f4f4ec; color: #1b1f2e; font: 17px/1.45 var(--pixel-font); padding: 22px 24px 20px;
+  box-shadow: var(--notch), inset 0 8px 0 0 #3c8772, inset -4px -4px 0 0 #c9ccd6;
+}
+[data-stijl="retro"] #panel h2 { font: 400 13px/1.5 var(--title-font); color: #2f6f5d; margin: 6px 0 8px; letter-spacing: 0; }
+[data-stijl="retro"] #panel h3 { font: 400 11px/1.5 var(--title-font); color: #2f6f5d; }
+[data-stijl="retro"] #panel .meta { color: #3b4561; font-size: 15px; }
+[data-stijl="retro"] #panel::after { color: #2f6f5d; }
+[data-stijl="retro"] .chips li { background: #d9ece4; border: 0; padding: 3px 9px; font-size: 14px; box-shadow: 0 -2px 0 0 #2f6f5d, 0 2px 0 0 #2f6f5d, -2px 0 0 0 #2f6f5d, 2px 0 0 0 #2f6f5d; margin: 2px; }
+[data-stijl="retro"] .meters i { background: #c9ccd6; }
+[data-stijl="retro"] .meters i.on { background: #f2b22e; box-shadow: inset 0 -2px 0 #c27a12; }
+[data-stijl="retro"] #hud {
+  font: 400 11px/1.6 var(--title-font); color: #1b1f2e; background: #f4f4ec; border: 0; padding: 10px 14px; top: 18px; left: 18px;
+  box-shadow: var(--notch), inset -4px -4px 0 0 #c9ccd6;
+}
+[data-stijl="retro"] #toast { font: 400 11px var(--title-font); background: #ffe27a; border: 0; box-shadow: var(--notch), inset -4px -4px 0 0 #f2b22e; padding: 9px 14px; }
+[data-stijl="retro"] #titlecard { background: radial-gradient(ellipse at center, rgba(27, 31, 46, .15), rgba(27, 31, 46, .45)); }
+[data-stijl="retro"] #titlecard h1 {
+  font: 400 clamp(24px, 5vw, 56px)/1.2 var(--title-font); color: #ffe27a; letter-spacing: 0;
+  text-shadow: 4px 4px 0 #1b1f2e, -3px -3px 0 #1b1f2e, 3px -3px 0 #1b1f2e, -3px 3px 0 #1b1f2e;
+}
+[data-stijl="retro"] #titlecard p { font: 600 clamp(16px, 2vw, 24px) var(--pixel-font); color: #f4f4ec; text-shadow: 3px 3px 0 #1b1f2e; }
+[data-stijl="retro"] #titlecard .start { font: 400 clamp(11px, 1.2vw, 14px) var(--title-font); }
+[data-stijl="retro"] #chapters { background: #f4f4ec; border: 0; gap: 10px; padding: 10px; box-shadow: var(--notch), inset -4px -4px 0 0 #c9ccd6; bottom: 18px; }
+[data-stijl="retro"] #chapters button { font: 400 9px/1.4 var(--title-font); color: #1b1f2e; background: #ffffff; border: 0; padding: 9px 10px; box-shadow: 0 0 0 2px #1b1f2e; }
+[data-stijl="retro"] #chapters button b { color: #2f6f5d; }
+[data-stijl="retro"] #chapters button:hover { background: #d9ece4; }
+[data-stijl="retro"] #chapters button.nu { background: #2f6f5d; color: #ffffff; box-shadow: 0 0 0 2px #1b1f2e, inset -3px -3px 0 0 #1f4f42; }
+[data-stijl="retro"] #chapters button.nu b { color: #ffe27a; }
+[data-stijl="retro"] .contact-form input, [data-stijl="retro"] .contact-form textarea { background: #ffffff; color: #1b1f2e; border: 2px solid #1b1f2e; font: 16px var(--pixel-font); }
+[data-stijl="retro"] .contact-form label { color: #3b4561; font-size: 13px; }
+[data-stijl="retro"] .contact-form button { font: 400 10px/1.4 var(--title-font); background: #2f6f5d; color: #ffffff; border: 0; padding: 12px 14px; box-shadow: var(--notch), inset -4px -4px 0 0 #1f4f42; }
+
+/* ---------- Business isometric: witte kaarten met isometrische rand ---------- */
+[data-stijl="zakelijk"] .topbar button, [data-stijl="zakelijk"] .topbar .btn, [data-stijl="zakelijk"] .close {
+  font: 600 13px/1 var(--pixel-font); text-transform: none; padding: 0 14px; min-height: 40px; display: inline-flex; align-items: center;
+  color: #16202a; background: #ffffff; border: 1px solid #c3cce0; border-radius: 8px; box-shadow: 4px 2px 0 #c3cce0;
+}
+[data-stijl="zakelijk"] .topbar button:hover, [data-stijl="zakelijk"] .topbar .btn:hover, [data-stijl="zakelijk"] .close:hover { background: #ffffff; border-color: #2f6f5d; }
+[data-stijl="zakelijk"] .topbar button:active, [data-stijl="zakelijk"] .topbar .btn:active, [data-stijl="zakelijk"] .close:active { transform: translate(2px, 1px); box-shadow: 2px 1px 0 #c3cce0; }
+[data-stijl="zakelijk"] #btn-switch { color: #ffffff; background: #2f6f5d; border-color: #2f6f5d; box-shadow: 4px 2px 0 #1d4a3e; }
+[data-stijl="zakelijk"] #panel {
+  outline: 0; border: 1px solid #d5dbe6; border-radius: 12px; background: #ffffff; color: #16202a;
+  font: 15px/1.55 var(--pixel-font); padding: 20px 22px; box-shadow: 10px 5px 0 #c3cce0;
+}
+[data-stijl="zakelijk"] #panel h2 { font: 600 21px/1.25 var(--title-font); color: #16202a; text-transform: none; letter-spacing: -0.01em; margin: 0 0 6px; }
+[data-stijl="zakelijk"] #panel h3 { font: 600 12px var(--pixel-font); letter-spacing: .08em; text-transform: uppercase; color: #24584a; }
+[data-stijl="zakelijk"] #panel .meta { color: #55606b; font-size: 14px; }
+[data-stijl="zakelijk"] #panel a { color: #2f6f5d; }
+[data-stijl="zakelijk"] #panel::after { content: none; }
+[data-stijl="zakelijk"] .chips { gap: 8px; }
+[data-stijl="zakelijk"] .chips li { background: #e3efe9; color: #24584a; border: 0; border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 500; }
+[data-stijl="zakelijk"] .meters i { width: 18px; height: 8px; border-radius: 4px; background: #e3efe9; }
+[data-stijl="zakelijk"] .meters i.on { background: #2f6f5d; }
+[data-stijl="zakelijk"] #hud {
+  font: 600 15px var(--title-font); color: #16202a; background: #ffffff; border: 1px solid #d5dbe6; border-radius: 10px;
+  padding: 10px 16px; box-shadow: 6px 3px 0 #c3cce0;
+}
+[data-stijl="zakelijk"] #toast { font: 600 14px var(--pixel-font); color: #ffffff; background: #16202a; border: 0; border-radius: 999px; padding: 8px 16px; box-shadow: 4px 2px 0 #3b4560; }
+[data-stijl="zakelijk"] #titlecard { background: radial-gradient(ellipse at center, rgba(22, 32, 42, .1), rgba(22, 32, 42, .4)); }
+[data-stijl="zakelijk"] #titlecard h1 { font: 700 clamp(32px, 6vw, 72px)/1.05 var(--title-font); color: #ffffff; letter-spacing: -0.02em; text-shadow: 6px 3px 0 #2f6f5d; }
+[data-stijl="zakelijk"] #titlecard p { font: 600 clamp(16px, 2vw, 22px) var(--pixel-font); color: #ffffff; text-shadow: 0 2px 8px rgba(22, 32, 42, .6); }
+[data-stijl="zakelijk"] #titlecard .start { font-size: 14px; letter-spacing: .08em; }
+[data-stijl="zakelijk"] #chapters { background: #ffffff; border: 1px solid #d5dbe6; border-radius: 12px; padding: 6px; gap: 4px; box-shadow: 8px 4px 0 #c3cce0; }
+[data-stijl="zakelijk"] #chapters button { font: 600 13px var(--pixel-font); color: #55606b; background: transparent; border: 0; border-radius: 8px; padding: 8px 12px; }
+[data-stijl="zakelijk"] #chapters button b { color: #9aa6bd; }
+[data-stijl="zakelijk"] #chapters button:hover { color: #16202a; background: #f6f7fb; }
+[data-stijl="zakelijk"] #chapters button.nu { color: #ffffff; background: #2f6f5d; }
+[data-stijl="zakelijk"] #chapters button.nu b { color: #b9d6ca; }
+[data-stijl="zakelijk"] .contact-form label { color: #55606b; font-size: 12px; font-weight: 600; letter-spacing: .04em; }
+[data-stijl="zakelijk"] .contact-form input, [data-stijl="zakelijk"] .contact-form textarea { background: #f6f7fb; color: #16202a; border: 1px solid #c3cce0; border-radius: 8px; font: 15px var(--pixel-font); }
+[data-stijl="zakelijk"] .contact-form input:focus, [data-stijl="zakelijk"] .contact-form textarea:focus { border-color: #2f6f5d; }
+[data-stijl="zakelijk"] .contact-form button { font: 600 15px var(--pixel-font); color: #ffffff; background: #2f6f5d; border: 0; border-radius: 8px; padding: 12px 18px; box-shadow: 6px 3px 0 #1d4a3e; }

@@ -35,8 +35,10 @@ export default class CampfirePiece {
     this.people = SEATS.map((dx, i) => {
       bench.fillStyle(0x5a3a22).fillRect(x + dx - 26, groundY - 12, 52, 12);
       const other = others[i % Math.max(1, others.length)];
-      const key = other ? heroKey(other) : heroKey(scene.cv);
-      const s = scene.add.sprite(x + dx, groundY - 8, key, 'idle0').setOrigin(0.5, 1).setScale(3).play(`${key}-idle`).setFlipX(dx > 0);
+      // Zelfde soort held als de speler in dit thema (pixel-held of kantoorheld).
+      const key = theme.tex(heroKey(other ?? scene.cv));
+      const s = scene.add.sprite(x + dx, groundY - 8, key, 'idle0').setOrigin(0.5, theme.heroOriginY ?? 1)
+        .setScale(theme.heroScale ?? 3).play(`${key}-idle`).setFlipX(dx > 0);
       if (!other) s.setTint([0xe4572e, 0x6c5ce7, 0xffb400, 0x2e86de][i]);
       return s;
     });
@@ -51,7 +53,7 @@ export default class CampfirePiece {
     this.bubbleTail = tail;
     this.lines = TESTCODERS.werkplezier;
 
-    this.title = label(scene, x, groundY - 420, 'NA HET WERK', theme, { size: 22, color: '#ffd23f' }).setOrigin(0.5).setStroke('#1a1430', 6).setScale(0);
+    this.title = label(scene, x, groundY - 420, 'NA HET WERK', theme, { size: 22, color: theme.colors.floatTitle ?? '#ffd23f' }).setOrigin(0.5).setStroke(theme.colors.floatStroke ?? '#1a1430', 6).setScale(0);
     this.subtitle = label(scene, x, groundY - 392, `Waar ${voornaam} warm voor loopt — en het team van TestCoders`, theme, { size: 13, color: '#f4e4c1' })
       .setOrigin(0.5).setStroke('#1a1430', 4).setAlpha(0);
 

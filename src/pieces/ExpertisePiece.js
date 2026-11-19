@@ -26,7 +26,7 @@ export default class ExpertisePiece {
     this.mouth = { x, y: groundY - this.chest.height };
 
     this.title = scene.add.text(x, 0, '★ EXPERTISE ★', {
-      fontFamily: font, fontSize: '18px', fontStyle: 'bold', color: colors.title, stroke: '#1a1430', strokeThickness: 6
+      fontFamily: font, fontSize: '18px', fontStyle: 'bold', color: colors.floatTitle ?? colors.title, stroke: colors.floatStroke ?? '#1a1430', strokeThickness: 6
     }).setOrigin(0.5).setScale(0);
 
     const items = station.data.slice(0, PER_COLUMN * 2);

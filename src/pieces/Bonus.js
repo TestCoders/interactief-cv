@@ -10,7 +10,7 @@ export default class Bonus {
     this.gift.refreshBody();
     scene.tweens.add({ targets: this.gift, y: this.gift.y - 8, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
     this.gift.setInteractive({ useHandCursor: true }).on('pointerdown', () => scene.requestJump());
-    this.hint = label(scene, x, groundY - 225, '▲ SPRING', theme, { size: 12, color: '#ffffff' }).setOrigin(0.5).setStroke('#1a1430', 5).setAlpha(0).setDepth(6);
+    this.hint = label(scene, x, groundY - 225, '▲ SPRING', theme, { size: 12, color: '#ffffff' }).setOrigin(0.5).setStroke(theme.colors.floatStroke ?? '#1a1430', 5).setAlpha(0).setDepth(6);
     scene.tweens.add({ targets: this.hint, alpha: { from: 0.3, to: 1 }, duration: 450, yoyo: true, repeat: -1, ease: 'Stepped', easeParams: [2] });
     this.hint.setVisible(false);
     this.sparks = scene.add.particles(0, 0, theme.tex('spark'), { speed: { min: 80, max: 260 }, lifespan: 600, scale: { start: 1.6, end: 0 }, gravityY: 300, emitting: false }).setDepth(7);
@@ -27,7 +27,14 @@ export default class Bonus {
     audio.play('bonus');
     scene.tweens.killTweensOf(this.gift);
     this.gift.disableBody(true, false);
-    scene.tweens.add({ targets: this.gift, scale: 1.6, alpha: 0, duration: 260, ease: 'Quad.out' });
+    const openKey = theme.tex('giftOpen');
+    if (scene.textures.exists(openKey)) {
+      // Koffertje klapt open en blijft staan (zakelijk thema).
+      this.gift.setTexture(openKey);
+      scene.tweens.add({ targets: this.gift, scale: 1.2, duration: 140, yoyo: true, ease: 'Back.out' });
+    } else {
+      scene.tweens.add({ targets: this.gift, scale: 1.6, alpha: 0, duration: 260, ease: 'Quad.out' });
+    }
 
     // Kaartje met de extra inhoud, boven het cadeautje.
     const items = this.items.slice(0, 12);
@@ -37,10 +44,11 @@ export default class Bonus {
     const w = cols * colW + 28;
     const h = 44 + rows * 20 + 10;
     const g = scene.add.graphics();
-    g.fillStyle(0x1a1430).fillRect(-w / 2 + 4, -h + 4, w, h);
-    g.fillStyle(0xffd23f).fillRect(-w / 2 - 3, -h - 3, w + 6, h + 6);
-    g.fillStyle(0x2b2147).fillRect(-w / 2, -h, w, h);
-    const parts = [g, label(scene, 0, -h + 12, `🎁 ${this.titel}`, theme, { size: 14, color: '#ffd23f' }).setOrigin(0.5, 0)];
+    const { colors } = theme;
+    g.fillStyle(colors.boardShadow).fillRect(-w / 2 + 4, -h + 4, w, h);
+    g.fillStyle(colors.boardEdge).fillRect(-w / 2 - 3, -h - 3, w + 6, h + 6);
+    g.fillStyle(colors.board).fillRect(-w / 2, -h, w, h);
+    const parts = [g, label(scene, 0, -h + 12, `🎁 ${this.titel}`, theme, { size: 14, color: colors.title }).setOrigin(0.5, 0)];
     items.forEach((it, i) => {
       const col = Math.floor(i / rows);
       const row = i % rows;
