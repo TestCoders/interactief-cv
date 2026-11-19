@@ -5,7 +5,8 @@ description: Zet een foto van een (TestCoders-)professional om naar de pixel-art
 
 # Foto naar pixel-art held
 
-Elke speler in het spel is een held van 16×18 pixels (`src/heroes.js`). Je maakt
+Elke speler in het spel is een held van 16×18 pixels (`src/graphics/pixelHero.js`); in de
+zakelijke stijl een kantoorheld (`src/graphics/heroSprites.js`) die dezelfde kenmerken gebruikt. Je maakt
 **geen** verkleinde foto: op 16 pixels breed lijkt die nergens op en hij past niet
 in de retrostijl. Je leest de **herkenbare kenmerken** van de foto af en zet ze om in
 het veld `uiterlijk` in de CV-JSON. Het spel tekent de held daaruit, zodat hij dezelfde
@@ -75,8 +76,10 @@ animaties, omlijning en stijl houdt als de andere helden.
 
 ## Iets nieuws nodig?
 
-Past geen enkel kapsel of baardtype, voeg dan een nieuw raster toe aan `KAPSELS` of
-`BAARDEN` in `src/heroes.js` (10 rijen van 16 tekens; de ogen staan op kolom 8 en 10
+Past geen enkel kapsel of baardtype, voeg dan een nieuw raster toe aan `HAIRSTYLES` of
+`BEARDS` in `src/graphics/pixelHero.js` (10 rijen van 16 tekens; de ogen staan op kolom 8 en 10
 van rij 5–6, zodat bril en baard blijven passen). De validatie leest de toegestane
 waarden uit die objecten, dus `scripts/validate-cv.mjs` hoeft niet mee te veranderen.
+Geef een nieuw kapsel ook een kantoorvariant in `OFFICE_VARIANT` en een nieuwe baard een
+tekening in `drawOfficeBeard` (`src/graphics/heroSprites.js`), zodat de zakelijke stijl meedoet.
 Werk wel de tabel in `references/kenmerken.md` bij.

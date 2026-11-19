@@ -9,7 +9,7 @@ import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { deflateSync } from 'node:zlib';
-import { HERO_H, HERO_W, heroFrames } from '../src/heroes.js';
+import { HERO_H, HERO_W, pixelHeroFrames } from '../src/graphics/pixelHero.js';
 
 const args = process.argv.slice(2);
 const mdMode = args[0] === '--md' && args.shift();
@@ -82,7 +82,7 @@ if (mdMode) {
   for (const md of args) {
     const { naam, uiterlijk } = uiterlijkUitMarkdown(readFileSync(md, 'utf8'));
     if (!Object.keys(uiterlijk).length) console.warn(`! ${md}: geen uiterlijk in de frontmatter, standaardheld gebruikt`);
-    const { frames, colors } = heroFrames({ naam, uiterlijk }, 0);
+    const { frames, colors } = pixelHeroFrames({ naam, uiterlijk }, 0);
     const rgb = Object.fromEntries(Object.entries(colors).map(([k, v]) => [k, toRgb(v)]));
     const rows = frames[0].rows;
     const file = join(dirname(md), basename(md, '.md') + '.png');
@@ -101,7 +101,7 @@ for (const id of wanted) {
     continue;
   }
   const cv = { id, ...JSON.parse(readFileSync(join(dir, `${id}.json`), 'utf8')) };
-  const { frames, colors } = heroFrames(cv, index);
+  const { frames, colors } = pixelHeroFrames(cv, index);
   const rgb = Object.fromEntries(Object.entries(colors).map(([k, v]) => [k, toRgb(v)]));
   const gap = 2;
   const cellW = HERO_W + gap;

@@ -189,7 +189,7 @@ informatie is erger dan een rommelig kopje Overig.
 
 ## Pixel-art poppetje
 
-Elk cv krijgt een pixel-art poppetje: dezelfde held als in het spel (`src/heroes.js`),
+Elk cv krijgt een pixel-art poppetje: dezelfde held als in het spel (`src/graphics/pixelHero.js`),
 met het uiterlijk van de persoon. Je maakt geen verkleinde foto, maar leest kenmerken af.
 
 1. **Zoek de foto op LinkedIn** met de naam uit het cv. Gebruik de browser (Claude in

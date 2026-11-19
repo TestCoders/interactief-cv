@@ -23,13 +23,26 @@ Besturing: ← → / A D lopen, spatie / ↑ / W springen. Knop **Klassiek CV** 
 
 ## Hoe het level werkt
 
-- **Scrollen = lopen** (muiswiel, trackpad, ↓, swipe); ← → en spatie om zelf te spelen.
-- Elk CV-onderdeel is een **set piece** met een eigen animatie (`src/pieces/`):
-  - **Expertise** — schatkist die openklapt; expertises vliegen eruit als badges.
-  - **Vaardigheden** — skillbord waarop per skill bloemetjes opgroeien tot het niveau (1–5 → 2–10 bloemen).
-  - **Werkplezier** — collega's die gaan springen als je aankomt.
-  - Overige onderdelen — bord + tekstbox (nog om te bouwen).
-- Aan de finish: **contactformulier naar TestCoders** (opent een ingevulde mail aan info@testcoders.nl).
+**Ontwerpregels:** extreem makkelijk (alleen scrollen is genoeg, je kunt niets missen of vastlopen) en elke mechanic heeft een reden.
+
+- **Scrollen = verder in het CV.** Muiswiel, trackpad, swipen en de pijltjes doen precies hetzelfde. Stop je, dan sta je binnen een seconde stil en glijd je naar het dichtstbijzijnde onderdeel (*halteplaats*); de tekstbox blijft staan tot het volgende onderdeel.
+- **Springen is optioneel** (spatie / ↑, of tik op het cadeautje): 🎁 cadeautjes bevatten extra's zoals kernwoorden en bezochte conferenties.
+- **Snel naar een hoofdstuk** (voor recruiters): hoofdstukbalk onderin of toetsen **1–7**. De held reist via een **CI/CD-pipeline**.
+- **De dag verloopt met de loopbaan mee**: ochtend bij het profiel, middag tijdens de opdrachten, avond bij het kampvuur.
+- **Scherp op elk scherm**: het canvas rendert op de echte venstergrootte; de wereld (540 px hoog) wordt opgezoomd en tekst rendert op die resolutie.
+- Elk CV-onderdeel is een **set piece** (`src/pieces/`):
+
+| Onderdeel | Set piece | Waarom zo |
+|-----------|-----------|-----------|
+| Profiel | Spelerskaart, **LVL = jaren in het testvak**, XP-balk, talen, specialiteiten | Kop van het TC-cv als RPG-karakter |
+| Expertise | Schatkist; expertises vliegen eruit als badges (★ = niveau) | Expertise is de schat |
+| Vaardigheden | Bord per categorie; bloemetjes groeien tot het niveau | Vaardigheden groeien |
+| Opleidingen | Oorkondes + afstudeerhoed; certificaten als medailles | Behaalde prijzen |
+| Ervaring | **Release per opdracht**: loop over ▶ RUN, werkzaamheden draaien als testcases op groen, PASSED, releasevlag met opdrachtgever de mast in (**mastlengte = duur**) | Elke opdracht is een geslaagde release — het vak van een tester |
+| Interesses + werkplezier | **Na het werk**: avond, het team rond het kampvuur vertelt om de beurt wat werken bij TestCoders leuk maakt; interesses stijgen op als wensballonnen van licht | De mens achter het cv, als rustig warm einde |
+| Finish | Contactformulier naar TestCoders | Doel van de klant |
+
+`npm run test:e2e` speelt het level met echte scroll-, toets- en tikevents en controleert deze regels (standaard op `robin-sterrenstof`; `CV=<id> npm run test:e2e` voor een ander CV).
 
 ## Versie voor AI
 
@@ -53,14 +66,16 @@ Werkt in `npm run dev` én in de build. Knop **AI / Markdown** in de topbar open
 |------|-----------|------------|
 | `naam`, `rol`, `profiel` | ja | Eerste bord |
 | `kleur` | nee | Kleur van je karakter (`"#rrggbb"`) |
-| `uiterlijk` (`kapsel`, `haarkleur`, `huid`, `bril`, `baard`) | nee | Uiterlijk van je karakter; maak het uit een foto met de skill `foto-naar-pixelart`. Bekijk het resultaat met `npm run heroes` |
-| `opleiding[]` (`periode`, `titel`, `instituut`) | nee | Eén bord per opleiding |
+| `uiterlijk` | nee | Vast personage in plaats van het standaardpoppetje, in beide gamestijlen. Nu beschikbaar: `"martijn"` (kaal met bril, blauwe trui met TC-logo). Zie `src/config/uiterlijk.js`. Of een object met kenmerken uit een foto (`kapsel`, `haarkleur`, `huid`, `bril`, `baard`): maak het met de skill `foto-naar-pixelart` en bekijk het met `npm run heroes` |
+| `opleiding[]` (`periode`, `titel`, `instituut`) | nee | Oorkondes bij het opleidingsonderdeel |
 | `werkervaring[]` (`periode`, `rol`, `opdrachtgever`, `omschrijving`, `tools[]`) | ja | Eén bord per opdracht — **nieuwste eerst** in de JSON, de game loopt van oud naar nieuw |
-| `expertise[]` | nee | Badges uit de schatkist |
-| `skills[]` (`naam`, `niveau` 1–5) | ja | Bloemetjes op het skillbord |
-| `interesses[]` | nee | Bord "Interesses" |
-| `werkplezier[]` | nee | Werkplezier-scène |
-| `certificeringen[]` | nee | Bord |
+| `expertise[]` (tekst of `naam`, `niveau`, `sinds`) | nee | Badges uit de schatkist |
+| `skills[]` (`naam`, `niveau` 1–5 of Junior/Medior/Senior, `sinds`, `categorie`) | ja | Bloemetjes op een bord per categorie |
+| `kernwoorden[]`, `conferenties[]` | nee | Bonus-cadeautjes |
+| `talen[]` (`taal`, `niveau`) | nee | Spelerskaart |
+| `interesses[]` | nee | Wensballonnen bij het kampvuur |
+| `werkplezier[]` | nee | Gesprek rond het kampvuur |
+| `certificeringen[]` | nee | Medailles bij het opleidingsonderdeel |
 | `contact` (`email`, …) | `email` ja | Alleen intern; in de game loopt contact via TestCoders |
 
 > Tip: laat een AI-agent je bestaande TC-CV (Word/PDF) omzetten naar dit JSON-formaat — geef `sam-voorbeeld.json` mee als voorbeeld.
@@ -69,16 +84,34 @@ Werkt in `npm run dev` én in de build. Knop **AI / Markdown** in de topbar open
 ## Projectstructuur
 
 ```
-index.html              pagina + DOM-overlays (paneel, toast, klassieke weergave)
-src/main.js             Phaser-config en topbar-knoppen
-src/cv.js               CV's laden + CV → lijst checkpoints
-src/ui.js               HTML voor panelen en klassieke weergave
-src/scenes/BootScene    genereert alle textures met code (nog geen assets nodig)
-src/scenes/SelectScene  karakterselectie
-src/scenes/LevelScene   het level: grond, borden, platforms, munten, finish
-src/data/cv/*.json      één CV per persoon
-scripts/validate-cv.mjs validatie van de CV-bestanden
-scripts/hero-preview.mjs PNG-preview van de pixel-art helden (npm run heroes)
+index.html                     pagina + DOM-overlays (paneel, toast, klassieke weergave)
+src/main.js                    start de game en koppelt de DOM-overlay
+src/config/                    alle afstelbare waarden op één plek
+  gameConfig.js                canvasformaat, zwaartekracht, scene-sleutels
+  levelConfig.js               wereld, speler, game feel, scroll-lopen, camera
+  traversalConfig.js           halteplaatsen, hoofdstukken en dagverloop
+  pieceConfig.js               afmetingen van de set pieces
+  company.js                   contactgegevens TestCoders
+src/cv/
+  cvLoader.js                  CV's laden uit src/data/cv
+  normalizeCv.js               niveaus, periodes en compatibiliteit met bestaande cv-data
+  stations.js                  CV → lijst checkpoints (stations) + stationtypes
+src/scenes/
+  BootScene.js                 maakt de textures en kiest de eerste scene
+  CharacterSelectScene.js      karakterselectie
+  LevelScene.js                het level: wereld, set pieces, finish
+src/level/                     onderdelen van het level
+  Player.js                    held: beweging, springen, squash & stof
+  KeyboardControls.js          toetsenbord
+  ScrollWalkInput.js           lopen door te scrollen/swipen
+  TitleCard.js                 titelkaart bij de start
+src/pieces/                    set pieces per CV-onderdeel (+ pieceRegistry.js)
+src/graphics/                  textures met code: helden, wereld, pixel art
+src/themes/retroTheme.js       kleuren, font en textures van de retrostijl
+src/ui/                        DOM-overlay: paneel, templates, topbar, contactformulier
+src/data/cv/*.json             één CV per persoon
+scripts/validate-cv.mjs        validatie van de CV-bestanden
+scripts/hero-preview.mjs       PNG-preview van de pixel-art helden (npm run heroes)
 ```
 
 ## Voorstel taakverdeling (3 personen)

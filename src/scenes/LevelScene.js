@@ -1,330 +1,515 @@
 import Phaser from 'phaser';
-import { buildStations } from '../cv.js';
-import { showPanel, hidePanel, stationHtml } from '../ui.js';
-import { createPiece } from '../pieces/index.js';
-import retro from '../themes/retro.js';
-import { heroKey } from '../heroes.js';
+import { buildStations } from '../cv/stations.js';
+import { SCENES } from '../config/gameConfig.js';
+import { MOVEMENT, CAMERA, STOPS } from '../config/levelConfig.js';
+import { BASE_H, GROUND_H, START_X, PIECE_GAP, BONUS_GAP, CHAPTERS } from '../config/traversalConfig.js';
+import { BRAND } from '../config/brand.js';
+import Player from '../level/Player.js';
+import KeyboardControls from '../level/KeyboardControls.js';
+import ScrollWalkInput from '../level/ScrollWalkInput.js';
+import { esc } from '../ui/html.js';
+import { showPanel, hidePanel } from '../ui/panel.js';
+import { stationHtml } from '../ui/stationTemplates.js';
+import { createPiece, widthOf, bonusFor } from '../pieces/pieceRegistry.js';
+import Bonus from '../pieces/Bonus.js';
+import { THEMES } from '../themes/index.js';
+import { heroKey as pixelHeroKey } from '../graphics/heroSprites.js';
+import { audio } from '../audio/index.js';
 
-const BASE_H = 540; // wereldhoogte; het venster mag groter zijn (Scale.EXPAND), de wereld schaalt niet mee
-const GROUND_H = 64;
-const STATION_GAP = 620;
-const START_X = 420;
-const HERO_SCALE = 3;
-
-// --- Game feel: alle knoppen om aan te draaien op één plek ---
-const MAX_SPEED = 300; // px/s
-const ACCEL_GROUND = 2600; // px/s² optrekken op de grond
-const DECEL_GROUND = 3400; // px/s² afremmen op de grond (iets sneller dan optrekken = strak)
-const ACCEL_AIR = 1700; // minder controle in de lucht
-const DECEL_AIR = 900;
-const JUMP = 640; // afzetsnelheid; springhoogte ≈ JUMP² / (2 · 1400) ≈ 146 px
-const FALL_GRAVITY = 900; // extra zwaartekracht bij het vallen: snel omhoog, sneller omlaag = niet zweverig
-const JUMP_CUT = 0.45; // springknop vroeg loslaten = lagere sprong
-const COYOTE_MS = 110; // nog springen vlak nadat je van een rand loopt
-const BUFFER_MS = 130; // springen vlak vóór de landing wordt onthouden
-const LOOKAHEAD = 140; // camera kijkt vooruit in looprichting
-const SCROLL_FACTOR = 1.4; // px lopen per px scroll
-const SCROLL_MAX = 900; // max opgespaarde loopafstand, zodat hard scrollen niet eindeloos doorloopt
+// Coach marks: een mini-tutorial, elk één keer, precies op het moment dat het nodig is.
+const COACH = {
+  martijn: '💬 Martijn vertelt over je nieuwe collega. Scroll of druk <b>→</b> voor de volgende zin.',
+  springen: '🎁 Een cadeautje! Druk op <b>spatie</b> (of tik erop) om te springen — er zit extra info in.',
+  release: '▶ Loop over <b>RUN</b>: elke opdracht draait als test. Groen? Dan gaat de vlag de mast in.',
+  snel: '⏩ Snel naar een onderdeel? Klik onderin een hoofdstuk of druk <b>1–8</b>.',
+  bug: '🐛 Hap! Deze bug brengt je er in een flits heen.'
+};
 
 // Het level wordt volledig uit het CV opgebouwd: elk CV-onderdeel is een set piece (src/pieces).
-// Besturing: scrollen / ↓ / swipen = lopen (zoals een gewone pagina), of zelf spelen met ← → en springen.
+// Besturing voor iedereen: pijltjes of muiswiel (de meeste bezoekers), WASD voor gamers.
+// Lopen is direct (loslaten = stoppen); spatie / ↑ / W springt.
 export default class LevelScene extends Phaser.Scene {
   constructor() {
-    super('level');
+    super(SCENES.level);
   }
 
-  init({ cv }) {
+  init({ cv, startX }) {
     this.cv = cv;
-    this.theme = retro;
+    this.theme = THEMES[this.registry.get('theme')] ?? THEMES.retro;
+    audio.setPack(this.theme.audio);
+    this.startX = startX;
     this.registry.set('currentCv', cv);
     this.finished = false;
-    this.scrollBudget = 0; // resterende afstand (px) die de speler nog "op scroll" loopt; teken = richting
+    this.lastDir = 1;
+    this.glideTo = null;
+    this.gate = null;
     this.hasMoved = false;
-    this.lastGroundedAt = 0;
-    this.jumpPressedAt = -1e9;
-    this.wasGrounded = false;
-    this.lastVy = 0;
+    this.traveling = false;
+    this.cutscene = false; // een set piece bestuurt de held (bijv. sprong tegen de vlaggenmast)
+    this.bonusesOpened = 0;
+    this.currentChapter = null;
   }
 
+  // ---------- Held per thema ----------
+
+  heroTex(cv) { return this.theme.tex(pixelHeroKey(cv)); }
+  get heroScale() { return this.theme.heroScale ?? 3; }
+
   create() {
-    const height = BASE_H;
-    const groundY = height - GROUND_H;
+    this.theme.createTextures(this); // eerst: grond, lucht, held en set pieces gebruiken thema-textures
+    const groundY = BASE_H - GROUND_H;
     this.groundY = groundY;
     const stations = buildStations(this.cv);
-    const finishX = START_X + stations.length * STATION_GAP;
-    const worldW = finishX + 400;
 
-    this.physics.world.setBounds(0, 0, worldW, height + 200);
-    this.cameras.main.setBounds(0, 0, worldW, height);
-    this.cameras.main.setBackgroundColor('#9fd6ff');
+    // --- Layout: set pieces naast elkaar op basis van hun breedte ---
+    const layout = [];
+    let cursor = START_X;
+    for (const st of stations) {
+      const bonus = bonusFor(st, this.cv);
+      if (bonus) cursor += BONUS_GAP;
+      const w = widthOf(st);
+      layout.push({ st, x: cursor + w / 2, bonus, bonusX: cursor - BONUS_GAP / 2 - 20 });
+      cursor += w + PIECE_GAP;
+    }
+    const finishX = cursor + 40;
+    this.worldW = finishX + 600;
+    this.physics.world.setBounds(0, 0, this.worldW, BASE_H + 200);
 
-    // --- Achtergrond (parallax) ---
-    this.clouds = this.add.tileSprite(0, 20, this.scale.width, 160, 'clouds').setOrigin(0, 0).setScrollFactor(0, 1);
-    this.hills = this.add.tileSprite(0, groundY - 260, this.scale.width, 300, 'hills').setOrigin(0, 0).setScrollFactor(0, 1);
+    // --- Lucht: sterren (alleen 's avonds) + parallax ---
+    const W = this.scale.width;
+    this.stars = this.add.graphics().setScrollFactor(0.02, 1).setAlpha(0);
+    for (let i = 0; i < 160; i++) {
+      this.stars.fillStyle(0xffffff, Phaser.Math.FloatBetween(0.4, 1)).fillRect(Phaser.Math.Between(-W, 3 * W), Phaser.Math.Between(-600, groundY - 200), 2, 2);
+    }
+    this.clouds = this.add.tileSprite(0, 20, 10, 160, this.theme.tex('clouds')).setOrigin(0, 0).setScrollFactor(0, 1);
+    this.hills = this.add.tileSprite(0, groundY - 260, 10, 300, this.theme.tex('hills')).setOrigin(0, 0).setScrollFactor(0, 1);
 
     // --- Grond ---
-    this.ground = this.add.tileSprite(0, groundY, worldW, GROUND_H, 'ground').setOrigin(0, 0);
+    this.ground = this.add.tileSprite(0, groundY, this.worldW, GROUND_H, this.theme.tex('ground')).setOrigin(0, 0);
     this.physics.add.existing(this.ground, true);
 
-    // --- Set pieces (één per CV-onderdeel) ---
-    this.theme.createTextures(this);
-    this.pieces = stations.map((st, i) => {
-      const piece = createPiece(this, START_X + i * STATION_GAP, groundY, st, this.theme);
+    // --- Set pieces + bonussen ---
+    this.pieces = layout.map(({ st, x }) => {
+      const piece = createPiece(this, x, groundY, st, this.theme);
       piece.station = st;
       piece.active = false;
       return piece;
     });
+    this.bonuses = layout.filter((l) => l.bonus).map((l) => new Bonus(this, l.bonusX, groundY, l.bonus, this.theme));
 
-    // --- Finish ---
+    // --- Finish: TestCoders ---
     this.finishX = finishX;
-    this.add.image(finishX, groundY, 'flag').setOrigin(0, 1);
+    this.add.image(finishX, groundY, this.theme.tex('flag')).setOrigin(0, 1);
+    // Halteplaatsen: elke stage van een set piece, onder elk cadeautje en bij de finish.
+    this.stops = [...this.pieces.flatMap((p) => p.stages.map((s) => s.x)), ...this.bonuses.map((b) => b.x), finishX + 40].sort((a, b) => a - b);
+
+    // Dag → avond: keerpunten in de wereld.
+    const firstWork = this.pieces.find((p) => p.station.type === 'work');
+    const finale = this.pieces.find((p) => p.station.type === 'finale');
+    const { sky, tint } = this.theme;
+    this.skyKeys = [
+      [0, sky.dag, tint.dag],
+      [firstWork?.x ?? finishX * 0.5, sky.middag, tint.dag],
+      [(finale?.x ?? finishX) - 900, sky.zonsondergang, tint.zonsondergang],
+      [(finale?.x ?? finishX) - 250, sky.avond, tint.avond]
+    ];
 
     // --- Speler ---
-    // Hitbox en uiterlijk zijn gescheiden: squash & wiebel mogen de physics niet beïnvloeden.
-    this.heroKey = heroKey(this.cv);
-    this.player = this.physics.add.sprite(120, groundY - 60, this.heroKey, 'idle0')
-      .setScale(HERO_SCALE).setCollideWorldBounds(true).setVisible(false);
-    this.player.body.setSize(10, 16).setOffset(3, 2);
-    this.vis = this.add.sprite(120, groundY, this.heroKey, 'idle0')
-      .setOrigin(0.5, 1).setScale(HERO_SCALE).setDepth(5).play(`${this.heroKey}-idle`);
-    this.events.on('postupdate', () => this.vis.setPosition(this.player.x, this.player.y + 27));
+    // Hitbox = pixel-held (zelfde gameplay in elk thema); wat je ziet = de held van het thema.
+    this.heroKey = this.heroTex(this.cv);
+    const startX = this.startX ?? 120;
+    this.hero = new Player(this, startX, groundY, pixelHeroKey(this.cv), { visualKey: this.heroKey, scale: this.heroScale, originY: this.theme.heroOriginY });
+    this.player = this.hero.sprite;
+    this.vis = this.hero.visual;
+    this.dust = this.hero.dust;
     this.physics.add.collider(this.player, this.ground);
-    this.cameras.main.startFollow(this.player, true, 0.09, 0.09, -LOOKAHEAD, 0);
+    for (const b of this.bonuses) this.physics.add.overlap(this.player, b.gift, () => b.open());
+    this.cameras.main.startFollow(this.player, true, CAMERA.followLerp, CAMERA.followLerp, -CAMERA.lookahead, 0);
+    this.cameras.main.roundPixels = true;
 
-    // Stofwolkjes bij landen en afzetten.
-    if (!this.textures.exists('dust')) {
-      const g = this.make.graphics({ add: false });
-      g.fillStyle(0xffffff).fillCircle(5, 5, 5).generateTexture('dust', 10, 10).destroy();
-    }
-    this.dust = this.add.particles(0, 0, 'dust', {
-      speed: { min: 30, max: 110 }, angle: { min: 200, max: 340 }, gravityY: 200,
-      lifespan: 380, scale: { start: 0.9, end: 0 }, alpha: { start: 0.8, end: 0 }, tint: 0xe9e2d0, emitting: false
-    }).setDepth(4);
-
-    // --- Titelkaart: de eerste indruk. Verdwijnt zodra je gaat lopen; de camera zoomt dan uit. ---
-    const { font } = this.theme;
-    const W = this.scale.width;
-    this.titleCard = this.add.container(0, 0).setScrollFactor(0).setDepth(20);
-    const shade = this.add.rectangle(0, 0, W * 3, BASE_H * 3, 0x1a1430, 0.35).setOrigin(0.5);
-    const name = this.add.text(0, -70, this.cv.naam.toUpperCase(), {
-      fontFamily: font, fontSize: '54px', fontStyle: 'bold', color: '#ffd23f', stroke: '#1a1430', strokeThickness: 10
-    }).setOrigin(0.5);
-    const rol = this.add.text(0, -10, this.cv.rol, {
-      fontFamily: font, fontSize: '22px', fontStyle: 'bold', color: '#f4e4c1', stroke: '#1a1430', strokeThickness: 6
-    }).setOrigin(0.5);
-    const start = this.add.text(0, 70, '▼  SCROLL OM TE BEGINNEN  ▼', {
-      fontFamily: font, fontSize: '18px', fontStyle: 'bold', color: '#ffffff', stroke: '#1a1430', strokeThickness: 6
-    }).setOrigin(0.5);
-    const keysHint = this.add.text(0, 104, 'of ← → lopen · spatie springen', {
-      fontFamily: font, fontSize: '14px', color: '#f4e4c1', stroke: '#1a1430', strokeThickness: 4
-    }).setOrigin(0.5);
-    this.titleCard.add([shade, name, rol, start, keysHint]);
-    this.tweens.add({ targets: start, alpha: 0.2, duration: 500, yoyo: true, repeat: -1, ease: 'Stepped', easeParams: [2] });
-    this.tweens.add({ targets: name, y: -76, duration: 1200, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
-    name.setScale(0);
-    this.tweens.add({ targets: name, scale: 1, duration: 600, ease: 'Back.out', delay: 150 });
-
-    // Begin ingezoomd op de speler; bij de eerste stap zoomt de camera uit naar het speelveld.
-    this.cameras.main.setZoom(1.35);
-
-    // HUD (pas zichtbaar na de intro).
-    this.hud = this.add.text(16, 14, `${this.cv.naam} · ${this.cv.rol}`, {
-      fontFamily: font, fontSize: '16px', fontStyle: 'bold', color: '#f4e4c1',
-      backgroundColor: '#2b2147', padding: { x: 10, y: 6 }
-    }).setScrollFactor(0).setDepth(10).setAlpha(0);
-
-    this.layoutScreen();
-    this.scale.on('resize', this.layoutScreen, this);
-    this.events.once('shutdown', () => this.scale.off('resize', this.layoutScreen, this));
-
-    // --- Besturing ---
-    this.keys = this.input.keyboard.addKeys('LEFT,RIGHT,UP,DOWN,SPACE,A,D,W,S');
-    this.setupScrollWalking();
-
-    this.confetti = this.add.particles(0, 0, 'flower', {
+    this.confetti = this.add.particles(0, 0, this.theme.tex('flower'), {
       speed: { min: 200, max: 500 }, angle: { min: 220, max: 320 }, gravityY: 700, rotate: { min: 0, max: 360 },
       lifespan: 1800, scale: { start: 1, end: 0.3 }, emitting: false
     });
 
-    this.events.once('shutdown', hidePanel);
+    // --- DOM: titelkaart, HUD, hoofdstukken, coach marks (altijd scherp) ---
+    this.setupDom();
+    this.layoutScreen();
+    if (this.startX !== undefined) {
+      // Na een stijlwissel: geen intro, direct verder waar je was; wat achter je ligt staat al in eindstand.
+      this.hasMoved = true;
+      this.dom.titlecard.hidden = true;
+      this.dom.hud.hidden = false;
+      this.cameras.main.setZoom(this.zoom);
+      this.cameras.main.centerOn(startX + CAMERA.lookahead, BASE_H / 2);
+      for (const p of this.pieces) for (const s of p.stages) if (s.x < startX - 40) this.runStage(p, s, true);
+    } else {
+      this.cameras.main.setZoom(this.zoom * CAMERA.introZoom);
+    }
+    this.scale.on('resize', this.layoutScreen, this);
+    this.events.once('shutdown', () => {
+      this.scale.off('resize', this.layoutScreen, this);
+      hidePanel();
+      for (const el of ['titlecard', 'hud', 'chapters', 'coach']) this.dom[el].hidden = true;
+    });
+
+    // --- Besturing ---
+    this.controls = new KeyboardControls(this);
+    this.scroll = new ScrollWalkInput(this);
   }
 
-  /** Alles wat aan de schermgrootte hangt (venster kan elk formaat hebben). */
+  // ---------- DOM-overlay ----------
+
+  setupDom() {
+    const $ = (id) => document.getElementById(id);
+    this.dom = { titlecard: $('titlecard'), hud: $('hud'), chapters: $('chapters'), coach: $('coach') };
+    const [voor, ...rest] = this.cv.naam.split(' ');
+    this.dom.titlecard.innerHTML = `<img class="tc-merk" src="${BRAND.logo}" alt="${BRAND.naam}"><p class="presenteert">presenteert</p>
+      <h1>${esc(voor.toUpperCase())} <span>${esc(rest.join(' ').toUpperCase())}</span></h1><p>${esc(this.cv.rol)}</p>
+      <p class="start">← → of scroll om te beginnen</p><p class="gamers">gamers: WASD · spatie springt</p>`;
+    this.dom.titlecard.classList.remove('weg');
+    this.dom.titlecard.hidden = false;
+    this.dom.hud.hidden = true;
+    this.dom.coach.hidden = true;
+
+    // Hoofdstukken: snel naar een onderdeel (klik of toets 1–8) — de bug brengt je.
+    const labels = [{ type: 'host', label: 'Intro' }, ...CHAPTERS];
+    this.chapters = labels.map((c) => {
+      const x = c.type === 'finish' ? this.finishX + 40 : this.pieces.find((p) => p.station.type === c.type)?.stages[0].x;
+      return x === undefined ? null : { ...c, x };
+    }).filter(Boolean);
+    this.dom.chapters.innerHTML = this.chapters.map((c, i) => `<button type="button" data-i="${i}"><b>${i + 1}</b>${c.label}</button>`).join('');
+    this.dom.chapters.onclick = (e) => {
+      const b = e.target.closest('button');
+      if (b) this.travelTo(this.chapters[Number(b.dataset.i)].x);
+    };
+    this.dom.chapters.hidden = false;
+    this.input.keyboard.on('keydown', (e) => {
+      const n = Number(e.key);
+      if (n >= 1 && n <= this.chapters.length) this.travelTo(this.chapters[n - 1].x);
+    });
+    this.updateHud();
+  }
+
+  /** HUD: TestCoders-beeldmerk, naam, voortgang (stap x van y) en gevonden extra's. */
+  updateHud() {
+    const step = (this.currentChapter ?? 0) + 1;
+    const total = this.chapters?.length ?? 1;
+    const extra = this.bonuses?.length ? `<span class="hud-extra">🎁 ${this.bonusesOpened}/${this.bonuses.length}</span>` : '';
+    this.dom.hud.innerHTML = `<img class="hud-merk" src="${BRAND.mark}" alt="${BRAND.naam}">
+      <div class="hud-tekst"><div class="hud-rij"><b>${esc(this.cv.naam)}</b><span>Stap ${step}/${total}</span></div>
+      <div class="hud-rij"><div class="hud-balk"><i style="width:${Math.round((step / total) * 100)}%"></i></div>${extra}</div></div>`;
+  }
+
+  onBonusOpened() {
+    this.bonusesOpened++;
+    this.updateHud();
+    this.sharpenText();
+  }
+
+  /** Mini-tutorial: elk tipje één keer per bezoek. */
+  coach(id) {
+    this.coached ??= new Set();
+    if (this.coached.has(id) || !COACH[id]) return;
+    this.coached.add(id);
+    const el = this.dom.coach;
+    el.innerHTML = COACH[id];
+    el.hidden = false;
+    el.classList.remove('weg');
+    clearTimeout(this.coachTimer);
+    this.coachTimer = setTimeout(() => {
+      el.classList.add('weg');
+      setTimeout(() => (el.hidden = true), 400);
+    }, 4200);
+  }
+
+  dismissTitle() {
+    if (this.hasMoved) return;
+    this.hasMoved = true;
+    this.dom.titlecard.classList.add('weg');
+    setTimeout(() => (this.dom.titlecard.hidden = true), 500);
+    this.dom.hud.hidden = false;
+    this.cameras.main.zoomTo(this.zoom, CAMERA.zoomOutMs, 'Sine.easeInOut');
+  }
+
+  /** Alles wat aan de schermgrootte hangt. De wereld (540 px hoog) wordt opgezoomd naar het scherm. */
   layoutScreen() {
     const { width, height } = this.scale;
-    this.clouds.setSize(width, 160);
-    this.hills.setSize(width, 300);
-    // Wereld verticaal onderaan het scherm; extra hoogte wordt lucht.
-    this.cameras.main.setBounds(0, Math.min(0, BASE_H - height), this.physics.world.bounds.width, Math.max(BASE_H, height));
-    if (this.titleCard?.active) this.titleCard.setPosition(width / 2, height / 2 - 30);
+    this.zoom = Math.max(0.6, Math.min(height / BASE_H, width / 640));
+    const cam = this.cameras.main;
+    if (this.hasMoved) cam.setZoom(this.zoom);
+    const viewH = Math.max(BASE_H, height / this.zoom);
+    cam.setBounds(0, BASE_H - viewH, this.worldW, viewH);
+    for (const layer of [this.clouds, this.hills]) layer.setPosition(-width, layer.y).setSize(width * 3, layer.height);
+    this.sharpenText();
   }
 
-  // ---------- Besturing ----------
-
-  setupScrollWalking() {
-    // Muiswiel / trackpad: scroll omlaag (of naar rechts) = vooruit lopen.
-    this.input.on('wheel', (_pointer, _objects, dx, dy) => {
-      const delta = Math.abs(dy) >= Math.abs(dx) ? dy : dx;
-      this.addScroll(delta * SCROLL_FACTOR);
+  /** Tekst in de wereld renderen op de echte schermresolutie (anders is hij wazig bij opzoomen). */
+  sharpenText() {
+    const res = Math.min(4, Math.ceil(this.zoom * (window.devicePixelRatio || 1)));
+    const walk = (list) => list.forEach((o) => {
+      if (o.type === 'Text' && o.style?.resolution !== res) o.setResolution(res);
+      if (o.list) walk(o.list);
     });
-    // Touch: swipe van rechts naar links = vooruit.
-    this.input.on('pointermove', (p) => {
-      if (p.isDown && p.wasTouch) this.addScroll((p.prevPosition.x - p.x) * 2.5);
-    });
-    // Voorkom dat de pagina zelf meescrollt terwijl je met de muis boven de game zit.
-    if (!this.game.wheelGuard) {
-      this.game.wheelGuard = true;
-      this.game.canvas.addEventListener('wheel', (e) => e.preventDefault(), { passive: false });
-      this.game.canvas.style.touchAction = 'none';
-    }
+    walk(this.children.list);
   }
 
-  addScroll(px) {
-    this.scrollBudget = Phaser.Math.Clamp(this.scrollBudget + px, -SCROLL_MAX, SCROLL_MAX);
+  /** Springen via tikken/klikken (bijv. op een cadeautje): altijd een volle sprong. */
+  requestJump() {
+    this.hero.bufferJump(this.game.loop.time, true);
   }
+
+  // ---------- Snelreis: de bug ----------
+
+  /** Een bug eet de held op, rent (camera erachteraan) naar het hoofdstuk en spuugt hem daar weer uit. */
+  travelTo(destX) {
+    if (this.traveling || this.cutscene || Math.abs(destX - this.player.x) < 20) return;
+    this.dismissTitle();
+    this.coach('bug');
+    this.traveling = true;
+    this.scroll.reset();
+    this.glideTo = null;
+    this.gate = null;
+    const cam = this.cameras.main;
+    const from = this.player.x;
+    const dir = destX > from ? 1 : -1;
+    const y = this.groundY;
+    const tex = (k) => this.theme.tex(k);
+    const bug = this.add.sprite(from - dir * (cam.worldView.width / 2 + 80), y, tex('bug0')).setOrigin(0.5, 1).setDepth(7).setFlipX(dir < 0);
+    const chewing = () => bug.setTexture(tex(bug.texture.key.endsWith('bug0') ? 'bug1' : 'bug0'));
+    this.player.setVelocity(0);
+    this.player.body.setAllowGravity(false);
+    const chew = this.time.addEvent({ delay: 90, loop: true, callback: chewing });
+
+    this.tweens.add({
+      targets: bug, x: from - dir * 20, duration: 420, ease: 'Quad.out',
+      onComplete: () => {
+        chew.remove();
+        bug.setTexture(tex('bug1'));
+        audio.play('travelIn');
+        this.tweens.add({ targets: this.vis, scale: 0, duration: 160, ease: 'Quad.in' });
+        this.time.delayedCall(170, () => {
+          bug.setTexture(tex('bug0'));
+          this.tweens.add({ targets: bug, scaleY: 0.85, scaleX: 1.15, duration: 90, yoyo: true, repeat: 1 });
+          this.vis.setVisible(false);
+          this.player.setPosition(destX, y - 40);
+          cam.stopFollow();
+          cam.startFollow(bug, true, 0.2, 0.2, -dir * CAMERA.lookahead, -40);
+          const run = this.time.addEvent({ delay: 60, loop: true, callback: () => { chewing(); this.dust.explode(2, bug.x - dir * 24, y); } });
+          this.tweens.add({
+            targets: bug, x: destX - dir * 30, duration: Phaser.Math.Clamp(Math.abs(destX - bug.x) / 4, 700, 1600), ease: 'Cubic.inOut', delay: 250,
+            onComplete: () => {
+              run.remove();
+              bug.setTexture(tex('bug1'));
+              audio.play('travelOut');
+              this.tweens.add({ targets: bug, scaleY: 1.15, scaleX: 0.9, duration: 100, yoyo: true });
+              this.player.body.setAllowGravity(true);
+              this.player.setPosition(destX, y - 40).setVelocity(0, -420);
+              this.vis.setVisible(true).setScale(0.3 * this.hero.scale);
+              this.tweens.add({ targets: this.vis, scale: this.hero.scale, duration: 260, ease: 'Back.out' });
+              cam.stopFollow();
+              cam.startFollow(this.player, true, CAMERA.followLerp, CAMERA.followLerp, -CAMERA.lookahead, 0);
+              this.lastDir = 1;
+              this.prevX = destX;
+              this.time.delayedCall(260, () => {
+                bug.setTexture(tex('bug0'));
+                this.tweens.add({ targets: bug, x: bug.x - dir * 700, alpha: 0, duration: 900, ease: 'Quad.in', onComplete: () => bug.destroy() });
+                this.traveling = false;
+              });
+            }
+          });
+        });
+      }
+    });
+  }
+
+  // ---------- Hoofdlus ----------
 
   update(time, delta) {
-    const { player, keys, vis } = this;
+    this.updateSky();
+    if (this.traveling) {
+      this.updateParallax();
+      return;
+    }
+    if (this.cutscene) {
+      this.hero.update(time, delta, 0, false); // alleen animatie; het set piece verplaatst de held
+      this.updateParallax();
+      return;
+    }
+    const { player } = this;
     const dt = delta / 1000;
-    const body = player.body;
-    const grounded = body.blocked.down;
-    if (grounded) this.lastGroundedAt = time;
+    const grounded = player.body.blocked.down;
 
-    // --- Input ---
-    const kbLeft = keys.LEFT.isDown || keys.A.isDown;
-    const kbRight = keys.RIGHT.isDown || keys.D.isDown || keys.DOWN.isDown || keys.S.isDown;
-    const JD = Phaser.Input.Keyboard.JustDown;
-    if (JD(keys.UP) || JD(keys.SPACE) || JD(keys.W)) this.jumpPressedAt = time;
-    const jumpHeld = keys.UP.isDown || keys.SPACE.isDown || keys.W.isDown;
+    // --- Input: ← → direct (loslaten = stoppen), of het muiswiel (kleine uitloop + halteplaats) ---
+    const dir = this.controls.direction();
+    const forwardPressed = this.controls.forwardJustPressed() || this.scroll.forwardPulse;
+    this.scroll.forwardPulse = false;
+    if (this.controls.jumpJustPressed()) this.hero.bufferJump(time);
 
-    // --- Gewenste snelheid: toetsenbord wint, anders de opgespaarde scroll-afstand ---
     let target = 0;
-    const kbDir = kbLeft ? -1 : kbRight ? 1 : 0;
-    const scrolling = kbDir === 0 && Math.abs(this.scrollBudget) > 0.5;
-    if (kbDir !== 0) {
-      this.scrollBudget = 0;
-      target = kbDir * MAX_SPEED;
-    } else if (scrolling) {
-      // Snelheid schaalt mee met wat er nog "in de tank" zit: vloeiend uitlopen i.p.v. abrupt stoppen.
-      target = Math.sign(this.scrollBudget) * Math.min(MAX_SPEED, 90 + Math.abs(this.scrollBudget) * 2.2);
-    }
-
-    // --- Optrekken / afremmen (in plaats van direct op topsnelheid) ---
-    const vx = body.velocity.x;
-    const speedingUp = target !== 0 && (Math.sign(target) === Math.sign(vx) || vx === 0) && Math.abs(target) > Math.abs(vx);
-    const rate = grounded ? (speedingUp ? ACCEL_GROUND : DECEL_GROUND) : (speedingUp ? ACCEL_AIR : DECEL_AIR);
-    const newVx = moveTowards(vx, target, rate * dt);
-    player.setVelocityX(newVx);
-
-    // Scroll-tank leegrijden met de werkelijk afgelegde afstand.
-    if (scrolling && Math.sign(newVx) === Math.sign(this.scrollBudget)) {
-      const travelled = Math.min(Math.abs(newVx) * dt, Math.abs(this.scrollBudget));
-      this.scrollBudget -= Math.sign(this.scrollBudget) * travelled;
-    }
-
-    if (newVx < -5) vis.setFlipX(true);
-    if (newVx > 5) vis.setFlipX(false);
-
-    // --- Springen: coyote time + jump buffer + variabele hoogte ---
-    const canJump = time - this.lastGroundedAt <= COYOTE_MS && body.velocity.y >= 0;
-    const wantsJump = time - this.jumpPressedAt <= BUFFER_MS;
-    if (wantsJump && canJump) this.jump();
-    if (!jumpHeld && body.velocity.y < -150 && this.jumpedByKey) {
-      player.setVelocityY(body.velocity.y * JUMP_CUT);
-      this.jumpedByKey = false;
-    }
-    body.setGravityY(body.velocity.y > 0 ? FALL_GRAVITY : 0);
-
-    // --- Landen: squash + stof ---
-    if (grounded && !this.wasGrounded && this.lastVy > 250) {
-      this.dust.explode(Math.min(14, Math.round(this.lastVy / 60)), player.x, player.y + 27);
-      this.squash(1.25, 0.75);
-    }
-    this.wasGrounded = grounded;
-    this.lastVy = body.velocity.y;
-
-    // --- Lopen: wiebel + af en toe een stofje ---
-    const speedRatio = Math.abs(newVx) / MAX_SPEED;
-    if (!this.squashing) {
-      if (grounded) {
-        const bob = Math.sin(time / 55) * 0.06 * speedRatio;
-        vis.setScale(HERO_SCALE * (1 + bob), HERO_SCALE * (1 - bob));
-        vis.setAngle(Math.sin(time / 110) * 5 * speedRatio);
-      } else {
-        const stretch = Phaser.Math.Clamp(Math.abs(body.velocity.y) / 2000, 0, 0.15);
-        vis.setScale(HERO_SCALE * (1 - stretch), HERO_SCALE * (1 + stretch));
-        vis.setAngle(Phaser.Math.Clamp(newVx / 40, -8, 8));
+    if (dir) {
+      target = dir * MOVEMENT.maxSpeed;
+      this.scroll.reset();
+      this.glideTo = null;
+      this.lastKeyAt = time;
+    } else if (this.scroll.active) {
+      target = this.scroll.targetSpeed();
+      this.glideTo = null;
+    } else if (this.hasMoved && this.scroll.lastAt > (this.lastKeyAt ?? -1e9) && time - this.scroll.lastAt > STOPS.idleBeforeSnapMs) {
+      // Na scrollen: glijd naar een onderdeel vlakbij (alleen vooruit, en nooit na de pijltjes).
+      if (this.glideTo === null && !this.gate && this.lastDir > 0) {
+        const s = this.stops.find((x) => x - player.x > 4 && x - player.x < STOPS.snapDistance);
+        if (s !== undefined) this.glideTo = s;
+      }
+      if (this.glideTo !== null) {
+        const d = this.glideTo - player.x;
+        if (Math.abs(d) < 3) this.glideTo = null;
+        else target = Math.sign(d) * Math.min(MOVEMENT.maxSpeed * 0.7, 40 + Math.abs(d) * 3);
       }
     }
-    if (grounded && speedRatio > 0.8 && Math.random() < 0.08) this.dust.explode(1, player.x - Math.sign(newVx) * 10, player.y + 27);
 
-    if (Math.abs(newVx) > 5 && !this.hasMoved) {
-      this.hasMoved = true;
-      this.tweens.add({ targets: this.titleCard, alpha: 0, duration: 450, onComplete: () => this.titleCard.destroy() });
-      this.tweens.add({ targets: this.hud, alpha: 1, duration: 450, delay: 300 });
-      this.cameras.main.zoomTo(1, 900, 'Sine.easeInOut');
+    const held = this.updateGate(target, forwardPressed, dir < 0 || this.scroll.budget < -0.5);
+    if (held) target = 0;
+    const newVx = this.hero.update(time, delta, target, this.controls.jumpHeld());
+    if (held) player.setX(this.gate.x).setVelocityX(0);
+    this.scroll.consume(newVx, dt);
+    if (Math.abs(newVx) > MOVEMENT.movingThreshold) this.lastDir = Math.sign(newVx);
+
+    if (Math.abs(newVx) > 5 || forwardPressed) this.dismissTitle();
+
+    const cam = this.cameras.main;
+    cam.followOffset.x = Phaser.Math.Linear(cam.followOffset.x, -this.lastDir * CAMERA.lookahead, CAMERA.lookaheadLerp);
+    this.updateParallax();
+
+    for (const b of this.bonuses) b.showHint(Math.abs(b.x - player.x) < 110 && grounded);
+    this.updateCoach();
+    this.updatePieces();
+    this.updateChapters();
+  }
+
+  updateCoach() {
+    const px = this.player.x;
+    const host = this.pieces.find((p) => p.station.type === 'host');
+    if (host && this.gate === host.stages[0]) this.coach('martijn');
+    const b0 = this.bonuses[0];
+    if (b0 && !b0.opened && b0.x - px < 260 && b0.x - px > -40) this.coach('springen');
+    const r0 = this.pieces.find((p) => p.station.type === 'work');
+    if (r0 && r0.stages[0].x - px < 320 && r0.stages[0].x - px > 0) this.coach('release');
+    if (r0?.stages.at(-1).complete) this.coach('snel');
+  }
+
+  /**
+   * Een onderdeel speelt af als je erlangs loopt (een stage passeert) of er aankomt (bug, halteplaats).
+   * Tot de animatie klaar is houdt de halteplaats je vast. Bij Martijn betekent vooruit "volgende zin".
+   * Terug (← of terug scrollen) laat je altijd los. Geeft true als de held deze frame wordt vastgehouden.
+   */
+  updateGate(target, forwardPressed, backPressed) {
+    const player = this.player;
+    const prevX = this.prevX ?? player.x;
+    this.prevX = player.x;
+    const now = this.game.loop.time;
+    for (const p of this.pieces) for (const s of p.stages) {
+      if (s.ran && !s.complete && !s.dialogue && now - s.startedAt >= s.duration) s.complete = true;
     }
 
-    // --- Camera kijkt vooruit in looprichting ---
+    if (!this.gate) {
+      const moved = player.x - prevX;
+      outer: for (const p of this.pieces) {
+        for (const s of p.stages) {
+          if (s.ran) continue;
+          const passed = target >= 0 && moved > 0 && moved < 100 && prevX < s.x && player.x >= s.x - 2;
+          const arrived = Math.abs(player.x - s.x) < 6 && Math.abs(player.body.velocity.x) < 5 && this.hasMoved;
+          if (passed || arrived) {
+            this.runStage(p, s);
+            this.gate = s;
+            break outer;
+          }
+        }
+      }
+    }
+    const s = this.gate;
+    if (!s) return false;
+    if (s.complete || backPressed || (!s.dialogue && now - s.startedAt > STOPS.gateMaxMs)) {
+      this.gate = null;
+      return false;
+    }
+    if (s.dialogue && forwardPressed) s.advance();
+    if (s.holdsHero === false) return false; // het set piece bestuurt de held zelf (cutscene)
+    this.scroll.reset(); // scrollen tijdens het vasthouden telt niet als loopafstand voor straks
+    return true;
+  }
+
+  runStage(piece, stage, instant = false) {
+    stage.ran = true;
+    stage.startedAt = this.game.loop.time;
+    if (instant && !stage.dialogue) stage.complete = true;
+    stage.run(instant);
+    piece.active = true;
+    if (!instant) audio.play('enter');
+    this.sharpenText();
+  }
+
+  updateParallax() {
     const cam = this.cameras.main;
-    const wantOffset = -Math.sign(newVx || (vis.flipX ? -1 : 1)) * LOOKAHEAD;
-    cam.followOffset.x = Phaser.Math.Linear(cam.followOffset.x, wantOffset, 0.03);
-
-    const anim = !grounded ? 'jump' : Math.abs(newVx) > 5 ? 'run' : 'idle';
-    vis.play(`${this.heroKey}-${anim}`, true);
-
-    // Parallax.
     this.clouds.tilePositionX = cam.scrollX * 0.1;
     this.hills.tilePositionX = cam.scrollX * 0.35;
-
-    this.updatePieces();
   }
 
-  jump() {
-    this.player.setVelocityY(-JUMP);
-    this.jumpedByKey = this.time.now - this.jumpPressedAt <= BUFFER_MS;
-    this.jumpPressedAt = -1e9;
-    this.lastGroundedAt = -1e9; // geen dubbele coyote-sprong
-    this.dust.explode(6, this.player.x, this.player.y + 27);
-    this.squash(0.8, 1.2);
+  /** Luchtkleur, tint van heuvels/wolken en sterren volgen de positie van de camera. */
+  updateSky() {
+    const x = this.cameras.main.midPoint.x;
+    const keys = this.skyKeys;
+    let i = 0;
+    while (i < keys.length - 2 && x > keys[i + 1][0]) i++;
+    const [x0, s0, t0] = keys[i];
+    const [x1, s1, t1] = keys[i + 1];
+    const f = Phaser.Math.Clamp((x - x0) / Math.max(1, x1 - x0), 0, 1);
+    const mix = (a, b) => {
+      const c = Phaser.Display.Color.Interpolate.ColorWithColor(Phaser.Display.Color.ValueToColor(a), Phaser.Display.Color.ValueToColor(b), 100, f * 100);
+      return Phaser.Display.Color.GetColor(c.r, c.g, c.b);
+    };
+    this.cameras.main.setBackgroundColor(mix(s0, s1));
+    const tint = mix(t0, t1);
+    this.hills.setTint(tint);
+    this.clouds.setTint(tint);
+    this.ground.setTint(tint);
+    this.stars.setAlpha(i === keys.length - 2 ? f : 0);
   }
 
-  squash(sx, sy) {
-    this.squashing = true;
-    this.vis.setScale(HERO_SCALE * sx, HERO_SCALE * sy).setAngle(0);
-    this.tweens.add({
-      targets: this.vis, scaleX: HERO_SCALE, scaleY: HERO_SCALE, duration: 160, ease: 'Back.out',
-      onComplete: () => (this.squashing = false)
-    });
-  }
-
-  /** Set pieces activeren als je in de buurt komt (animatie) en het paneel tonen waar dat hoort. */
+  /** Doorlopende effecten (bijv. het gesprek bij het kampvuur) aan als je er bent; tekstbox van het dichtstbijzijnde onderdeel. */
   updatePieces() {
     const px = this.player.x;
-    let panelPiece = null;
     for (const piece of this.pieces) {
-      const near = Math.abs(piece.x - px) < piece.range;
-      if (near && !piece.active) piece.enter();
-      if (!near && piece.active) piece.leave();
-      piece.active = near;
-      if (near && piece.usesPanel) panelPiece = piece;
+      const near = piece.stages[0].ran && Math.abs(piece.stopX - px) < piece.halfWidth + 260;
+      if (near && !piece.active) { piece.enter?.(); piece.active = true; }
+      if (!near && piece.active) { piece.leave?.(); piece.active = false; }
     }
 
     if (px >= this.finishX - 20) {
       if (!this.finished) {
         this.finished = true;
-        this.confetti.explode(60, this.finishX + 30, this.scale.height - 200);
+        this.confetti.explode(60, this.finishX + 30, BASE_H - 200);
+        audio.play('finish');
       }
       showPanel('finish', stationHtml({ type: 'finish' }, this.cv));
-    } else if (panelPiece) {
-      showPanel(`station-${panelPiece.x}`, stationHtml(panelPiece.station, this.cv));
-    } else {
-      hidePanel();
+      return;
     }
+    let nearest = null;
+    for (const piece of this.pieces) {
+      const d = Math.abs(piece.stopX - px);
+      if (d < piece.halfWidth + 120 && (!nearest || d < Math.abs(nearest.stopX - px))) nearest = piece;
+    }
+    if (nearest?.usesPanel && nearest.stages[0].ran) showPanel(`station-${nearest.x}`, stationHtml(nearest.station, this.cv));
+    else hidePanel();
   }
-}
 
-function moveTowards(current, target, maxDelta) {
-  if (Math.abs(target - current) <= maxDelta) return target;
-  return current + Math.sign(target - current) * maxDelta;
+  updateChapters() {
+    const px = this.player.x;
+    let current = 0;
+    this.chapters.forEach((c, i) => { if (px >= c.x - 80) current = i; });
+    if (current === this.currentChapter) return;
+    this.currentChapter = current;
+    [...this.dom.chapters.children].forEach((b, i) => b.classList.toggle('nu', i === current));
+    this.updateHud();
+  }
 }

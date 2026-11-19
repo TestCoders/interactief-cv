@@ -2,7 +2,8 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BAARDEN, KAPSELS } from '../src/heroes.js';
+import { UITERLIJKEN } from '../src/config/uiterlijk.js';
+import { BEARDS, HAIRSTYLES } from '../src/graphics/pixelHero.js';
 
 const dir = new URL('../src/data/cv/', import.meta.url);
 const files = readdirSync(dir).filter((f) => f.endsWith('.json'));
@@ -27,16 +28,20 @@ for (const file of files) {
   if (!Array.isArray(cv.skills) || cv.skills.length === 0) err('"skills" moet minstens één item hebben');
   else cv.skills.forEach((s, i) => {
     if (!isStr(s.naam)) err(`skills[${i}].naam ontbreekt`);
-    if (s.niveau !== undefined && !(Number.isInteger(s.niveau) && s.niveau >= 1 && s.niveau <= 5)) err(`skills[${i}].niveau moet 1 t/m 5 zijn`);
+    if (s.niveau !== undefined && !(Number.isInteger(s.niveau) && s.niveau >= 1 && s.niveau <= 5) && !/^(beginner|junior|medior|gevorderd|senior|expert)$/i.test(s.niveau)) err(`skills[${i}].niveau moet 1 t/m 5 of Junior/Medior/Senior zijn`);
   });
   (cv.opleiding ?? []).forEach((o, i) => ['periode', 'titel', 'instituut'].forEach((k) => isStr(o[k]) || err(`opleiding[${i}].${k} ontbreekt`)));
   if (cv.uiterlijk !== undefined) {
     const u = cv.uiterlijk;
     const hex = (v) => /^#[0-9a-fA-F]{6}$/.test(v ?? '');
-    if (typeof u !== 'object' || u === null || Array.isArray(u)) err('"uiterlijk" moet een object zijn');
+    if (typeof u === 'string') {
+      // Vast personage, bv. "martijn".
+      if (!Object.hasOwn(UITERLIJKEN, u)) err(`"uiterlijk" moet een van deze zijn: ${Object.keys(UITERLIJKEN).join(', ')}, of een object met kenmerken`);
+    } else if (typeof u !== 'object' || u === null || Array.isArray(u)) err('"uiterlijk" moet een vast personage (tekst) of een object met kenmerken zijn');
     else {
-      if (u.kapsel !== undefined && !KAPSELS[u.kapsel]) err(`uiterlijk.kapsel moet een van ${Object.keys(KAPSELS).join(', ')} zijn`);
-      if (u.baard !== undefined && !BAARDEN[u.baard]) err(`uiterlijk.baard moet een van ${Object.keys(BAARDEN).join(', ')} zijn`);
+      // Kenmerken uit een foto (skill foto-naar-pixelart).
+      if (u.kapsel !== undefined && !Object.hasOwn(HAIRSTYLES, u.kapsel)) err(`uiterlijk.kapsel moet een van ${Object.keys(HAIRSTYLES).join(', ')} zijn`);
+      if (u.baard !== undefined && !Object.hasOwn(BEARDS, u.baard)) err(`uiterlijk.baard moet een van ${Object.keys(BEARDS).join(', ')} zijn`);
       for (const k of ['haarkleur', 'huid']) if (u[k] !== undefined && !hex(u[k])) err(`uiterlijk.${k} moet een hexkleur zijn, bijv. "#6b3e26"`);
       if (u.bril !== undefined && typeof u.bril !== 'boolean') err('uiterlijk.bril moet true of false zijn');
       const bekend = ['kapsel', 'haarkleur', 'huid', 'bril', 'baard'];

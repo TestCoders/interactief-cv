@@ -6,7 +6,7 @@
   --paper: #ffffff;
   --muted: #5b6475;
   --bg: #eef3f1;
-  /* Tekstbox/knoppen — hoort bij het retro-thema (src/themes/retro.js) */
+  /* Tekstbox/knoppen — hoort bij het retro-thema (src/themes/retroTheme.js) */
   --pixel-font: "Courier New", ui-monospace, monospace;
   --box: #2b2147;
   --box-hover: #3a2d5e;
@@ -40,7 +40,7 @@ html, body { height: 100%; overflow: hidden; background: #9fd6ff; }
 
 /* Tekstbox onderin, zoals in een RPG */
 #panel {
-  position: fixed; left: 50%; bottom: 24px; width: min(680px, calc(100vw - 32px)); max-height: 42vh; overflow: auto;
+  position: fixed; right: 20px; bottom: 20px; width: min(440px, calc(100vw - 32px)); max-height: 46vh; overflow: auto;
   background: var(--box); color: var(--box-text); border: 4px solid var(--box-text);
   box-shadow: 6px 6px 0 var(--box-shadow), inset 0 0 0 3px var(--box);
   outline: 3px solid var(--box-shadow); padding: 16px 20px 18px;
@@ -63,21 +63,68 @@ html, body { height: 100%; overflow: hidden; background: #9fd6ff; }
 }
 
 #classic {
-  position: fixed; inset: 0; overflow: auto; background: var(--bg); padding: 24px 16px; z-index: 10;
+  position: fixed; inset: 0; overflow: auto; background: #e9e5de; padding: 24px 16px; z-index: 10;
 }
-#classic article {
-  max-width: 760px; margin: 16px auto; background: var(--paper); padding: 32px; border-radius: 8px;
-  border-top: 6px solid var(--accent);
+#classic .close { display: block; margin: 0 auto 16px; }
+#classic article { max-width: 900px; margin: 0 auto; }
+
+/* ---------- Klassiek cv: TestCoders-huisstijl ---------- */
+.tc-cv { --tc-blauw: #1f5ea8; --tc-inkt: #151515; --tc-papier: #f5f1ea; --tc-lijn: #d9d2c5; --tc-grijs: #6b6458;
+  background: #fff; color: var(--tc-inkt); padding: 56px 64px 40px; font: 15px/1.65 "Open Sans", system-ui, sans-serif;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .12); }
+.tc-cv h1, .tc-cv h2, .tc-cv h3, .tc-cv h4 { font-family: Poppins, system-ui, sans-serif; color: var(--tc-inkt); }
+.tc-cv h2 { font-size: 28px; font-weight: 500; margin: 44px 0 14px; }
+.tc-cv h2 span, .tc-cv h1 span { color: var(--tc-blauw); }
+.tc-label { font: 600 11px Poppins, sans-serif; letter-spacing: 3px; text-transform: uppercase; color: var(--tc-grijs); margin: 0 0 8px; }
+.tc-kop { display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px; background: var(--tc-papier); padding: 32px; margin: -16px -24px 0; }
+.tc-logo { display: block; height: 34px; margin-bottom: 26px; }
+.tc-rol { font: 600 12px Poppins, sans-serif; letter-spacing: 3px; text-transform: uppercase; color: var(--tc-blauw); margin: 0; }
+.tc-kop h1 { font-size: 52px; line-height: 1.05; font-weight: 800; margin: 8px 0 14px; letter-spacing: -1px; }
+.tc-top { margin: 0; font-size: 13px; color: #3a3a3a; }
+.tc-kop-rechts { text-align: right; }
+.tc-kop dl { margin: 32px 0 0; text-align: left; }
+.tc-kop dl div { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--tc-lijn); padding: 6px 0; }
+.tc-kop dl div:last-child { border-bottom: 1px solid var(--tc-lijn); }
+.tc-kop dt { font: 600 10px Poppins, sans-serif; letter-spacing: 2px; text-transform: uppercase; color: var(--tc-grijs); align-self: center; }
+.tc-kop dd { margin: 0; font-weight: 600; }
+.tc-over { display: grid; grid-template-columns: 1.7fr 1fr; gap: 40px; }
+.tc-over aside { padding-top: 92px; }
+.tc-over aside ul { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--tc-lijn); border-bottom: 1px solid var(--tc-lijn); font-size: 13px; line-height: 1.75; }
+.tc-tabel { width: 100%; border-collapse: collapse; font-size: 14px; }
+.tc-tabel th { text-align: left; font: 600 10px Poppins, sans-serif; letter-spacing: 2px; text-transform: uppercase; color: var(--tc-grijs); padding: 6px 8px 6px 0; border-bottom: 1px solid var(--tc-inkt); }
+.tc-tabel td { padding: 9px 8px 9px 0; border-bottom: 1px solid var(--tc-lijn); vertical-align: top; }
+.tc-periode { font-size: 12px; color: var(--tc-grijs); white-space: nowrap; }
+.tc-tag { display: inline-block; background: #efe7da; border-radius: 3px; padding: 0 6px; margin: 0 4px 4px 0; font-size: 11px; line-height: 1.8; }
+.tc-expertise { list-style: none; padding: 0; columns: 2; column-gap: 40px; }
+.tc-expertise li { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--tc-lijn); padding: 5px 0; break-inside: avoid; }
+.tc-expertise em { color: var(--tc-grijs); font-style: normal; font-size: 13px; white-space: nowrap; }
+.tc-skills { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 40px; }
+.tc-skillgroep h4 { font-size: 14px; margin: 12px 0 4px; color: var(--tc-blauw); }
+.tc-cv .meters li { border-bottom: 1px solid #efe9df; font-size: 14px; }
+.tc-cv .meters i { background: #ece6dc; border-radius: 2px; }
+.tc-cv .meters i.on { background: var(--tc-blauw); }
+.tc-twee { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.tc-opdracht { border-top: 1px solid var(--tc-lijn); padding-top: 10px; margin-top: 18px; }
+.tc-opdracht h3 { font-size: 17px; margin: 0; }
+.tc-opdracht h3 span { color: var(--tc-blauw); font-weight: 500; }
+.tc-meta { color: var(--tc-grijs); font-size: 13px; margin: 0 0 6px; }
+.tc-cv a { color: var(--tc-blauw); }
+.tc-voet { display: flex; justify-content: space-between; margin-top: 48px; padding-top: 14px; border-top: 1px solid var(--tc-lijn); font: 600 10px Poppins, sans-serif; letter-spacing: 2px; color: var(--tc-grijs); }
+@media (max-width: 720px) {
+  .tc-cv { padding: 28px 20px; }
+  .tc-kop, .tc-over, .tc-twee, .tc-skills { grid-template-columns: 1fr; }
+  .tc-kop { margin: -8px -8px 0; }
+  .tc-kop h1 { font-size: 38px; }
+  .tc-over aside { padding-top: 0; }
+  .tc-expertise { columns: 1; }
 }
-#classic h1 { margin: 0; }
-#classic h2 { border-bottom: 2px solid var(--bg); padding-bottom: 4px; margin-top: 28px; }
-#classic .close { display: block; margin: 0 auto; }
 
 @media print {
   html, body { height: auto; overflow: visible; }
   .topbar, .brand, #stage, #panel, #classic .close { display: none !important; }
   #classic { position: static; padding: 0; }
-  #classic article { border: 0; padding: 0; }
+  #classic { background: #fff; }
+  .tc-cv { box-shadow: none; padding: 0; }
 }
 
 /* Skillmeters (5 niveaus) in het paneel */
@@ -89,8 +136,8 @@ html, body { height: 100%; overflow: hidden; background: #9fd6ff; }
 #classic .meters { max-width: 360px; }
 
 /* Paneel-animatie (game feel) */
-#panel { opacity: 0; transform: translate(-50%, 24px); transition: opacity .2s ease, transform .25s cubic-bezier(.2, 1.4, .4, 1); }
-#panel.in { opacity: 1; transform: translate(-50%, 0); }
+#panel { opacity: 0; transform: translateY(24px); transition: opacity .2s ease, transform .25s cubic-bezier(.2, 1.4, .4, 1); }
+#panel.in { opacity: 1; transform: none; }
 
 /* Contactformulier in de tekstbox */
 .contact-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; margin: 10px 0 6px; }
@@ -109,3 +156,179 @@ html, body { height: 100%; overflow: hidden; background: #9fd6ff; }
 @media (max-width: 520px) { .contact-form { grid-template-columns: 1fr; } }
 #panel:has(.contact-form) { max-height: 82vh; bottom: 16px; }
 #panel:has(.contact-form)::after { display: none; }
+
+/* Contactformulier aan de finish mag het midden pakken */
+#panel:has(.contact-form) { right: 50%; transform: translateX(50%); width: min(680px, calc(100vw - 32px)); }
+#panel.in:has(.contact-form) { transform: translateX(50%); }
+#panel h2 { font-size: 17px; }
+#panel { font-size: 14px; }
+
+/* ---------- HUD, titelkaart en hoofdstukken (DOM = altijd scherp) ---------- */
+#hud {
+  position: fixed; left: 16px; top: 14px; z-index: 5; padding: 7px 12px;
+  font: 700 15px var(--pixel-font); color: var(--box-text); background: var(--box);
+  border: 3px solid var(--box-text); box-shadow: 3px 3px 0 var(--box-shadow);
+}
+#titlecard {
+  position: fixed; inset: 0; z-index: 6; display: grid; place-content: center; text-align: center; gap: 10px;
+  background: radial-gradient(ellipse at center, rgba(26, 20, 48, .25), rgba(26, 20, 48, .6)); pointer-events: none;
+  transition: opacity .5s ease;
+}
+#titlecard.weg { opacity: 0; }
+#titlecard h1 {
+  margin: 0; font: 700 clamp(32px, 6vw, 72px)/1 var(--pixel-font); color: var(--box-title); letter-spacing: 2px;
+  text-shadow: 4px 4px 0 var(--box-shadow), -2px -2px 0 var(--box-shadow), 2px -2px 0 var(--box-shadow), -2px 2px 0 var(--box-shadow);
+  animation: pop .6s cubic-bezier(.2, 1.6, .4, 1) both, float 2.4s ease-in-out .6s infinite;
+}
+#titlecard p { margin: 0; font: 700 clamp(16px, 2vw, 24px) var(--pixel-font); color: var(--box-text); text-shadow: 3px 3px 0 var(--box-shadow); }
+#titlecard .start { margin-top: 28px; color: #fff; animation: blink 1s steps(2) infinite; }
+@keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+@keyframes float { 50% { transform: translateY(-6px); } }
+
+/* Hoofdstukbalk: snel naar een onderdeel (CI/CD-pipeline) — ook met toetsen 1–7 */
+#chapters {
+  position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 5;
+  display: flex; gap: 6px; padding: 6px; background: rgba(26, 20, 48, .75); border: 3px solid var(--box-text);
+  box-shadow: 3px 3px 0 var(--box-shadow); max-width: calc(100vw - 24px); overflow-x: auto;
+}
+#chapters button {
+  font: 700 12px var(--pixel-font); color: var(--box-text); background: var(--box); border: 2px solid var(--box-dim);
+  padding: 6px 10px; cursor: pointer; white-space: nowrap;
+}
+#chapters button b { color: var(--box-dim); margin-right: 4px; }
+#chapters button:hover { border-color: var(--box-title); }
+#chapters button.nu { background: var(--box-title); color: var(--box-shadow); border-color: var(--box-text); }
+#chapters button.nu b { color: var(--box-shadow); }
+/* tekstbox boven de hoofdstukbalk */
+#panel { bottom: 72px; max-height: calc(100vh - 170px); }
+.brand { display: none; }
+
+#titlecard[hidden], #chapters[hidden], #coach[hidden], #hud[hidden] { display: none; }
+
+/* ---------- Branding: TestCoders-logo in HUD, titelkaart en finish ---------- */
+.brand { display: block; position: fixed; left: 16px; bottom: 14px; z-index: 5; height: 26px; opacity: .9; }
+#hud { display: flex; align-items: center; gap: 10px; min-width: 240px; }
+#hud .hud-merk { width: 30px; height: 30px; flex: none; }
+#hud .hud-tekst { flex: 1; display: grid; gap: 5px; }
+#hud .hud-rij { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+#hud .hud-rij span { font-size: 12px; color: var(--box-dim); font-variant-numeric: tabular-nums; }
+#hud .hud-balk { flex: 1; height: 6px; background: var(--box-shadow); border-radius: 3px; overflow: hidden; }
+#hud .hud-balk i { display: block; height: 100%; background: var(--box-title); transition: width .4s ease; }
+#hud .hud-extra { font-weight: 700; color: var(--box-text) !important; }
+#titlecard .tc-merk { height: clamp(36px, 5vw, 56px); margin: 0 auto 4px; background: #fff; padding: 8px 14px; border-radius: 10px; }
+#titlecard .presenteert { font-size: 14px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 8px; }
+.panel-merk { display: block; height: 28px; margin-bottom: 10px; }
+
+/* Coach marks: mini-tutorial op het juiste moment */
+#coach {
+  position: fixed; left: 50%; top: 76px; transform: translateX(-50%); z-index: 6; max-width: min(540px, calc(100vw - 32px));
+  padding: 10px 16px; font: 600 14px/1.4 var(--pixel-font); color: var(--box-text); background: var(--box);
+  border: 3px solid var(--box-title); box-shadow: 4px 4px 0 var(--box-shadow); text-align: center;
+  animation: coachIn .35s cubic-bezier(.2, 1.4, .4, 1); transition: opacity .35s ease;
+}
+#coach b { color: var(--box-title); }
+#coach.weg { opacity: 0; }
+@keyframes coachIn { from { transform: translate(-50%, -16px); opacity: 0; } }
+
+#titlecard .gamers { font-size: 13px; opacity: .8; margin-top: -4px; }
+
+/* ==========================================================================
+   Stijlregels per gamestijl (data-stijl op <html>, gezet door applyThemeCss).
+   Volgen de ontwerpen in design/retro-pixel-art en design/strak-zakelijk.
+   ========================================================================== */
+
+/* ---------- Retro pixel-art: crème kaders met gekartelde inktrand ---------- */
+[data-stijl="retro"] { --notch: 0 -4px 0 0 #1b1f2e, 0 4px 0 0 #1b1f2e, -4px 0 0 0 #1b1f2e, 4px 0 0 0 #1b1f2e; }
+[data-stijl="retro"] .topbar { gap: 16px; top: 18px; right: 18px; }
+[data-stijl="retro"] .topbar button, [data-stijl="retro"] .topbar .btn, [data-stijl="retro"] .close {
+  font: 400 10px/1.4 var(--title-font); padding: 10px 12px; min-height: 40px; border: 0; color: #1b1f2e; background: #f4f4ec;
+  box-shadow: var(--notch), inset -4px -4px 0 0 #c9ccd6;
+}
+[data-stijl="retro"] .topbar button:hover, [data-stijl="retro"] .topbar .btn:hover, [data-stijl="retro"] .close:hover { background: #ffffff; }
+[data-stijl="retro"] .topbar button:active, [data-stijl="retro"] .topbar .btn:active, [data-stijl="retro"] .close:active { transform: translateY(4px); box-shadow: var(--notch); }
+[data-stijl="retro"] #panel {
+  border: 0; outline: 0; background: #f4f4ec; color: #1b1f2e; font: 17px/1.45 var(--pixel-font); padding: 22px 24px 20px;
+  box-shadow: var(--notch), inset 0 8px 0 0 #3c8772, inset -4px -4px 0 0 #c9ccd6;
+}
+[data-stijl="retro"] #panel h2 { font: 400 13px/1.5 var(--title-font); color: #2f6f5d; margin: 6px 0 8px; letter-spacing: 0; }
+[data-stijl="retro"] #panel h3 { font: 400 11px/1.5 var(--title-font); color: #2f6f5d; }
+[data-stijl="retro"] #panel .meta { color: #3b4561; font-size: 15px; }
+[data-stijl="retro"] #panel::after { color: #2f6f5d; }
+[data-stijl="retro"] .chips li { background: #d9ece4; border: 0; padding: 3px 9px; font-size: 14px; box-shadow: 0 -2px 0 0 #2f6f5d, 0 2px 0 0 #2f6f5d, -2px 0 0 0 #2f6f5d, 2px 0 0 0 #2f6f5d; margin: 2px; }
+[data-stijl="retro"] .meters i { background: #c9ccd6; }
+[data-stijl="retro"] .meters i.on { background: #f2b22e; box-shadow: inset 0 -2px 0 #c27a12; }
+[data-stijl="retro"] #hud {
+  font: 400 11px/1.6 var(--title-font); color: #1b1f2e; background: #f4f4ec; border: 0; padding: 10px 14px; top: 18px; left: 18px;
+  box-shadow: var(--notch), inset -4px -4px 0 0 #c9ccd6;
+}
+[data-stijl="retro"] #toast { font: 400 11px var(--title-font); background: #ffe27a; border: 0; box-shadow: var(--notch), inset -4px -4px 0 0 #f2b22e; padding: 9px 14px; }
+[data-stijl="retro"] #titlecard { background: radial-gradient(ellipse at center, rgba(27, 31, 46, .15), rgba(27, 31, 46, .45)); }
+[data-stijl="retro"] #titlecard h1 {
+  font: 400 clamp(24px, 5vw, 56px)/1.2 var(--title-font); color: #ffe27a; letter-spacing: 0;
+  text-shadow: 4px 4px 0 #1b1f2e, -3px -3px 0 #1b1f2e, 3px -3px 0 #1b1f2e, -3px 3px 0 #1b1f2e;
+}
+[data-stijl="retro"] #titlecard p { font: 600 clamp(16px, 2vw, 24px) var(--pixel-font); color: #f4f4ec; text-shadow: 3px 3px 0 #1b1f2e; }
+[data-stijl="retro"] #titlecard .start { font: 400 clamp(11px, 1.2vw, 14px) var(--title-font); }
+[data-stijl="retro"] #chapters { background: #f4f4ec; border: 0; gap: 10px; padding: 10px; box-shadow: var(--notch), inset -4px -4px 0 0 #c9ccd6; bottom: 18px; }
+[data-stijl="retro"] #chapters button { font: 400 9px/1.4 var(--title-font); color: #1b1f2e; background: #ffffff; border: 0; padding: 9px 10px; box-shadow: 0 0 0 2px #1b1f2e; }
+[data-stijl="retro"] #chapters button b { color: #2f6f5d; }
+[data-stijl="retro"] #chapters button:hover { background: #d9ece4; }
+[data-stijl="retro"] #chapters button.nu { background: #2f6f5d; color: #ffffff; box-shadow: 0 0 0 2px #1b1f2e, inset -3px -3px 0 0 #1f4f42; }
+[data-stijl="retro"] #chapters button.nu b { color: #ffe27a; }
+[data-stijl="retro"] .contact-form input, [data-stijl="retro"] .contact-form textarea { background: #ffffff; color: #1b1f2e; border: 2px solid #1b1f2e; font: 16px var(--pixel-font); }
+[data-stijl="retro"] .contact-form label { color: #3b4561; font-size: 13px; }
+[data-stijl="retro"] .contact-form button { font: 400 10px/1.4 var(--title-font); background: #2f6f5d; color: #ffffff; border: 0; padding: 12px 14px; box-shadow: var(--notch), inset -4px -4px 0 0 #1f4f42; }
+
+/* ---------- Business isometric: witte kaarten met isometrische rand ---------- */
+[data-stijl="zakelijk"] .topbar button, [data-stijl="zakelijk"] .topbar .btn, [data-stijl="zakelijk"] .close {
+  font: 600 13px/1 var(--pixel-font); text-transform: none; padding: 0 14px; min-height: 40px; display: inline-flex; align-items: center;
+  color: #16202a; background: #ffffff; border: 1px solid #c3cce0; border-radius: 8px; box-shadow: 4px 2px 0 #c3cce0;
+}
+[data-stijl="zakelijk"] .topbar button:hover, [data-stijl="zakelijk"] .topbar .btn:hover, [data-stijl="zakelijk"] .close:hover { background: #ffffff; border-color: #2f6f5d; }
+[data-stijl="zakelijk"] .topbar button:active, [data-stijl="zakelijk"] .topbar .btn:active, [data-stijl="zakelijk"] .close:active { transform: translate(2px, 1px); box-shadow: 2px 1px 0 #c3cce0; }
+[data-stijl="zakelijk"] #btn-switch { color: #ffffff; background: #2f6f5d; border-color: #2f6f5d; box-shadow: 4px 2px 0 #1d4a3e; }
+[data-stijl="zakelijk"] #panel {
+  outline: 0; border: 1px solid #d5dbe6; border-radius: 12px; background: #ffffff; color: #16202a;
+  font: 15px/1.55 var(--pixel-font); padding: 20px 22px; box-shadow: 10px 5px 0 #c3cce0;
+}
+[data-stijl="zakelijk"] #panel h2 { font: 600 21px/1.25 var(--title-font); color: #16202a; text-transform: none; letter-spacing: -0.01em; margin: 0 0 6px; }
+[data-stijl="zakelijk"] #panel h3 { font: 600 12px var(--pixel-font); letter-spacing: .08em; text-transform: uppercase; color: #24584a; }
+[data-stijl="zakelijk"] #panel .meta { color: #55606b; font-size: 14px; }
+[data-stijl="zakelijk"] #panel a { color: #2f6f5d; }
+[data-stijl="zakelijk"] #panel::after { content: none; }
+[data-stijl="zakelijk"] .chips { gap: 8px; }
+[data-stijl="zakelijk"] .chips li { background: #e3efe9; color: #24584a; border: 0; border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 500; }
+[data-stijl="zakelijk"] .meters i { width: 18px; height: 8px; border-radius: 4px; background: #e3efe9; }
+[data-stijl="zakelijk"] .meters i.on { background: #2f6f5d; }
+[data-stijl="zakelijk"] #hud {
+  font: 600 15px var(--title-font); color: #16202a; background: #ffffff; border: 1px solid #d5dbe6; border-radius: 10px;
+  padding: 10px 16px; box-shadow: 6px 3px 0 #c3cce0;
+}
+[data-stijl="zakelijk"] #toast { font: 600 14px var(--pixel-font); color: #ffffff; background: #16202a; border: 0; border-radius: 999px; padding: 8px 16px; box-shadow: 4px 2px 0 #3b4560; }
+[data-stijl="zakelijk"] #titlecard { background: radial-gradient(ellipse at center, rgba(22, 32, 42, .1), rgba(22, 32, 42, .4)); }
+[data-stijl="zakelijk"] #titlecard h1 { font: 700 clamp(32px, 6vw, 72px)/1.05 var(--title-font); color: #ffffff; letter-spacing: -0.02em; text-shadow: 6px 3px 0 #2f6f5d; }
+[data-stijl="zakelijk"] #titlecard p { font: 600 clamp(16px, 2vw, 22px) var(--pixel-font); color: #ffffff; text-shadow: 0 2px 8px rgba(22, 32, 42, .6); }
+[data-stijl="zakelijk"] #titlecard .start { font-size: 14px; letter-spacing: .08em; }
+[data-stijl="zakelijk"] #chapters { background: #ffffff; border: 1px solid #d5dbe6; border-radius: 12px; padding: 6px; gap: 4px; box-shadow: 8px 4px 0 #c3cce0; }
+[data-stijl="zakelijk"] #chapters button { font: 600 13px var(--pixel-font); color: #55606b; background: transparent; border: 0; border-radius: 8px; padding: 8px 12px; }
+[data-stijl="zakelijk"] #chapters button b { color: #9aa6bd; }
+[data-stijl="zakelijk"] #chapters button:hover { color: #16202a; background: #f6f7fb; }
+[data-stijl="zakelijk"] #chapters button.nu { color: #ffffff; background: #2f6f5d; }
+[data-stijl="zakelijk"] #chapters button.nu b { color: #b9d6ca; }
+[data-stijl="zakelijk"] .contact-form label { color: #55606b; font-size: 12px; font-weight: 600; letter-spacing: .04em; }
+[data-stijl="zakelijk"] .contact-form input, [data-stijl="zakelijk"] .contact-form textarea { background: #f6f7fb; color: #16202a; border: 1px solid #c3cce0; border-radius: 8px; font: 15px var(--pixel-font); }
+[data-stijl="zakelijk"] .contact-form input:focus, [data-stijl="zakelijk"] .contact-form textarea:focus { border-color: #2f6f5d; }
+[data-stijl="zakelijk"] .contact-form button { font: 600 15px var(--pixel-font); color: #ffffff; background: #2f6f5d; border: 0; border-radius: 8px; padding: 12px 18px; box-shadow: 6px 3px 0 #1d4a3e; }
+
+/* Coach marks (mini-tutorial) in de stijl van de toast uit de ontwerpen */
+[data-stijl="retro"] #coach { font: 400 11px/1.6 var(--title-font); color: #1b1f2e; background: #ffe27a; border: 0; box-shadow: var(--notch), inset -4px -4px 0 0 #f2b22e; padding: 10px 16px; }
+[data-stijl="retro"] #coach b { color: #2f6f5d; }
+[data-stijl="zakelijk"] #coach { font: 600 14px var(--pixel-font); color: #ffffff; background: #16202a; border: 0; border-radius: 999px; padding: 9px 18px; box-shadow: 4px 2px 0 #3b4560; }
+[data-stijl="zakelijk"] #coach b { color: #9be3c6; }
+/* HUD-voortgang in de kleuren van de stijl */
+[data-stijl="retro"] #hud .hud-balk { background: #c9ccd6; border-radius: 0; }
+[data-stijl="retro"] #hud .hud-balk i { background: #2f6f5d; }
+[data-stijl="retro"] #hud .hud-rij span { color: #3b4561; font-size: 10px; }
+[data-stijl="zakelijk"] #hud .hud-balk { background: #e3efe9; }
+[data-stijl="zakelijk"] #hud .hud-balk i { background: #2f6f5d; }
+[data-stijl="zakelijk"] #hud .hud-rij span { color: #55606b; font: 500 12px var(--pixel-font); }

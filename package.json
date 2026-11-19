@@ -6,11 +6,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "design": "vite --open /design/retro-pixel-art/",
+    "design": "vite --open /design/",
     "check": "node scripts/validate-cv.mjs",
     "heroes": "node scripts/hero-preview.mjs",
     "build": "node scripts/validate-cv.mjs && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "node tests/e2e.mjs",
+    "test": "node --test tests/cv-integration.test.mjs"
   },
   "dependencies": {
     "phaser": "3.90.0"
