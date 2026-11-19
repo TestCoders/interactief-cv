@@ -35,13 +35,20 @@ let selection;
 let markdown;
 
 const themeButton = get('landing-theme');
-themeButton.addEventListener('click', () => {
-  const dark = landing.dataset.theme !== 'dark';
-  landing.dataset.theme = dark ? 'dark' : 'light';
+const page = document.documentElement;
+
+function showTheme(dark) {
+  page.dataset.theme = dark ? 'dark' : 'light';
   get('landing-logo').src = dark ? darkLogo : lightLogo;
   themeButton.setAttribute('aria-pressed', String(dark));
   themeButton.querySelector('[aria-hidden]').textContent = dark ? '☀' : '☾';
   themeButton.querySelector('.theme-label').textContent = dark ? 'light' : 'dark';
+}
+
+showTheme(page.dataset.theme === 'dark');
+themeButton.addEventListener('click', () => {
+  showTheme(page.dataset.theme !== 'dark');
+  try { localStorage.setItem('cv-kleurmodus', page.dataset.theme); } catch {}
 });
 
 function showError(message) {

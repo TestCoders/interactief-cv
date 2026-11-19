@@ -45,14 +45,15 @@
   --display: Poppins, system-ui, sans-serif;
   position: fixed;
   inset: 0;
-  overflow: auto;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   background: var(--desktop);
   color: var(--ink);
   color-scheme: light;
   font-family: 'Open Sans', system-ui, sans-serif;
 }
 
-#landing[data-theme='dark'] {
+[data-theme='dark'] #landing {
   --desktop: #0c0b09;
   --page: #141210;
   --surface: #1c1a18;
@@ -68,6 +69,8 @@
   color-scheme: dark;
 }
 
+.landing-scroll { overflow: auto; }
+
 .landing-window {
   max-width: 1400px;
   min-height: 100%;
@@ -76,9 +79,7 @@
 }
 
 .window-bar {
-  position: sticky;
-  top: 0;
-  z-index: 1;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -222,14 +223,12 @@
 #game-view .topbar { flex-wrap: wrap; justify-content: flex-end; max-width: calc(100vw - 28px); }
 
 @media (min-width: 768px) {
-  #landing { padding: 24px; }
+  .landing-scroll { padding: 24px; }
   .landing-window {
-    min-height: calc(100vh - 48px);
     border: 1px solid var(--line);
     border-radius: 12px;
     box-shadow: 0 20px 60px #1412101a;
   }
-  .window-bar { border-radius: 12px 12px 0 0; }
   .landing-nav, .landing-content { padding-inline: 40px; }
   .landing-nav { min-height: 72px; }
 }
