@@ -1,0 +1,66 @@
+/* Pas deze variabelen aan naar de TestCoders-huisstijl. */
+:root {
+  --accent: #3c8772;
+  --accent-dark: #2a6152;
+  --ink: #1d2433;
+  --paper: #ffffff;
+  --muted: #5b6475;
+  --bg: #eef3f1;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); }
+
+.topbar {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 10px 16px; background: var(--ink); color: #fff;
+}
+.brand b { color: #7fd1b9; }
+.topbar button, .close {
+  font: inherit; cursor: pointer; border: 0; border-radius: 6px;
+  padding: 6px 12px; background: var(--accent); color: #fff; margin-left: 6px;
+}
+.topbar button:hover, .close:hover { background: var(--accent-dark); }
+
+#stage { position: relative; max-width: 960px; margin: 16px auto 0; aspect-ratio: 16 / 9; }
+#game, #game canvas { width: 100%; height: 100%; display: block; border-radius: 8px; }
+
+#panel {
+  position: absolute; top: 12px; right: 12px; width: min(380px, 60%); max-height: calc(100% - 24px);
+  overflow: auto; background: var(--paper); border-radius: 8px; padding: 14px 16px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .25); border-top: 5px solid var(--accent);
+  font-size: 14px; line-height: 1.45;
+}
+#panel h2 { margin: 0 0 4px; font-size: 18px; }
+#panel h3 { margin: 10px 0 2px; font-size: 15px; }
+#panel .meta { color: var(--muted); font-size: 13px; margin: 0 0 6px; }
+#panel ul { margin: 4px 0; padding-left: 18px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0 0; padding: 0; list-style: none; }
+.chips li { background: var(--bg); border-radius: 999px; padding: 2px 8px; font-size: 12px; }
+
+#toast {
+  position: absolute; left: 50%; top: 16px; transform: translateX(-50%);
+  background: #ffd23f; color: var(--ink); font-weight: 700; padding: 6px 14px; border-radius: 999px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .2);
+}
+
+.help { text-align: center; color: var(--muted); font-size: 13px; padding: 0 16px; }
+
+#classic {
+  position: fixed; inset: 0; overflow: auto; background: var(--bg); padding: 24px 16px; z-index: 10;
+}
+#classic article {
+  max-width: 760px; margin: 16px auto; background: var(--paper); padding: 32px; border-radius: 8px;
+  border-top: 6px solid var(--accent);
+}
+#classic h1 { margin: 0; }
+#classic h2 { border-bottom: 2px solid var(--bg); padding-bottom: 4px; margin-top: 28px; }
+#classic .close { display: block; margin: 0 auto; }
+
+@media print {
+  .topbar, #stage, .help, #classic .close { display: none !important; }
+  #classic { position: static; padding: 0; }
+  #classic article { border: 0; padding: 0; }
+}
