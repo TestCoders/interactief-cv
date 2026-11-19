@@ -2,6 +2,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { BAARDEN, KAPSELS } from '../src/heroes.js';
 
 const dir = new URL('../src/data/cv/', import.meta.url);
 const files = readdirSync(dir).filter((f) => f.endsWith('.json'));
@@ -29,6 +30,19 @@ for (const file of files) {
     if (s.niveau !== undefined && !(Number.isInteger(s.niveau) && s.niveau >= 1 && s.niveau <= 5)) err(`skills[${i}].niveau moet 1 t/m 5 zijn`);
   });
   (cv.opleiding ?? []).forEach((o, i) => ['periode', 'titel', 'instituut'].forEach((k) => isStr(o[k]) || err(`opleiding[${i}].${k} ontbreekt`)));
+  if (cv.uiterlijk !== undefined) {
+    const u = cv.uiterlijk;
+    const hex = (v) => /^#[0-9a-fA-F]{6}$/.test(v ?? '');
+    if (typeof u !== 'object' || u === null || Array.isArray(u)) err('"uiterlijk" moet een object zijn');
+    else {
+      if (u.kapsel !== undefined && !KAPSELS[u.kapsel]) err(`uiterlijk.kapsel moet een van ${Object.keys(KAPSELS).join(', ')} zijn`);
+      if (u.baard !== undefined && !BAARDEN[u.baard]) err(`uiterlijk.baard moet een van ${Object.keys(BAARDEN).join(', ')} zijn`);
+      for (const k of ['haarkleur', 'huid']) if (u[k] !== undefined && !hex(u[k])) err(`uiterlijk.${k} moet een hexkleur zijn, bijv. "#6b3e26"`);
+      if (u.bril !== undefined && typeof u.bril !== 'boolean') err('uiterlijk.bril moet true of false zijn');
+      const bekend = ['kapsel', 'haarkleur', 'huid', 'bril', 'baard'];
+      Object.keys(u).filter((k) => !bekend.includes(k)).forEach((k) => err(`uiterlijk.${k} is onbekend (toegestaan: ${bekend.join(', ')})`));
+    }
+  }
   if (!cv.contact || !isStr(cv.contact.email)) err('"contact.email" ontbreekt');
 }
 

@@ -53,6 +53,7 @@ Werkt in `npm run dev` én in de build. Knop **AI / Markdown** in de topbar open
 |------|-----------|------------|
 | `naam`, `rol`, `profiel` | ja | Eerste bord |
 | `kleur` | nee | Kleur van je karakter (`"#rrggbb"`) |
+| `uiterlijk` (`kapsel`, `haarkleur`, `huid`, `bril`, `baard`) | nee | Uiterlijk van je karakter; maak het uit een foto met de skill `foto-naar-pixelart`. Bekijk het resultaat met `npm run heroes` |
 | `opleiding[]` (`periode`, `titel`, `instituut`) | nee | Eén bord per opleiding |
 | `werkervaring[]` (`periode`, `rol`, `opdrachtgever`, `omschrijving`, `tools[]`) | ja | Eén bord per opdracht — **nieuwste eerst** in de JSON, de game loopt van oud naar nieuw |
 | `expertise[]` | nee | Badges uit de schatkist |
@@ -77,6 +78,7 @@ src/scenes/SelectScene  karakterselectie
 src/scenes/LevelScene   het level: grond, borden, platforms, munten, finish
 src/data/cv/*.json      één CV per persoon
 scripts/validate-cv.mjs validatie van de CV-bestanden
+scripts/hero-preview.mjs PNG-preview van de pixel-art helden (npm run heroes)
 ```
 
 ## Voorstel taakverdeling (3 personen)

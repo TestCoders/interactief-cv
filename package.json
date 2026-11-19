@@ -8,6 +8,7 @@
     "dev": "vite",
     "design": "vite --open /design/retro-pixel-art/",
     "check": "node scripts/validate-cv.mjs",
+    "heroes": "node scripts/hero-preview.mjs",
     "build": "node scripts/validate-cv.mjs && vite build",
     "preview": "vite preview"
   },
