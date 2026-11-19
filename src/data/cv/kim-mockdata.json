@@ -1,0 +1,26 @@
+{
+  "naam": "Kim Mockdata",
+  "rol": "Test Consultant",
+  "kleur": "#6c5ce7",
+  "profiel": "Verbindt business en techniek. Zet teststrategieën neer die passen bij het team in plaats van andersom.",
+  "werkervaring": [
+    {
+      "periode": "2020 – heden",
+      "rol": "Test Consultant",
+      "opdrachtgever": "Fictieve Zorgverzekeraar",
+      "omschrijving": "Teststrategie voor de migratie naar de cloud; coaching van drie scrumteams in risicogebaseerd testen.",
+      "tools": ["TMap", "Xray", "Confluence"]
+    }
+  ],
+  "skills": [
+    { "naam": "Teststrategie", "niveau": 5 },
+    { "naam": "Risicoanalyse", "niveau": 5 },
+    { "naam": "Coaching", "niveau": 4 },
+    { "naam": "SpecFlow", "niveau": 3 }
+  ],
+  "certificeringen": ["TMap NEXT", "ISTQB Advanced Test Manager"],
+  "opleiding": [
+    { "periode": "2012 – 2016", "titel": "Bedrijfskunde", "instituut": "Hogeschool Voorbeeld" }
+  ],
+  "contact": { "email": "kim.mockdata@example.com" }
+}

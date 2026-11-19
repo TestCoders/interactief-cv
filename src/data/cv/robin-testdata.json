@@ -1,0 +1,35 @@
+{
+  "naam": "Robin Testdata",
+  "rol": "Performance & Security Tester",
+  "kleur": "#e4572e",
+  "profiel": "Maakt systemen kapot zodat klanten dat niet hoeven te doen. Specialist in loadtests en het vinden van zwakke plekken.",
+  "werkervaring": [
+    {
+      "periode": "2022 – heden",
+      "rol": "Performance Tester",
+      "opdrachtgever": "Fictief Energiebedrijf",
+      "omschrijving": "Loadtests voor piekmomenten bij prijswijzigingen; bottleneck in de database gevonden vóór livegang.",
+      "tools": ["k6", "Grafana", "Kubernetes"]
+    },
+    {
+      "periode": "2019 – 2022",
+      "rol": "Security Tester",
+      "opdrachtgever": "Voorbeeld Gemeente",
+      "omschrijving": "OWASP-scans en handmatige pentests op burgerportalen.",
+      "tools": ["OWASP ZAP", "Burp Suite"]
+    }
+  ],
+  "skills": [
+    { "naam": "k6", "niveau": 5 },
+    { "naam": "JMeter", "niveau": 4 },
+    { "naam": "OWASP ZAP", "niveau": 4 },
+    { "naam": "Grafana", "niveau": 4 },
+    { "naam": "Python", "niveau": 3 }
+  ],
+  "certificeringen": ["ISTQB Foundation", "CEH"],
+  "opleiding": [
+    { "periode": "2014 – 2018", "titel": "Technische Informatica", "instituut": "Universiteit Voorbeeld" }
+  ],
+  "hobbys": ["Hardlopen", "Escape rooms"],
+  "contact": { "email": "robin.testdata@example.com" }
+}
