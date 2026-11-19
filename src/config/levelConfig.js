@@ -45,11 +45,18 @@ export const MOVEMENT = {
 
 /** Lopen door te scrollen of te swipen, zoals op een gewone pagina. */
 export const SCROLL_WALK = {
-  wheelFactor: 1.4, // px lopen per px scroll
+  wheelFactor: 1.2, // px lopen per px scroll
   touchFactor: 2.5, // px lopen per px swipe
-  maxBudget: 900, // max opgespaarde loopafstand, zodat hard scrollen niet eindeloos doorloopt
+  maxBudget: 200, // max opgespaarde loopafstand: stop je met scrollen, dan sta je binnen ~0,7 s stil
   minSpeed: 90, // px/s zodra er iets in de tank zit
   speedPerBudgetPx: 2.2 // sneller lopen naarmate er meer in de tank zit
+};
+
+/** Halteplaatsen: na scrollen glijdt de held naar het onderdeel als dat vlakbij is. Na ← → niet: loslaten = stoppen. */
+export const STOPS = {
+  snapDistance: 160,
+  idleBeforeSnapMs: 160,
+  gateMaxMs: 5000 // een animatie houdt je nooit langer vast dan dit
 };
 
 export const CAMERA = {

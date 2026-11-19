@@ -32,6 +32,13 @@
   .frame { overflow-x: auto; background: #ffffff; border: 1px solid var(--line); border-radius: 12px; max-width: max-content; }
   iframe { display: block; border: 0; width: 960px; height: 540px; }
   iframe.stijlgids { width: 1440px; height: 3240px; }
+  iframe.personage { width: 1200px; height: 600px; }
+  .geluid { display: flex; flex-wrap: wrap; gap: 12px; margin: 0; }
+  .geluid button { font: 600 14px/1 Inter, sans-serif; min-height: 44px; padding: 0 18px; cursor: pointer; color: var(--ink); background: #ffffff; border: 1px solid var(--line); border-radius: 8px; box-shadow: 4px 2px 0 #c3cce0; }
+  .geluid button:hover { border-color: var(--accent); }
+  .geluid button:active { transform: translate(2px, 1px); box-shadow: 2px 1px 0 #c3cce0; }
+  .geluid button[aria-pressed="true"] { color: #ffffff; background: var(--accent); border-color: var(--accent); box-shadow: 4px 2px 0 #1d4a3e; }
+  .geluid button:focus-visible { outline: 3px solid #9cc7b8; outline-offset: 2px; }
 </style>
 </head>
 <body>
@@ -46,6 +53,8 @@
   <div role="tablist" aria-label="Onderdelen van het ontwerp">
     <button type="button" role="tab" id="tab-screens" aria-controls="screens" aria-selected="true">Game-screens</button>
     <button type="button" role="tab" id="tab-stijlgids" aria-controls="stijlgids" aria-selected="false" tabindex="-1">Stijlgids</button>
+    <button type="button" role="tab" id="tab-personages" aria-controls="personages" aria-selected="false" tabindex="-1">Personages</button>
+    <button type="button" role="tab" id="tab-geluid" aria-controls="geluid" aria-selected="false" tabindex="-1">Geluid</button>
   </div>
 
   <div role="tabpanel" id="screens" aria-labelledby="tab-screens" tabindex="0">
@@ -66,7 +75,38 @@
       <div class="frame"><iframe class="stijlgids" src="stijlgids.html" title="Stijlgids business isometric"></iframe></div>
     </section>
   </div>
+
+  <div role="tabpanel" id="personages" aria-labelledby="tab-personages" tabindex="0" hidden>
+    <section>
+      <div class="head"><h2>Martijn</h2><a href="martijn.html">Openen op ware grootte</a></div>
+      <p>Vast personage, te kiezen met <code>"uiterlijk": "martijn"</code> in een cv. Hij ademt: het bovenlijf beweegt zacht op en neer.</p>
+      <div class="frame"><iframe class="personage" src="martijn.html" title="Personage Martijn"></iframe></div>
+    </section>
+  </div>
+
+  <div role="tabpanel" id="geluid" aria-labelledby="tab-geluid" tabindex="0" hidden data-geluid="zakelijk">
+    <section>
+      <h2>Achtergrondmuziek</h2>
+      <p>Opgewekte city pop (Fmaj7 – G6 – Em7 – Am7, 104 bpm): gesyncopeerde elektrische piano, een funky bas, een sprankelend arpeggio, een marimba-melodie van 8 maten en handclaps, met zacht stadsgeroezemoes eronder. Live gegenereerd met de Web Audio API, net als in de game (<code>src/audio/packs/zakelijk.js</code>). Werkt via <code>npm run design</code>.</p>
+      <div class="geluid"><button type="button" data-muziek aria-pressed="false">Muziek afspelen</button></div>
+    </section>
+    <section>
+      <h2>Geluidseffecten</h2>
+      <div class="geluid">
+        <button type="button" data-sfx="jump">Springen</button>
+        <button type="button" data-sfx="land">Landen</button>
+        <button type="button" data-sfx="enter">Mijlpaal bereikt</button>
+        <button type="button" data-sfx="bonus">Koffertje open</button>
+        <button type="button" data-sfx="travelIn">Lift omlaag</button>
+        <button type="button" data-sfx="travelOut">Lift omhoog</button>
+        <button type="button" data-sfx="finish">Finish</button>
+        <button type="button" data-sfx="select">Kiezen</button>
+        <button type="button" data-sfx="confirm">Bevestigen</button>
+      </div>
+    </section>
+  </div>
 </main>
+<script type="module" src="../geluid.js"></script>
 
 <script>
   // Tabs: klik of pijltjestoetsen; de gekozen tab staat in de URL (#screens of #stijlgids).

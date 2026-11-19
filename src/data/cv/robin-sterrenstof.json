@@ -1,0 +1,883 @@
+{
+  "naam": "Robin Sterrenstof",
+  "rol": "Test Automation Engineer",
+  "kleur": "#2e86de",
+  "profiel": "Robin is een enthousiaste digitale alleskunner die teams helpt om slimme oplossingen te bedenken en te bouwen. Sinds 2015 werkt Robin aan uiteenlopende softwareprojecten, van vrolijke webwinkels tot handige planningsapps. De rode draad: ingewikkelde uitdagingen begrijpelijk maken en samen iets moois opleveren.",
+  "kernwoorden": [
+    "Kritisch",
+    "Leergierig",
+    "Analytisch",
+    "Zelfstandig",
+    "Proactief",
+    "Pragmatisch",
+    "Flexibel",
+    "Multidisciplinair",
+    "Behulpzaam",
+    "Rustig",
+    "Doorzettend",
+    "Samenwerkend"
+  ],
+  "expertise": [
+    {
+      "naam": "Agile/Scrum",
+      "niveau": "Senior",
+      "sinds": 2015
+    },
+    {
+      "naam": "DevOps",
+      "niveau": "Senior",
+      "sinds": 2017
+    },
+    {
+      "naam": "Testautomatisering",
+      "niveau": "Senior",
+      "sinds": 2015
+    },
+    {
+      "naam": "TMap Next",
+      "niveau": "Senior",
+      "sinds": 2015
+    },
+    {
+      "naam": "Behaviour Driven Development (BDD)",
+      "niveau": "Senior",
+      "sinds": 2015
+    },
+    {
+      "naam": "ST (systeemtest)",
+      "niveau": "Senior",
+      "sinds": 2016
+    },
+    {
+      "naam": "IT (Integratie test)",
+      "niveau": "Senior",
+      "sinds": 2015
+    },
+    {
+      "naam": "KT (ketentest)",
+      "niveau": "Senior",
+      "sinds": 2016
+    },
+    {
+      "naam": "BT (browsertest)",
+      "niveau": "Senior",
+      "sinds": 2015
+    },
+    {
+      "naam": "Branchekennis: Financiële dienstverlening",
+      "niveau": "Senior",
+      "sinds": 2015
+    },
+    {
+      "naam": "Branchekennis: Commerciële dienstverlening",
+      "niveau": "Medior",
+      "sinds": 2015
+    },
+    {
+      "naam": "Branchekennis: Spoordomein",
+      "niveau": "Senior",
+      "sinds": 2020
+    }
+  ],
+  "skills": [
+    {
+      "naam": "Agile/Scrum",
+      "niveau": "Senior",
+      "sinds": 2015,
+      "categorie": "Methoden/Technieken"
+    },
+    {
+      "naam": "DevOps",
+      "niveau": "Senior",
+      "sinds": 2017,
+      "categorie": "Methoden/Technieken"
+    },
+    {
+      "naam": "Testautomatisering",
+      "niveau": "Senior",
+      "sinds": 2015,
+      "categorie": "Methoden/Technieken"
+    },
+    {
+      "naam": "Continuous Integration/Delivery (CI/CD)",
+      "niveau": "Medior",
+      "sinds": 2016,
+      "categorie": "Methoden/Technieken"
+    },
+    {
+      "naam": "TMap Next",
+      "niveau": "Senior",
+      "sinds": 2015,
+      "categorie": "Methoden/Technieken"
+    },
+    {
+      "naam": "Behaviour Driven Development (BDD)",
+      "niveau": "Senior",
+      "sinds": 2015,
+      "categorie": "Methoden/Technieken"
+    },
+    {
+      "naam": "Large Scale Scrum (LeSS)",
+      "niveau": "Medior",
+      "sinds": 2017,
+      "categorie": "Methoden/Technieken"
+    },
+    {
+      "naam": "ST (systeemtest)",
+      "niveau": "Senior",
+      "sinds": 2016,
+      "categorie": "Testvormen"
+    },
+    {
+      "naam": "IT (Integratie test)",
+      "niveau": "Senior",
+      "sinds": 2015,
+      "categorie": "Testvormen"
+    },
+    {
+      "naam": "KT (ketentest)",
+      "niveau": "Senior",
+      "sinds": 2016,
+      "categorie": "Testvormen"
+    },
+    {
+      "naam": "BT (browsertest)",
+      "niveau": "Senior",
+      "sinds": 2015,
+      "categorie": "Testvormen"
+    },
+    {
+      "naam": "GAT (gebruikersacceptatietest)",
+      "niveau": "Medior",
+      "sinds": 2015,
+      "categorie": "Testvormen"
+    },
+    {
+      "naam": "UT (unittest)",
+      "niveau": "Medior",
+      "sinds": 2016,
+      "categorie": "Testvormen"
+    },
+    {
+      "naam": "PT (performance test)",
+      "niveau": "Junior",
+      "sinds": 2017,
+      "categorie": "Testvormen"
+    },
+    {
+      "naam": "Financiële dienstverlening",
+      "niveau": "Senior",
+      "sinds": 2015,
+      "categorie": "Branchekennis"
+    },
+    {
+      "naam": "Commerciële dienstverlening",
+      "niveau": "Medior",
+      "sinds": 2015,
+      "categorie": "Branchekennis"
+    },
+    {
+      "naam": "Spoordomein",
+      "niveau": "Senior",
+      "sinds": 2020,
+      "categorie": "Branchekennis"
+    },
+    {
+      "naam": "Java",
+      "niveau": "Senior",
+      "sinds": 2016,
+      "categorie": "Programmeertalen & Frameworks"
+    },
+    {
+      "naam": "Kotlin",
+      "niveau": "Medior",
+      "sinds": 2022,
+      "categorie": "Programmeertalen & Frameworks"
+    },
+    {
+      "naam": "C#",
+      "niveau": "Medior",
+      "sinds": 2019,
+      "categorie": "Programmeertalen & Frameworks"
+    },
+    {
+      "naam": "JavaScript",
+      "niveau": "Senior",
+      "sinds": 2016,
+      "categorie": "Programmeertalen & Frameworks"
+    },
+    {
+      "naam": "TypeScript",
+      "niveau": "Senior",
+      "sinds": 2017,
+      "categorie": "Programmeertalen & Frameworks"
+    },
+    {
+      "naam": "Angular",
+      "niveau": "Senior",
+      "sinds": 2017,
+      "categorie": "Programmeertalen & Frameworks"
+    },
+    {
+      "naam": "VueJS",
+      "niveau": "Junior",
+      "sinds": 2020,
+      "categorie": "Programmeertalen & Frameworks"
+    },
+    {
+      "naam": "Spring Boot",
+      "niveau": "Medior",
+      "sinds": 2018,
+      "categorie": "Programmeertalen & Frameworks"
+    },
+    {
+      "naam": "SQL",
+      "niveau": "Medior",
+      "sinds": 2006,
+      "categorie": "Programmeertalen & Frameworks"
+    },
+    {
+      "naam": "XML/JSON",
+      "niveau": "Medior",
+      "sinds": 2013,
+      "categorie": "Programmeertalen & Frameworks"
+    },
+    {
+      "naam": "HTML5/CSS",
+      "niveau": "Medior",
+      "sinds": 2010,
+      "categorie": "Programmeertalen & Frameworks"
+    },
+    {
+      "naam": "PHP",
+      "niveau": "Junior",
+      "sinds": 2006,
+      "categorie": "Programmeertalen & Frameworks"
+    },
+    {
+      "naam": "Eclipse RCP",
+      "niveau": "Junior",
+      "sinds": 2020,
+      "categorie": "Programmeertalen & Frameworks"
+    },
+    {
+      "naam": "MySQL",
+      "niveau": "Medior",
+      "sinds": 2006,
+      "categorie": "Databases"
+    },
+    {
+      "naam": "Postgres",
+      "niveau": "Medior",
+      "sinds": 2023,
+      "categorie": "Databases"
+    },
+    {
+      "naam": "Windows",
+      "niveau": "Senior",
+      "sinds": 1998,
+      "categorie": "Besturingssystemen"
+    },
+    {
+      "naam": "Mac OS",
+      "niveau": "Senior",
+      "sinds": 2010,
+      "categorie": "Besturingssystemen"
+    },
+    {
+      "naam": "Android",
+      "niveau": "Senior",
+      "sinds": 2000,
+      "categorie": "Besturingssystemen"
+    },
+    {
+      "naam": "iOS",
+      "niveau": "Senior",
+      "sinds": 2015,
+      "categorie": "Besturingssystemen"
+    },
+    {
+      "naam": "Linux (Ubuntu)",
+      "niveau": "Junior",
+      "sinds": 2016,
+      "categorie": "Besturingssystemen"
+    },
+    {
+      "naam": "Selenium Webdriver/Selenide",
+      "niveau": "Senior",
+      "sinds": 2015,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Cypress",
+      "niveau": "Senior",
+      "sinds": 2018,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "WebDriverIO",
+      "niveau": "Senior",
+      "sinds": 2017,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Cucumber",
+      "niveau": "Senior",
+      "sinds": 2015,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "CodeceptJS",
+      "niveau": "Senior",
+      "sinds": 2018,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Playwright",
+      "niveau": "Medior",
+      "sinds": 2021,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Postman",
+      "niveau": "Senior",
+      "sinds": 2016,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "REST-Assured",
+      "niveau": "Medior",
+      "sinds": 2018,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Puppeteer",
+      "niveau": "Medior",
+      "sinds": 2020,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Protractor",
+      "niveau": "Medior",
+      "sinds": 2017,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Jest",
+      "niveau": "Medior",
+      "sinds": 2019,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Jasmine",
+      "niveau": "Medior",
+      "sinds": 2017,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "FitNesse",
+      "niveau": "Medior",
+      "sinds": 2015,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "WireMock",
+      "niveau": "Medior",
+      "sinds": 2018,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Gatling",
+      "niveau": "Medior",
+      "sinds": 2019,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Maven",
+      "niveau": "Medior",
+      "sinds": 2015,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "xUnit",
+      "niveau": "Medior",
+      "sinds": 2019,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "jUnit",
+      "niveau": "Medior",
+      "sinds": 2016,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "KoTest",
+      "niveau": "Medior",
+      "sinds": 2026,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "FluentAssertions",
+      "niveau": "Medior",
+      "sinds": 2019,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Jenkins",
+      "niveau": "Senior",
+      "sinds": 2016,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "XL Release",
+      "niveau": "Medior",
+      "sinds": 2018,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "XL Deploy",
+      "niveau": "Medior",
+      "sinds": 2018,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Splunk",
+      "niveau": "Medior",
+      "sinds": 2016,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Kibana",
+      "niveau": "Medior",
+      "sinds": 2020,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Grafana",
+      "niveau": "Medior",
+      "sinds": 2020,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Git/Bitbucket",
+      "niveau": "Senior",
+      "sinds": 2015,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "IBM WebSphere",
+      "niveau": "Junior",
+      "sinds": 2018,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Confluence",
+      "niveau": "Senior",
+      "sinds": 2015,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Jira",
+      "niveau": "Senior",
+      "sinds": 2015,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Azure DevOps",
+      "niveau": "Medior",
+      "sinds": 2019,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Pivotal Cloud Foundry (Azure)",
+      "niveau": "Medior",
+      "sinds": 2018,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Openshift",
+      "niveau": "Senior",
+      "sinds": 2023,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Docker",
+      "niveau": "Medior",
+      "sinds": 2019,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Kubernetes",
+      "niveau": "Medior",
+      "sinds": 2019,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Ansible",
+      "niveau": "Medior",
+      "sinds": 2022,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Awx",
+      "niveau": "Medior",
+      "sinds": 2022,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "ArgoCD",
+      "niveau": "Medior",
+      "sinds": 2025,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Helm",
+      "niveau": "Medior",
+      "sinds": 2025,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Redis",
+      "niveau": "Junior",
+      "sinds": 2018,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Keycloak",
+      "niveau": "Medior",
+      "sinds": 2024,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "SonarQube",
+      "niveau": "Medior",
+      "sinds": 2017,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Fortify",
+      "niveau": "Junior",
+      "sinds": 2017,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "Nexus",
+      "niveau": "Medior",
+      "sinds": 2017,
+      "categorie": "Tools"
+    },
+    {
+      "naam": "WinApp driver",
+      "niveau": "Medior",
+      "sinds": 2020,
+      "categorie": "Tools"
+    }
+  ],
+  "talen": [
+    {
+      "taal": "Nederlands",
+      "niveau": "Moedertaal"
+    },
+    {
+      "taal": "Engels",
+      "niveau": "Goed"
+    }
+  ],
+  "interesses": [
+    "Passie voor testautomatisering",
+    "Conferenties in binnen- en buitenland",
+    "Meetups",
+    "Het volgen van cursussen en zelfstudie",
+    "Nieuwe tools uitproberen",
+    "Experimenteren met kleine programmeerprojecten"
+  ],
+  "conferenties": [
+    "UKStar, Maanstad (2018)",
+    "QA&Test, Zonnehaven (2018)",
+    "SeleniumConf, Kersenbloesemstad (2019)",
+    "dotJS, Lichtstad (2019)",
+    "International JavaScript Conference, Bergstad (2021 + 2022)",
+    "EpicHey!, Zeezicht (2023)",
+    "KDC Denmark, Noorderhaven (2024)",
+    "Devcon, Koperdorp (2025)",
+    "Buildstuff, Dennestad (2025)",
+    "Hustef, Thermenstad (2026)"
+  ],
+  "opleiding": [
+    {
+      "titel": "Master Communicatie Wetenschappen",
+      "instituut": "Sterrenstad",
+      "periode": "2015"
+    },
+    {
+      "titel": "Bachelor Digitale Communicatie",
+      "instituut": "Kastanjedorp",
+      "periode": "2012"
+    }
+  ],
+  "certificeringen": [
+    "TMap NEXT® Test Engineer, EXIN",
+    "Agile Foundation, Agile Consortium",
+    "Java Masterclass voor Testers, Vijfhart/Ordina",
+    "Certified ScrumMaster, Scrum Alliance",
+    "Angular course, FrontMen",
+    "CodeceptJS workshop, MeetUp",
+    "Advanced front-end development met JavaScript, Vijfhart",
+    "Single page applications with Angular2+ fundamentals, Vijfhart",
+    "Responsive Web Design, Vijfhart"
+  ],
+  "werkervaring": [
+    {
+      "periode": "Augustus 2024 – heden",
+      "rol": "DevOps/Test Automation Engineer",
+      "opdrachtgever": "Project Nachttrein",
+      "omschrijving": "De Kompas Service Organisatie is een samenwerking tussen Spoor & Co en Spoor & Co. Deze organisatie faciliteert het planning- en verdelingsproces van het Nederlandse spoor middels de Kompas tool. Op dit moment is er een moderniseringsslag gaande waarbij er delen van de oude applicatie worden vernieuwd en de basis word gelegd voor een nieuwe planningsapplicatie.",
+      "werkzaamheden": [
+        "Implementeren van features in de applicatie",
+        "Meewerken aan de overgang van Ansible/AWX naar ArgoCD/Helm",
+        "Kennishouder rond automatische tests beheerd door het team",
+        "Reviewen applicatiecode",
+        "CICD straat onderhouden en optimaliseren",
+        "Dagelijks operationeel werk zoals monitoring en bugs",
+        "Overleg met stakeholders",
+        "Opsporen en oplossen van bugs"
+      ],
+      "tools": [
+        "Cucumberr",
+        "Jenkins",
+        "Spring Boot",
+        "KoTest",
+        "jUnit",
+        "ArgoCD",
+        "Helm",
+        "Openshift",
+        "Jenkins",
+        "Keycloak",
+        "Grafana",
+        "Github Copilot"
+      ],
+      "talen": [
+        "Java",
+        "Kotlin",
+        "Typescript"
+      ]
+    },
+    {
+      "periode": "November 2023 – juli 2024",
+      "rol": "DevOps Automation Engineer",
+      "opdrachtgever": "Voltoria Energie",
+      "omschrijving": "Robin werkte in een enthousiast projectteam aan een digitale toepassing voor dagelijks gebruik. Het team verbeterde bestaande functies, ontwikkelde nieuwe mogelijkheden en maakte het systeem makkelijker te testen en te onderhouden. Robin dacht mee over de aanpak, schreef en controleerde code, automatiseerde terugkerende controles en stemde regelmatig af met collega’s en belanghebbenden.",
+      "werkzaamheden": [
+        "Schrijven van automatische tests voor frontend met Cypress",
+        "Schrijven van automatische tests voor backend met Cucumber/Java",
+        "Teststrategie bepalen",
+        "Overleggen met de stakeholders",
+        "Reviewen applicatiecode",
+        "CI/CD straat onderhouden en verbeteren",
+        "Bouwen nieuwe functionaliteit in Java",
+        "Opsporen en oplossen van bugs"
+      ],
+      "tools": [
+        "Cucumber",
+        "Cypress",
+        "Jenkins",
+        "Maven",
+        "GIT",
+        "Quarkus",
+        "JUnit"
+      ],
+      "talen": [
+        "Java",
+        "JavaScript/TypeScript",
+        "Angular"
+      ]
+    },
+    {
+      "periode": "December 2020 – oktober 2023",
+      "rol": "DevOps/Test Automation Engineer",
+      "opdrachtgever": "Project Nachttrein",
+      "omschrijving": "Robin werkte in een enthousiast projectteam aan een digitale toepassing voor dagelijks gebruik. Het team verbeterde bestaande functies, ontwikkelde nieuwe mogelijkheden en maakte het systeem makkelijker te testen en te onderhouden. Robin dacht mee over de aanpak, schreef en controleerde code, automatiseerde terugkerende controles en stemde regelmatig af met collega’s en belanghebbenden.",
+      "werkzaamheden": [
+        "Schrijven van automatische tests",
+        "Migratie van webDriverIO naar CodeceptJS Playwright",
+        "Automatiseren handmatige regressietestset",
+        "Teststrategie opstellen huidige en nieuwe situatie",
+        "Overleggen met de stakeholders",
+        "Reviewen applicatiecode",
+        "CI/CD straat onderhouden en verbeteren",
+        "Bouwen nieuwe functionaliteit in Java/Kotlin",
+        "Opsporen en oplossen van bugs"
+      ],
+      "tools": [
+        "WinApp driver",
+        "Cucumber",
+        "CodeceptJS",
+        "WebdriverIO",
+        "Playwright",
+        "Selenide",
+        "Jasmine",
+        "jUnit",
+        "Wiremock",
+        "Websocket",
+        "Springboot",
+        "Openshift",
+        "Awx",
+        "Ansible",
+        "Eclipse RCP",
+        "Jenkins",
+        "Grafana"
+      ],
+      "talen": [
+        "Java",
+        "JavaScript/TypeScript",
+        "Angular",
+        "Kotlin"
+      ]
+    },
+    {
+      "periode": "Juni 2020 – November 2020",
+      "rol": "Test Automation Engineer",
+      "opdrachtgever": "PixelPolder Studio",
+      "omschrijving": "PixelPolder Studio biedt bedrijven complete oplossingen op het gebied van marketing en software ontwikkeling. Deze producten worden allemaal in-house ontwikkeld.",
+      "werkzaamheden": [
+        "Schrijven automatische tests",
+        "Migratie van CodeceptJS webDriverIO naar CodeceptJS Puppeteer",
+        "Configuratie om testen parallel te kunnen draaien",
+        "E2E tests integreren in de CI/CD pipeline",
+        "Code reviews uitvoeren",
+        "Adviseren teststrategie"
+      ],
+      "tools": [
+        "Azure DevOps",
+        "CodeceptJS",
+        "WebdriverIO",
+        "Puppeteer",
+        "REST",
+        "Docker",
+        "MYSQL",
+        "Jasmine",
+        "Redis",
+        "Wiremock",
+        "Azure Portal"
+      ],
+      "talen": [
+        "C#",
+        "JavaScript",
+        "VueJS",
+        "Angular"
+      ]
+    },
+    {
+      "periode": "April 2020 – heden",
+      "rol": "Front-end ontwikkelaar",
+      "opdrachtgever": "Sterrenstof Labs",
+      "omschrijving": "Robin werkte in een enthousiast projectteam aan een digitale toepassing voor dagelijks gebruik. Het team verbeterde bestaande functies, ontwikkelde nieuwe mogelijkheden en maakte het systeem makkelijker te testen en te onderhouden. Robin dacht mee over de aanpak, schreef en controleerde code, automatiseerde terugkerende controles en stemde regelmatig af met collega’s en belanghebbenden.",
+      "werkzaamheden": [
+        "Architectuur van de applicatie ontwerpen",
+        "Bouwen van de applicatie",
+        "Reviewen code van collega",
+        "Overleggen met de stakeholders"
+      ],
+      "tools": [
+        "CodeceptJS",
+        "REST",
+        "Docker",
+        "Jest",
+        "Angular Materials",
+        "Figma"
+      ],
+      "talen": [
+        "Angular",
+        "TypeScript"
+      ]
+    },
+    {
+      "periode": "Augustus 2019 – Mei 2020",
+      "rol": "Test Automation Engineer",
+      "opdrachtgever": "VergelijkVlot",
+      "omschrijving": "Robin werkte in een enthousiast projectteam aan een digitale toepassing voor dagelijks gebruik. Het team verbeterde bestaande functies, ontwikkelde nieuwe mogelijkheden en maakte het systeem makkelijker te testen en te onderhouden. Robin dacht mee over de aanpak, schreef en controleerde code, automatiseerde terugkerende controles en stemde regelmatig af met collega’s en belanghebbenden.",
+      "werkzaamheden": [
+        "Opzetten automatische testen",
+        "Optimalisatie Cypress testcode",
+        "Pairen bij het maken van unit-testen",
+        "Doorvoeren van verbeteringen aan het testframework",
+        "Ontwikkelen tools voor testers",
+        "Testresultaten controleren in KlantKompas"
+      ],
+      "tools": [
+        "Cypress",
+        "Jest",
+        "Jasmine",
+        "xUnit",
+        "Azure DevOps",
+        "Wiremock.net",
+        "RestAssured.net",
+        "FluentAssertions",
+        "Docker",
+        "Kubernetes",
+        "KlantKompas"
+      ],
+      "talen": [
+        "Angular (TypeScript)",
+        "C#"
+      ]
+    },
+    {
+      "periode": "December 2015 – Augustus 2019",
+      "rol": "DevOps/Test Automation Engineer",
+      "opdrachtgever": "Rivierbank",
+      "omschrijving": "Robin werkte in een enthousiast projectteam aan een digitale toepassing voor dagelijks gebruik. Het team verbeterde bestaande functies, ontwikkelde nieuwe mogelijkheden en maakte het systeem makkelijker te testen en te onderhouden. Robin dacht mee over de aanpak, schreef en controleerde code, automatiseerde terugkerende controles en stemde regelmatig af met collega’s en belanghebbenden.",
+      "werkzaamheden": [
+        "Opzetten automatische testen",
+        "Opzetten Wiremock stubs",
+        "Opzetten CI/CD pipelines",
+        "Uitvoeren van keten- en browsertesten",
+        "Het team vooruithelpen op Agile/Scrum gebied",
+        "Het implementeren van kleine feature of bug fixes (Java/Angular)",
+        "Het naar productie brengen van nieuwe features",
+        "Overnemen van de Scrum master rol bij afwezigheid",
+        "Meedraaien met de stand-by diensten binnen het team",
+        "Ondersteunen van andere teams bij vragen over tooling als Wiremock en REST-Assured"
+      ],
+      "tools": [
+        "Spring Boot",
+        "Maven",
+        "Selenium Webdriver",
+        "REST-Assured",
+        "WebdriverIO",
+        "Gatling",
+        "Protractor",
+        "Wiremock",
+        "Cucumber",
+        "Jira",
+        "Azure DevOps",
+        "Confluence",
+        "Reids",
+        "Jenkins",
+        "XL Release",
+        "XL Deploy",
+        "IntelliJ",
+        "Git",
+        "Splunk",
+        "Postman",
+        "Pivotal Cloud Foundry (PCF)",
+        "IBM WebSphere",
+        "KlantKompas",
+        "Tridion",
+        "SonarQube",
+        "Fortify",
+        "Nexus"
+      ],
+      "talen": [
+        "Java",
+        "Angular",
+        "JavaScript & TypeScript",
+        "XML",
+        "SQL"
+      ]
+    }
+  ],
+  "contact": {
+    "email": "robin.sterrenstof@example.com"
+  }
+}

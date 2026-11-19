@@ -1,11 +1,13 @@
 import Phaser from 'phaser';
 import { GAME } from './config/gameConfig.js';
-import BootScene from './scenes/BootScene.js?avatar-flow';
+import BootScene from './scenes/BootScene.js';
+import CharacterSelectScene from './scenes/CharacterSelectScene.js';
 import LevelScene from './scenes/LevelScene.js';
 import { initContactForm } from './ui/contactForm.js';
 import { initTopBar, releaseKeysWhileTyping } from './ui/topBar.js';
+import { initStyleSwitcher, initSound } from './ui/styleSwitcher.js';
 
-export function startGame(cv) {
+export function startGame(cv, style) {
   const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',
@@ -13,10 +15,12 @@ export function startGame(cv) {
     height: GAME.height,
     backgroundColor: GAME.backgroundColor,
     pixelArt: true,
+    roundPixels: true,
     physics: { default: 'arcade', arcade: { gravity: { y: GAME.gravityY }, debug: false } },
-    // EXPAND: vult het hele venster; het basisvlak is altijd zichtbaar, bredere schermen zien meer wereld.
-    scale: { mode: Phaser.Scale.EXPAND, autoCenter: Phaser.Scale.CENTER_BOTH },
-    scene: [BootScene, LevelScene]
+    audio: { noAudio: true }, // geluid loopt via src/audio (Web Audio-synthese), niet via Phaser
+    // Render op venstergrootte; het level zoomt de wereld naar schermhoogte.
+    scale: { mode: Phaser.Scale.RESIZE, width: window.innerWidth, height: window.innerHeight },
+    scene: [BootScene, CharacterSelectScene, LevelScene]
   });
 
   game.registry.set('cvs', [cv]);
@@ -25,6 +29,8 @@ export function startGame(cv) {
   // Alleen in dev: handvat voor tests en debuggen in de console.
   if (import.meta.env.DEV) window.__game = game;
 
+  initStyleSwitcher(game, style);
+  initSound(game);
   initTopBar(game);
   releaseKeysWhileTyping(game);
   initContactForm();

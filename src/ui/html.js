@@ -14,8 +14,8 @@ const MAX_SKILL_LEVEL = SKILL_LEVEL_LABELS.length;
 export const skillMeters = (skills = []) =>
   `<ul class="meters">${skills
     .map((skill) => {
-      const level = skill.niveau ?? 0;
+      const level = skill.score ?? (typeof skill.niveau === 'number' ? skill.niveau : 0);
       const blocks = Array.from({ length: MAX_SKILL_LEVEL }, (_, i) => `<i class="${i < level ? 'on' : ''}"></i>`).join('');
-      return `<li><span>${esc(skill.naam)}</span><b title="${SKILL_LEVEL_LABELS[level - 1] ?? ''}">${blocks}</b></li>`;
+      return `<li><span>${esc(skill.naam)}</span><b title="${esc(typeof skill.niveau === 'string' ? skill.niveau : SKILL_LEVEL_LABELS[level - 1] ?? '')}">${blocks}</b></li>`;
     })
     .join('')}</ul>`;

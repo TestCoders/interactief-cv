@@ -5,7 +5,10 @@ import { MOVEMENT, SCROLL_WALK } from '../config/levelConfig.js';
 // Scrollen vult een "tank" met loopafstand; de held loopt die leeg met de afstand die hij echt aflegt.
 export default class ScrollWalkInput {
   constructor(scene) {
+    this.scene = scene;
     this.budget = 0; // resterende afstand (px); teken = richting
+    this.lastAt = -1e9; // tijdstip van de laatste scroll (voor de halteplaats)
+    this.forwardPulse = false; // er is net vooruit gescrold (o.a. om Martijn verder te laten praten)
 
     // Muiswiel / trackpad: scroll omlaag (of naar rechts) = vooruit lopen.
     scene.input.on('wheel', (_pointer, _objects, dx, dy) => {
@@ -26,6 +29,9 @@ export default class ScrollWalkInput {
   }
 
   add(px) {
+    if (this.scene.traveling || this.scene.cutscene) return;
+    this.lastAt = this.scene.game.loop.time;
+    if (px > 0) this.forwardPulse = true;
     this.budget = Phaser.Math.Clamp(this.budget + px, -SCROLL_WALK.maxBudget, SCROLL_WALK.maxBudget);
   }
 

@@ -194,7 +194,7 @@
 .style-card span { font: .85rem var(--mono); color: var(--muted); }
 .style-preview { width: 100%; height: 7.75rem; overflow: hidden; border-radius: 3px; position: relative; }
 .style-preview.retro { background: #5fb7f0; }
-.style-preview.business { background: #e4e9f7; }
+.style-preview.zakelijk { background: #e4e9f7; }
 .style-preview.colorful { background: radial-gradient(circle at 33% 48%, #fcb768 0 22%, transparent 23%), radial-gradient(circle at 60% 70%, #ff8eba 0 28%, #6752b4 29%); }
 .style-preview.futuristic { background: repeating-linear-gradient(150deg, #201433 0 1.5rem, #6b3e8f 1.5rem 1.6rem, #251736 1.6rem 2rem); }
 .style-preview iframe {

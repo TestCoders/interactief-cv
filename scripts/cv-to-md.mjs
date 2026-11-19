@@ -42,10 +42,11 @@ export function cvToMarkdown(cv, siteUrl = '') {
 
   for (const w of cv.werkervaring ?? []) {
     lines.push(`### ${w.rol} — ${w.opdrachtgever} (${w.periode})`, '', w.omschrijving, '');
+    if (w.werkzaamheden?.length) lines.push(list(w.werkzaamheden), '');
     if (w.tools?.length) lines.push(`Tools: ${w.tools.join(', ')}`, '');
   }
 
-  lines.push('## Skills', '', '| Skill | Niveau (1–5) |', '|-------|--------------|');
+  lines.push('## Skills', '', '| Skill | Niveau |', '|-------|--------------|');
   for (const s of skills) lines.push(`| ${s.naam} | ${s.niveau ?? '–'} |`);
   lines.push('');
 
@@ -53,6 +54,12 @@ export function cvToMarkdown(cv, siteUrl = '') {
   if (cv.opleiding?.length) {
     lines.push('## Opleiding', '', list(cv.opleiding.map((o) => `${o.titel}, ${o.instituut} (${o.periode})`)), '');
   }
+  if (cv.expertise?.length) lines.push('## Expertise', '', list(cv.expertise.map((e) => typeof e === 'string' ? e : `${e.naam}${e.niveau ? ` — ${e.niveau}` : ''}${e.sinds ? `, sinds ${e.sinds}` : ''}`)), '');
+  if (cv.interesses?.length) lines.push('## Interesses', '', list(cv.interesses), '');
+  if (cv.werkplezier?.length) lines.push('## Werkplezier', '', list(cv.werkplezier), '');
+  if (cv.kernwoorden?.length) lines.push('## Kernwoorden', '', list(cv.kernwoorden), '');
+  if (cv.conferenties?.length) lines.push('## Conferenties', '', list(cv.conferenties), '');
+  if (cv.talen?.length) lines.push('## Talen', '', list(cv.talen.map((t) => `${t.taal}: ${t.niveau}`)), '');
   if (cv.hobbys?.length) lines.push('## Naast het werk', '', list(cv.hobbys), '');
 
   const c = cv.contact ?? {};

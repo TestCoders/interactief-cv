@@ -1,6 +1,6 @@
 import { TESTCODERS } from '../config/company.js';
-import { STATION_TYPES, interestsOf } from '../cv/stations.js';
-import { chips, esc, list, skillMeters } from './html.js';
+import { chips, esc, skillMeters } from './html.js';
+import { BRAND } from '../config/brand.js';
 
 // HTML voor het tekstpaneel per station, en de klassieke (niet-game) weergave van een CV.
 
@@ -8,9 +8,9 @@ const firstName = (cv) => cv.naam.split(' ')[0];
 
 // Contactformulier aan het eind: gaat naar TestCoders (zie ./contactForm.js).
 function finishHtml(cv) {
+  if (cv.uploaded) return `<h2>🏁 Gehaald!</h2><p>Je hebt het CV van ${esc(cv.naam)} doorlopen.</p>`;
   const name = esc(firstName(cv));
-  if (cv.uploaded) return `<h2>🏁 Gehaald!</h2><p>Je hebt het CV van ${name} doorlopen.</p>`;
-  return `<h2>🏁 Gehaald!</h2>
+  return `<img class="panel-merk" src="${BRAND.logo}" alt="${BRAND.naam}"><h2>🏁 Gehaald!</h2>
     <p>Je hebt het hele CV van ${name} doorlopen. Interesse in ${name} voor jouw team?</p>
     <form id="contact-form" class="contact-form" data-cv="${esc(cv.naam)}">
       <label>Naam <input name="naam" required autocomplete="name"></label>
@@ -27,50 +27,88 @@ function contactHtml() {
   return `<ul><li><a href="mailto:${t.email}">${t.email}</a></li><li>${esc(t.telefoon)}</li><li><a href="${t.website}" target="_blank" rel="noopener">testcoders.nl</a></li></ul>`;
 }
 
+const kort = (t = '', n = 280) => (t.length > n ? t.slice(0, t.lastIndexOf(' ', n)) + '…' : t);
+
+// Alleen onderdelen met extra tekst gebruiken de tekstbox; de rest staat in de wereld zelf.
 export function stationHtml(station, cv) {
   const d = station.data;
-  const T = STATION_TYPES;
   switch (station.type) {
-    case T.profile:
-      return `<h2>${esc(cv.naam)}</h2><p class="meta">${esc(cv.rol)}</p><p>${esc(cv.profiel)}</p>`;
-    case T.education:
-      return `<h2>🎓 ${esc(d.titel)}</h2><p class="meta">${[d.instituut, d.periode].filter(Boolean).map(esc).join(' · ')}</p>`;
-    case T.work:
+    case 'profile':
+      return `<h2>${esc(cv.naam)}</h2><p class="meta">${esc(cv.rol)} · in het testvak sinds ${esc(cv.sinds)}</p><p>${esc(kort(cv.profiel, 360))}</p>`;
+    case 'education':
+      return `<h2>🎓 Opleidingen</h2>
+        ${d.diplomas.length ? `<ul>${d.diplomas.map((o) => `<li>${[o.titel, o.instituut, o.periode].filter(Boolean).map(esc).join(' · ')}</li>`).join('')}</ul>` : ''}
+        ${d.certificaten.length ? `<h3>🏅 Cursussen & certificaten</h3>${chips(d.certificaten)}` : ''}`;
+    case 'work':
       return `<h2>${esc(d.rol)}</h2><p class="meta">${esc(d.opdrachtgever)} · ${esc(d.periode)}</p>
-        <p>${esc(d.omschrijving)}</p>${chips(d.tools)}`;
-    case T.certifications:
-      return `<h2>🏅 Certificeringen</h2>${list(d)}`;
-    case T.expertise:
-      return `<h2>🧠 Expertise</h2>${list(d)}`;
-    case T.skills:
-      return `<h2>🛠️ Vaardigheden</h2>${skillMeters(d)}`;
-    case T.interests:
-      return `<h2>🎈 Interesses</h2>${chips(d)}`;
-    case T.workEnjoyment:
-      return `<h2>🎉 Werkplezier bij TestCoders</h2>${list(d)}`;
-    case T.finish:
+        <p>${esc(kort(d.omschrijving))}</p>
+        ${d.werkzaamheden?.length ? `<ul>${d.werkzaamheden.slice(0, 4).map((w) => `<li>${esc(w)}</li>`).join('')}</ul>` : ''}
+        ${chips((d.tools ?? []).slice(0, 8))}`;
+    case 'finish':
       return finishHtml(cv);
     default:
       return '';
   }
 }
 
+const MAAND_KORT = { januari: 'jan', februari: 'feb', maart: 'mrt', april: 'apr', mei: 'mei', juni: 'jun', juli: 'jul', augustus: 'aug', september: 'sep', oktober: 'okt', november: 'nov', december: 'dec' };
+const kortePeriode = (p = '') => p.replace(/[A-Za-z]+/g, (m) => MAAND_KORT[m.toLowerCase()] ?? m.toLowerCase());
+const TAAL_KORT = { nederlands: 'NL', engels: 'EN', duits: 'DE', frans: 'FR', spaans: 'ES' };
+
+/** Klassiek cv in de TestCoders-huisstijl (opbouw zoals het officiële TC-cv), printbaar. */
 export function classicHtml(cv) {
-  const jobs = (cv.werkervaring ?? [])
-    .map((job) => `<h3>${esc(job.rol)} — ${esc(job.opdrachtgever)}</h3><p class="meta">${esc(job.periode)}</p>
-      <p>${esc(job.omschrijving)}</p>${chips(job.tools)}`)
-    .join('');
-  const education = (cv.opleiding ?? []).map((o) => `<li>${[o.titel, o.instituut, o.periode].filter(Boolean).map(esc).join(' · ')}</li>`).join('');
-  const interests = interestsOf(cv);
+  const [voor, ...rest] = cv.naam.split(' ');
+  const lijst = (items) => `<ul>${items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>`;
+  const tags = (items) => items.map((t) => `<span class="tc-tag">${esc(t)}</span>`).join('');
+  const talen = (cv.talen ?? []).map((t) => `${TAAL_KORT[t.taal.toLowerCase()] ?? t.taal} ${t.niveau.toLowerCase()}`).join(', ');
+  const werk = [...(cv.werkervaring ?? [])].sort((a, b) => (b.start ?? 0) - (a.start ?? 0));
+  const opdrachten = werk.map((w) => `<tr><td class="tc-periode">${esc(kortePeriode(w.periode))}</td><td>${esc(w.opdrachtgever)}</td><td>${esc(w.rol)}</td><td>${tags((w.tools ?? []).slice(0, 3))}</td></tr>`).join('');
+  const perCat = new Map();
+  for (const s of cv.skills ?? []) perCat.set(s.categorie, [...(perCat.get(s.categorie) ?? []), s]);
+  const skills = [...perCat].map(([cat, items]) => `<div class="tc-skillgroep"><h4>${esc(cat)}</h4>${skillMeters(items)}</div>`).join('');
+  const expertise = (cv.expertise ?? []).map((e) => `<li><span>${esc(e.naam)}</span><em>${esc([e.niveau, e.sinds && `sinds ${e.sinds}`].filter(Boolean).join(', '))}</em></li>`).join('');
+  const details = werk.map((w) => `<div class="tc-opdracht"><h3>${esc(w.rol)} <span>· ${esc(w.opdrachtgever)}</span></h3><p class="tc-meta">${esc(w.periode)}</p>
+      <p>${esc(w.omschrijving)}</p>${w.werkzaamheden?.length ? lijst(w.werkzaamheden) : ''}<p>${tags(w.tools ?? [])}</p></div>`).join('');
   return `
-    <h1>${esc(cv.naam)}</h1><p class="meta">${esc(cv.rol)}</p>
-    <h2>Profiel</h2><p>${esc(cv.profiel)}</p>
-    <h2>Werkervaring</h2>${jobs}
-    <h2>Vaardigheden</h2>${skillMeters(cv.skills)}
-    ${cv.certificeringen?.length ? `<h2>Certificeringen</h2>${list(cv.certificeringen)}` : ''}
-    ${education ? `<h2>Opleiding</h2><ul>${education}</ul>` : ''}
-    ${cv.expertise?.length ? `<h2>Expertise</h2>${list(cv.expertise)}` : ''}
-    ${interests?.length ? `<h2>Interesses</h2>${chips(interests)}` : ''}
-    ${cv.werkplezier?.length ? `<h2>Werkplezier</h2>${list(cv.werkplezier)}` : ''}
-    ${cv.uploaded ? '' : `<h2>Contact via TestCoders</h2>${contactHtml()}`}`;
+  <div class="tc-cv">
+    <header class="tc-kop">
+      <div class="tc-kop-links">
+        <img class="tc-logo" src="${BRAND.logo}" alt="${BRAND.naam}">
+        <p class="tc-rol">${esc(cv.rol)}</p>
+        <h1>${esc(voor)} <span>${esc(rest.join(' '))}</span></h1>
+        <p class="tc-top">${esc((cv.topSkills ?? []).join(' · '))}</p>
+      </div>
+      <div class="tc-kop-rechts">
+        <p class="tc-label">Curriculum vitae<br>TestCoders</p>
+        <dl>
+          <div><dt>In het testvak sinds</dt><dd>${esc(cv.sinds)}</dd></div>
+          ${talen ? `<div><dt>Talen</dt><dd>${esc(talen)}</dd></div>` : ''}
+        </dl>
+      </div>
+    </header>
+
+    <section class="tc-over">
+      <div><h2>Over <span>${esc(voor)}</span></h2><p>${esc(cv.profiel)}</p></div>
+      ${cv.kernwoorden?.length ? `<aside><p class="tc-label">Kernwoorden</p>${lijst(cv.kernwoorden)}</aside>` : ''}
+    </section>
+
+    ${opdrachten ? `<section><h2>Recente <span>opdrachten</span></h2>
+      <table class="tc-tabel"><thead><tr><th>Periode</th><th>Opdrachtgever</th><th>Rol</th><th>Belangrijkste technieken</th></tr></thead><tbody>${opdrachten}</tbody></table></section>` : ''}
+
+    ${expertise ? `<section><h2>Expertise</h2><ul class="tc-expertise">${expertise}</ul></section>` : ''}
+    ${skills ? `<section><h2>Vaardig<span>heden</span></h2><div class="tc-skills">${skills}</div></section>` : ''}
+
+    ${(cv.opleiding?.length || cv.certificeringen?.length) ? `<section class="tc-twee"><div><h2>Oplei<span>dingen</span></h2>${lijst((cv.opleiding ?? []).map((o) => [o.titel, o.instituut, o.periode].filter(Boolean).join(' · ')))}</div>
+      ${cv.certificeringen?.length ? `<div><h2>Cursussen &amp; <span>certificaten</span></h2>${lijst(cv.certificeringen)}</div>` : ''}</section>` : ''}
+
+    ${details ? `<section><h2>Ervaring <span>in detail</span></h2>${details}</section>` : ''}
+
+    <section class="tc-twee">
+      ${cv.interesses?.length ? `<div><h2>Interes<span>ses</span></h2>${lijst(cv.interesses)}${cv.conferenties?.length ? `<p class="tc-label">Bezochte conferenties</p>${lijst(cv.conferenties)}` : ''}</div>` : ''}
+      ${cv.uploaded ? '' : `<div><h2>Werkplezier bij <span>TestCoders</span></h2>${lijst(TESTCODERS.werkplezier)}
+        <h2>Contact</h2><p>Interesse in ${esc(voor)}? Neem contact op met TestCoders.</p>${contactHtml()}</div>`}
+    </section>
+
+    <footer class="tc-voet"><span>${esc(cv.naam.toUpperCase())} · CURRICULUM VITAE</span><span>TESTCODERS.NL</span></footer>
+  </div>`;
 }

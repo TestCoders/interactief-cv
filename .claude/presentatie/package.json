@@ -1,0 +1,16 @@
+{
+  "name": "interactief-cv-presentatie",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prepare:demo": "node scripts/prepare-demo.mjs",
+    "dev": "npm run prepare:demo && CHOKIDAR_USEPOLLING=1 CHOKIDAR_INTERVAL=1000 slidev slides.md --port 3030 --bind 127.0.0.1",
+    "build": "npm run prepare:demo && slidev build slides.md",
+    "preview": "vite preview --host 127.0.0.1 --port 3030",
+    "test": "node --test scripts/prepare-demo.test.mjs scripts/fullscreen.test.mjs",
+    "test:live": "node --test scripts/live.test.mjs"
+  },
+  "devDependencies": {
+    "@slidev/cli": "52.20.1"
+  }
+}

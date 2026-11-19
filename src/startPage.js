@@ -1,5 +1,6 @@
 import { avatarOptions } from './graphics/avatarOptions.js';
-import { drawAvatarPreview } from './graphics/heroSprites.js?avatar-flow';
+import { drawAvatarPreview } from './graphics/heroSprites.js';
+import { normalizeCv } from './cv/normalizeCv.js';
 import { loadCvs } from './cv/cvLoader.js';
 import { MAX_MARKDOWN_BYTES, parseMarkdownCv } from './cv/markdownCv.js';
 import retroPreview from '../design/retro-pixel-art/level.html?raw';
@@ -12,7 +13,7 @@ const exampleAvatars = {
   'robin-testdata': { person: 'man', hair: 'short', color: 'red', face: 'beard' },
   'sam-voorbeeld': { person: 'man', hair: 'short', color: 'blond', face: 'freckles' }
 };
-const cvs = loadCvs().map((cv) => ({ ...cv, avatar: exampleAvatars[cv.id] }));
+const cvs = loadCvs().map((cv) => ({ ...cv, avatar: exampleAvatars[cv.id] ?? exampleAvatars[cv.id === 'robin-sterrenstof' ? 'robin-testdata' : ''] }));
 const get = (id) => document.getElementById(id);
 const landing = get('landing');
 const source = get('cv-source');
@@ -25,7 +26,7 @@ const dialog = get('share-dialog');
 const api = new URL('./api/cv-shares/', document.baseURI);
 const styles = [
   { id: 'retro', name: 'Retro pixel-art', description: 'Pixelkunst en een groene spelwereld.', playable: true, preview: retroPreview },
-  { id: 'business', name: 'Business isometric', description: 'Een isometrische zakenwijk met neonborden.', preview: businessPreview },
+  { id: 'zakelijk', name: 'Business isometric', description: 'Een isometrische zakenwijk met neonborden.', preview: businessPreview, playable: true },
   { id: 'colorful', name: 'Kleurrijk en speels', description: 'Ronde vormen en levendige kleuren.' },
   { id: 'futuristic', name: 'Donker en futuristisch', description: 'Een donkere wereld met neonaccenten.' }
 ];
@@ -50,12 +51,12 @@ function showError(message) {
 
 async function play(cv, style, expiresAt) {
   if (!styles.some((entry) => entry.id === style && entry.playable)) return;
-  const { startGame } = await import('./main.js?avatar-flow');
+  const { startGame } = await import('./main.js');
   if (expiresAt && Date.now() >= expiresAt) throw new Error('Deze CV-link is verlopen.');
   get('game-view').hidden = false;
   landing.hidden = true;
   get('btn-switch').focus();
-  startGame(cv);
+  startGame(cv.uploaded ? normalizeCv(cv) : cv, style);
   if (expiresAt) setTimeout(() => location.reload(), expiresAt - Date.now());
 }
 
