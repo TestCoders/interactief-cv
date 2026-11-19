@@ -9,18 +9,18 @@ kopjes. Laat een kopje staan, ook als er niets onder valt, en zet er dan
 ---
 naam: <volledige naam>
 functie: <functie uit personalia>
-woonplaats: <woonplaats>
-geboortedatum: <JJJJ-MM-DD>
 bron: <bestandsnaam van de docx>
+uiterlijk:
+  kapsel: <kort|opzij|lang|staart|krullen|kaal|pet>
+  haarkleur: "<#rrggbb>"
+  huid: "<#rrggbb>"
+  bril: <true|false>
+  baard: <geen|stoppels|snor|sik|vol>
 ---
 
 # <volledige naam>
 
-## Profiel
-
-<alle profielalinea's, letterlijk, elk als eigen alinea>
-
-**Kernwoorden:** <kernwoorden, letterlijk>
+![Pixel-art poppetje van <volledige naam>](<<bestandsnaam van de md zonder .md>.png>)
 
 ## Expertise
 
@@ -89,12 +89,29 @@ bron: <bestandsnaam van de docx>
 <informatie uit het bron-cv die onder geen enkel kopje past>
 ````
 
+## Wat vast is en wat mag afwijken
+
+- **Vast**: de frontmatter-velden, de `##`-kopjes en hun volgorde, de vaste `###`-kopjes
+  (`Talen`, `Bezochte conferenties`, `Diploma's`, `Cursussen en certificeringen`) en de
+  labels in Ervaring (`**Periode:**`, `**Werkzaamheden:**`, `**Proces:**`,
+  `**Programmeertalen:**`, `**Testvormen:**`, `**Tools:**`).
+- **Mag per cv verschillen**: de categorienamen onder `## Vaardigheden` (bv.
+  `Methoden/Technieken` of `Methodieken/Technieken`, `Tools` of `Tools & Frameworks`).
+  Neem de naam uit de bron over en hernoem niet naar een standaardlijst. De demo loopt
+  door alle `###`-blokken onder Vaardigheden heen en zoekt niet op een vaste naam.
+
 ## Details per kopje
 
-- **Frontmatter**: alleen de vier personalia-velden plus `bron`. Ontbreekt een
-  veld in de bron, laat de waarde dan leeg (`woonplaats:`) in plaats van te gokken.
-  Zet de geboortedatum om naar `JJJJ-MM-DD` (25 mei 1988 → 1988-05-25); dat is
-  de enige toegestane omzetting van een waarde.
+- **Frontmatter**: alleen `naam`, `functie` en `bron`. Ontbreekt de functie in de
+  bron, laat de waarde dan leeg (`functie:`) in plaats van te gokken. Geboortedatum,
+  woonplaats en andere persoonsgegevens neem je **niet** op (zie "Persoonsgegevens"
+  in `SKILL.md`).
+- **uiterlijk**: het uiterlijk van het pixel-art poppetje (zie "Pixel-art poppetje" in
+  `SKILL.md`). Zet de hexkleuren tussen aanhalingstekens, anders leest YAML ze als
+  commentaar. Geen foto gevonden? Laat het hele `uiterlijk`-blok weg; de afbeelding
+  blijft staan en toont dan het standaardpoppetje.
+- **Afbeelding**: de PNG staat naast de Markdown met dezelfde bestandsnaam. Zet het pad
+  tussen `<` en `>`, zodat spaties in de bestandsnaam werken.
 - **Ervaring**: één `###`-blok per opdracht, in dezelfde volgorde als in de
   bron (meestal nieuwste eerst). Labels zonder inhoud in de bron laat je weg
   binnen het blok (bijvoorbeeld geen `**Testvormen:**` als die er niet is).
@@ -102,8 +119,8 @@ bron: <bestandsnaam van de docx>
   regel ertussen; anders plakt Markdown ze aan elkaar tot één regel.
 - **Expertise**: naam, dan ` — `, dan niveau en jaar. Ontbreekt het jaar, schrijf
   dan alleen het niveau (`- Performancetesten — Expert`).
-- **Kernwoorden**: staan die niet in de bron, laat de regel `**Kernwoorden:**`
-  dan helemaal weg. Dat is een veld, geen kopje; een leeg veld geeft alleen ruis.
+- **Geen profiel**: er is geen `## Profiel`-kopje. Het profiel en de kernwoorden uit
+  de bron laat je weg (zie `SKILL.md`).
 - **Ontbrekende tabelwaarden**: laat de cel leeg (geen `-` of `?`). Geeft de bron
   één niveau per taal, zet dat onder Spreken en laat Schrijven leeg.
 - **Tabellen**: één rij per competentie. Staan er in de bron twee
