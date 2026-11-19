@@ -1,12 +1,7 @@
-// Skillbord: per skill een "laadbalk" van plantvakjes die vollopen met bloemetjes
-// zodra de speler aankomt. Aantal bloemen = niveau (1–5) uit het CV, omgerekend naar SLOTS.
-const SLOTS = 10;
-const ROW_H = 30;
-const SLOT_W = 22;
-const NAME_W = 140;
-const PAD = 20;
-const HEADER_H = 46;
+import { SKILLS } from '../config/pieceConfig.js';
 
+// Skillbord: per skill een "laadbalk" van plantvakjes die vollopen met bloemetjes
+// zodra de speler aankomt. Aantal bloemen = niveau (1–5) uit het CV, omgerekend naar SKILLS.slots.
 export default class SkillsPiece {
   constructor(scene, x, groundY, station, theme) {
     this.scene = scene;
@@ -14,32 +9,33 @@ export default class SkillsPiece {
     this.done = false;
     const skills = station.data;
     const { colors, font } = theme;
+    const { slots, rowHeight, slotWidth, nameWidth, padding, headerHeight, postHeight } = SKILLS;
 
-    const w = PAD * 2 + NAME_W + SLOTS * SLOT_W;
-    const h = HEADER_H + skills.length * ROW_H + 14;
+    const w = padding * 2 + nameWidth + slots * slotWidth;
+    const h = headerHeight + skills.length * rowHeight + 14;
     const left = Math.round(x - w / 2);
-    const top = Math.round(groundY - 56 - h);
-    this.range = w / 2 + 60; // begint te groeien zodra je het bord binnenloopt
+    const top = Math.round(groundY - postHeight - h);
+    this.range = w / 2 + SKILLS.rangeMargin;
 
     // Bord met palen, pixel-stijl: harde randen, geen afgeronde hoeken.
     const g = scene.add.graphics();
-    g.fillStyle(colors.post).fillRect(left + 28, top + h, 12, 56).fillRect(left + w - 40, top + h, 12, 56);
+    g.fillStyle(colors.post).fillRect(left + 28, top + h, 12, postHeight).fillRect(left + w - 40, top + h, 12, postHeight);
     g.fillStyle(colors.boardShadow).fillRect(left - 2, top + 4, w + 8, h + 4);
     g.fillStyle(colors.boardEdge).fillRect(left - 4, top - 4, w + 8, h + 8);
     g.fillStyle(colors.board).fillRect(left, top, w, h);
 
     scene.add.text(x, top + 14, 'VAARDIGHEDEN', { fontFamily: font, fontSize: '16px', fontStyle: 'bold', color: colors.title }).setOrigin(0.5, 0);
 
-    this.rows = skills.map((s, i) => {
-      const cy = top + HEADER_H + i * ROW_H + ROW_H / 2;
-      scene.add.text(left + PAD, cy, s.naam, { fontFamily: font, fontSize: '13px', fontStyle: 'bold', color: colors.text }).setOrigin(0, 0.5);
+    this.rows = skills.map((skill, i) => {
+      const cy = top + headerHeight + i * rowHeight + rowHeight / 2;
+      scene.add.text(left + padding, cy, skill.naam, { fontFamily: font, fontSize: '13px', fontStyle: 'bold', color: colors.text }).setOrigin(0, 0.5);
       const flowers = [];
-      for (let j = 0; j < SLOTS; j++) {
-        const sx = left + PAD + NAME_W + j * SLOT_W + SLOT_W / 2;
+      for (let j = 0; j < slots; j++) {
+        const sx = left + padding + nameWidth + j * slotWidth + slotWidth / 2;
         scene.add.image(sx, cy + 9, 'soil');
         flowers.push(scene.add.image(sx, cy + 8, 'flower').setOrigin(0.5, 1).setScale(0));
       }
-      const count = Math.round(((s.niveau ?? 0) / 5) * SLOTS);
+      const count = Math.round(((skill.niveau ?? 0) / SKILLS.maxLevel) * slots);
       return { flowers, count };
     });
 

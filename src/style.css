@@ -6,7 +6,7 @@
   --paper: #ffffff;
   --muted: #5b6475;
   --bg: #eef3f1;
-  /* Tekstbox/knoppen — hoort bij het retro-thema (src/themes/retro.js) */
+  /* Tekstbox/knoppen — hoort bij het retro-thema (src/themes/retroTheme.js) */
   --pixel-font: "Courier New", ui-monospace, monospace;
   --box: #2b2147;
   --box-hover: #3a2d5e;
