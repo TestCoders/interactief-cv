@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gamestijlen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@600;700&amp;family=Press+Start+2P&amp;display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #16202a; --muted: #55606b; --paper: #f6f7f5; --line: #dfe3e0; --accent: #2f6f5d; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: Inter, system-ui, sans-serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 56px 16px 80px; display: flex; flex-direction: column; gap: 32px; }
+  .kicker { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  h1 { margin: 10px 0 8px; font-family: 'Space Grotesk', sans-serif; font-size: clamp(30px, 5vw, 44px); letter-spacing: -.02em; }
+  p { margin: 0; font-size: 18px; line-height: 1.5; color: var(--muted); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+  .card { display: flex; flex-direction: column; gap: 10px; padding: 24px; background: #ffffff; border: 1px solid var(--line); border-radius: 14px; color: inherit; text-decoration: none; }
+  a.card:hover { border-color: var(--accent); }
+  a.card:focus-visible { outline: 3px solid #9cc7b8; outline-offset: 2px; }
+  .card h2 { margin: 0; font-size: 22px; }
+  .card .num { font-size: 13px; color: var(--muted); }
+  .retro h2 { font-family: 'Press Start 2P', monospace; font-weight: 400; font-size: 15px; line-height: 1.6; }
+  .zakelijk h2 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
+  .later { background: transparent; border-style: dashed; }
+  .later h2 { font-family: 'Space Grotesk', sans-serif; font-weight: 600; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="kicker">Interactief cv · ontwerp</p>
+    <h1>Gamestijlen</h1>
+    <p>Elke stijl heeft dezelfde gameplay; alleen de look verschilt. Kies een stijl om de game-screens en de stijlgids te bekijken.</p>
+  </header>
+  <div class="grid">
+    <a class="card retro" href="retro-pixel-art/">
+      <span class="num">Stijl 1</span>
+      <h2>Retro pixel-art</h2>
+      <p>8/16-bit gamelook, speels en herkenbaar.</p>
+    </a>
+    <a class="card zakelijk" href="strak-zakelijk/">
+      <span class="num">Stijl 2</span>
+      <h2>Business isometric</h2>
+      <p>Strak en zakelijk: isometrische zakenwijk met neonborden.</p>
+    </a>
+    <div class="card later">
+      <span class="num">Stijl 3 · nog te ontwerpen</span>
+      <h2>Kleurrijk en speels</h2>
+      <p>Vrolijke kleuren, ronde vormen, illustratief.</p>
+    </div>
+    <div class="card later">
+      <span class="num">Stijl 4 · nog te ontwerpen</span>
+      <h2>Donker en futuristisch</h2>
+      <p>Neon-accenten op een donkere achtergrond.</p>
+    </div>
+  </div>
+</main>
+</body>
+</html>
